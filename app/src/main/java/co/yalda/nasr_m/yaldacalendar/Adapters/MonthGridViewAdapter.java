@@ -1,13 +1,15 @@
 package co.yalda.nasr_m.yaldacalendar.Adapters;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+
+import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
 
 /**
  * Created by Nasr_M on 2/21/2015.
@@ -40,12 +42,13 @@ public class MonthGridViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater infalInflater = (LayoutInflater) this.context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null)
-            convertView = infalInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-        TextView tv = (TextView) convertView.findViewById(android.R.id.text1);
-        tv.setText(gridList.get(position));
-        return convertView;
+//        LayoutInflater infalInflater = (LayoutInflater) this.context
+//                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        if (convertView == null)
+//            convertView = infalInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+//        TextView tv = (TextView) convertView.findViewById(android.R.id.text1);
+//        tv.setText(gridList.get(position));
+//        return convertView;
+        return DayUC.newInstance(Calendar.getInstance(), true, MainActivity.viewMode.Month).getView();
     }
 }
