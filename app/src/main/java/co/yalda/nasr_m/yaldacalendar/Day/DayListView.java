@@ -1,6 +1,5 @@
 package co.yalda.nasr_m.yaldacalendar.Day;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,7 +29,6 @@ public class DayListView extends Fragment {
     private DayUC dayUC;                    //day user control object
     private View rootView;
     private RelativeLayout rootLayout;      //root layout of UC. UC will be linked to this layout
-    private Context context;                        //context
 
     //List View Day Mode attributes
     private TextView dayDateTV;             //date text view
@@ -52,9 +50,8 @@ public class DayListView extends Fragment {
     So, for making Fragment Class with custom input value new method should be written to create
     class objects and set private attributes according to input values
      */
-    public static DayListView newInstance(Context context, Calendar dayCal){
+    public static DayListView newInstance(Calendar dayCal){
         DayListView dayListView = new DayListView();
-        dayListView.context = context;
 //        dayListView.dayUC = DayUC.newInstance(dayCal, true, MainActivity.viewMode.DayHeader);
 //        dayListView.dayUC = new DayUC(dayCal);
         return dayListView;
@@ -64,19 +61,13 @@ public class DayListView extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.day_list_mode_view, container, false);
 
-
+        initialDay();
 
         return rootView;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        initialDay();
-    }
-
     //initial attributes
-    private void initialDay(/*LayoutInflater inflater, @Nullable ViewGroup container*/){
+    private void initialDay(){
 
 //        dayUC = (DayUC) getFragmentManager().findFragmentByTag("DayList");
 //        if (dayUC == null){

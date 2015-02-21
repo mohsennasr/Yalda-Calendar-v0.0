@@ -1,35 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/day_uc_root"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/day_uc_second_date"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="@color/link_text_material_light"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" />
 
-        <TextView
-            android:id="@+id/day_uc_second_date"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:textColor="@color/link_text_material_light"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true" />
-
-        <TextView
-            android:id="@+id/day_uc_third_date"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:textColor="@color/background_floating_material_dark"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true" />
-
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/day_uc_third_date"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="@color/background_floating_material_dark"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" />
 
     <TextView
         android:id="@+id/day_uc_main_date"
@@ -38,4 +31,4 @@
         android:textSize="22sp"
         android:gravity="center"/>
 
-</LinearLayout>
+</RelativeLayout>

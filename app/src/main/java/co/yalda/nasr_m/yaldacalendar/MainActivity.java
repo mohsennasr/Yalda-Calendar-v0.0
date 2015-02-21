@@ -194,7 +194,7 @@ public class MainActivity extends ActionBarActivity
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    return DayListView.newInstance(getApplicationContext(), Calendar.getInstance());
+                    return DayListView.newInstance(Calendar.getInstance());
                 case 1:
                     return MonthView.newInstance(Calendar.getInstance());
                 case 2:
