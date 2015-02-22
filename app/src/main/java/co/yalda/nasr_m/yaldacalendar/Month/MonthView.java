@@ -3,6 +3,7 @@ package co.yalda.nasr_m.yaldacalendar.Month;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
+import co.yalda.nasr_m.yaldacalendar.Utilities.AESEncryption;
 import co.yalda.nasr_m.yaldacalendar.Utilities.Crypto;
 import co.yalda.nasr_m.yaldacalendar.Utilities.GetDeviceID;
 
@@ -88,26 +90,33 @@ public class MonthView extends Fragment{
 
         ArrayList<String> arrlist = new ArrayList<>();
 
-        String skey = "co.yalda.YaldaBahamCalendar";
+        String skey = "co.yalda.YaldaBahamCalendarco.yalda.YaldaBahamCalendarco.yalda.YaldaBahamCalendarco.yalda.YaldaBahamCalendar1234567891234567891234567890";
         arrlist.add("Encryption/Decryption Key is: " + skey);
 
-        String decrypted, plainText;
+        String decrypted, plainText, AESen, AESde;
         byte[] encrypted;
 
         Crypto crypto = new Crypto();
+        AESEncryption aesEncryption = new AESEncryption();
 
 
         for (int i=0; i<10; i++) {
 
             Random random = new Random();
-            plainText = random.toString() + String.valueOf(Calendar.getInstance().getTimeInMillis());
+            plainText = String.valueOf(random.nextLong()) + " IMEI = " + devId;
 
             try {
                 encrypted = crypto.encrypt(skey, plainText);
                 decrypted = crypto.decrypt(skey, encrypted);
 
-                arrlist.add("Encrypted Value: " + encrypted.toString());
-                arrlist.add("Decrypted Value: " + decrypted);
+                arrlist.add("Crypto Encrypted Value: " + Base64.encodeToString(encrypted, Base64.DEFAULT));
+                arrlist.add("Crypto Decrypted Value: " + decrypted);
+
+                AESen = aesEncryption.encrypt(plainText);
+                AESde = aesEncryption.decrypt(AESen);
+
+                arrlist.add("AES Encrypted Value: " + AESen);
+                arrlist.add("AES Decrypted Value: " + AESde);
             } catch (GeneralSecurityException e) {
                 e.printStackTrace();
                 arrlist.add("Exception: " + e.getMessage());
