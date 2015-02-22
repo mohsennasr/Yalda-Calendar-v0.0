@@ -3,33 +3,23 @@ package co.yalda.nasr_m.yaldacalendar.Month;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
+import java.util.Random;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
+import co.yalda.nasr_m.yaldacalendar.Utilities.Crypto;
 import co.yalda.nasr_m.yaldacalendar.Utilities.GetDeviceID;
 
 /**
@@ -96,42 +86,33 @@ public class MonthView extends Fragment{
 //        monthGridView.setAdapter(gridViewAdapter);
 //        gridViewAdapter.notifyDataSetChanged();
 
-//        String[] list = new String[]{"1", "2", "3"};
         ArrayList<String> arrlist = new ArrayList<>();
-//        arrlist.addAll(Arrays.asList(list));
 
-        String skey = "BAHAM";
+        String skey = "co.yalda.YaldaBahamCalendar";
         arrlist.add("Encryption/Decryption Key is: " + skey);
 
+        String decrypted, plainText;
+        byte[] encrypted;
 
-        DESKeySpec keySpec = null;
-        try {
-            keySpec = new DESKeySpec(skey.getBytes("UTF8"));
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            SecretKey key = keyFactory.generateSecret(keySpec);
-            Base64 encoder, decoder;
+        Crypto crypto = new Crypto();
 
-// ENCODE plainTextPassword String
-            byte[] cleartext = devId.getBytes("UTF8");
 
-            Cipher cipher = Cipher.getInstance("DES"); // cipher is not thread safe
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            String encryptedPwd = cipher.doFinal(cleartext).toString();
+        for (int i=0; i<10; i++) {
 
-// DECODE encryptedPwd String
-            byte[] encrypedPwdBytes = encryptedPwd.getBytes();
+            Random random = new Random();
+            plainText = random.toString() + String.valueOf(Calendar.getInstance().getTimeInMillis());
 
-            Cipher dcipher = Cipher.getInstance("DES");// cipher is not thread safe
-            dcipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] plainTextPwdBytes = (cipher.doFinal(encrypedPwdBytes));
+            try {
+                encrypted = crypto.encrypt(skey, plainText);
+                decrypted = crypto.decrypt(skey, encrypted);
 
-            arrlist.add("Encrypted Value is:" + encryptedPwd);
-            arrlist.add("Decrypted Value is:" + plainTextPwdBytes.toString());
-
-        } catch (InvalidKeyException | UnsupportedEncodingException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-            e.printStackTrace();
+                arrlist.add("Encrypted Value: " + encrypted.toString());
+                arrlist.add("Decrypted Value: " + decrypted);
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+                arrlist.add("Exception: " + e.getMessage());
+            }
         }
-
 
         gridViewAdapter = new MonthGridViewAdapter(getActivity(), arrlist);
         monthGridView.setAdapter(gridViewAdapter);
