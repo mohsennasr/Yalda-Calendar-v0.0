@@ -13,8 +13,8 @@ public class GlobalStativValues {
     public static final String FULLVIEW = "FULLVIEW";
     public static final String SIMPLE = "SIMPLE";
     public static final String LISTVIEW = "LISTVIEW";
-    public static final String[] PersianWeekDayNames = new String[]{"شنبه","یکشنبه","دوشنبه"
-            ,"سه شنبه","چهارشنبه","پنج شنبه","چمعه"};
-    public static final String[] PersianMonthNames = new String[]{"فروردین","اردیبهشت","خرداد"
-            ,"تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند" };
+    public static final String[] PersianWeekDayNames = new String[]{"شنبه", "یکشنبه", "دوشنبه"
+            , "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه"};
+    public static final String[] PersianMonthNames = new String[]{"فروردین", "اردیبهشت", "خرداد"
+            , "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
 }

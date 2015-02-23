@@ -1,7 +1,6 @@
 package co.yalda.nasr_m.yaldacalendar.Day;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,76 +14,46 @@ import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 /**
- * Created by Nasr_M on 2/17/2015.
+ * Created by Nasr_M on 2/23/2015.
  */
-public class DayUC extends Fragment {
+public class DayLinearLayout extends Fragment {
 
     private boolean isHoliday;                  //is it holiday
     private boolean isEnable = true;         //should be clickable
     private View rootView;                      // root view of fragment
-    public PersianCalendar persianCalendar;
-    public Calendar miladiCalendar = Calendar.getInstance();
+    private ViewGroup parent;
+    private PersianCalendar persianCalendar;
+    private Calendar miladiCalendar = Calendar.getInstance();
     private MainActivity.viewMode viewMode;
+    private Context context;
+    private TextView mainDate_TV, secondDate_TV, thirdDate_TV;
 
-    public TextView mainDate_TV, secondDate_TV, thirdDate_TV;
+    public static DayLinearLayout newInstance(Context context, Calendar miladiDate, boolean isEnable,
+                                              MainActivity.viewMode viewMode) {
+        DayLinearLayout dayLinearLayout = new DayLinearLayout();
+        dayLinearLayout.miladiCalendar.setTime(miladiDate.getTime());
+        dayLinearLayout.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);
+        dayLinearLayout.isEnable = isEnable;
+        dayLinearLayout.viewMode = viewMode;
+        dayLinearLayout.context = context;
 
-    public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.viewMode viewMode) {
-        DayUC dayUC = new DayUC();
-        dayUC.miladiCalendar.setTime(miladiDate.getTime());
-        dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);
-        dayUC.isEnable = isEnable;
-        dayUC.viewMode = viewMode;
-        return dayUC;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        LayoutInflater mInfalater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         switch (viewMode) {
             case DayHeader:
-                rootView = inflater.inflate(R.layout.day_uc_header_mode_view, container, false);
-//                initialDayHeader();
+                dayLinearLayout.rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
+                dayLinearLayout.initialDayHeader();
                 break;
             case DaySimple:
                 break;
             case DayFull:
                 break;
             case Month:
-                rootView = inflater.inflate(R.layout.day_uc_month_view, container, false);
-//                initialMonth();
+                dayLinearLayout.rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
+                dayLinearLayout.initialMonth();
                 break;
         }
-
-
-        return rootView;
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        switch (viewMode){
-            case DayHeader:
-                initialDayHeader();
-                break;
-            case DaySimple:
-                initialDaySimple();
-                break;
-            case DayFull:
-                initialDayFull();
-                break;
-            case Month:
-//                initialMonth();
-                break;
-        }
-
+        return dayLinearLayout;
     }
 
     private void initialDayHeader() {
@@ -102,6 +71,24 @@ public class DayUC extends Fragment {
                 break;
         }
     }
+
+//    private void initialDayHeader(){
+//        View root = ((LayoutInflater)(getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)))
+//                .inflate(R.layout.day_uc_header_mode_view, (android.view.ViewGroup) getTargetFragment().getView().findViewById(R.id.day_list_mode_frame));
+//        mainDate_TV = (TextView) root.findViewById(R.id.day_uc_header_mode_tv);
+//        switch (MainActivity.mainCalendarType){
+//            case Solar:
+//                persianCalendar = new PersianCalendar(miladiCalendar);
+//                mainDate_TV.setText(persianCalendar.getPersianFullDate());
+//                break;
+//            case Gregorian:
+//                mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
+//                break;
+//            case Hejri:
+////                mainDate_TV.setText(String.valueOf(arabicCalendar.getDate()));
+//                break;
+//        }
+//    }
 
     private void initialMonth() {
 //        View root = ((LayoutInflater)(getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)))
@@ -157,17 +144,5 @@ public class DayUC extends Fragment {
                     break;
             }
         }
-    }
-
-    private void initialDayFull() {
-
-    }
-
-    private void initialDaySimple() {
-
-    }
-
-    private void checkHoliday() {
-
     }
 }

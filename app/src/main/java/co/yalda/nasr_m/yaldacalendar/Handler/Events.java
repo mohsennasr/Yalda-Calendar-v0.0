@@ -13,7 +13,7 @@ import co.yalda.nasr_m.yaldacalendar.Adapters.ListViewAdapter;
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class Events{
+public class Events {
 
     private Context context;
     private Calendar cal = Calendar.getInstance();                   //event object date
@@ -32,7 +32,7 @@ public class Events{
         initialize();
     }
 
-    private void initialize(){
+    private void initialize() {
 
         //initiate event list array and list view
         eventList = new ArrayList<String>();

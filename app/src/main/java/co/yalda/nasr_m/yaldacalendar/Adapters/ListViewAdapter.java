@@ -56,7 +56,7 @@ public class ListViewAdapter extends BaseAdapter {
         final Button noteViewBT, noteEditBT, noteRemoveBT;
 
         //if first time item created, create view for it. else update view
-        if (convertView == null){
+        if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.note_list_item, parent, false);
         }
 
@@ -103,9 +103,9 @@ public class ListViewAdapter extends BaseAdapter {
 
                 noteEditDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        if (String.valueOf(noteEditET.getText()).isEmpty()){
+                        if (String.valueOf(noteEditET.getText()).isEmpty()) {
                             list.remove(position);
-                        }else {
+                        } else {
                             list.set(position, String.valueOf(noteEditET.getText()));
                         }
                         notifyDataSetChanged();
@@ -151,6 +151,8 @@ public class ListViewAdapter extends BaseAdapter {
                 noteRemoveDialog.show();
             }
         });
+
+
         return convertView;
     }
 }

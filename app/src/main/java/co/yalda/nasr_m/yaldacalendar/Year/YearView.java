@@ -30,7 +30,7 @@ public class YearView extends Fragment {
     private GridView yearGridView;
     private Calendar yearCal = Calendar.getInstance();
 
-    public static YearView newInstance(Calendar yearCal){
+    public static YearView newInstance(Calendar yearCal) {
         YearView yearView = new YearView();
         yearView.yearCal.setTime(yearCal.getTime());
         return yearView;
@@ -55,12 +55,12 @@ public class YearView extends Fragment {
     }
 
     //initial attributes
-    private void initialYear(/*LayoutInflater inflater, @Nullable ViewGroup container*/){
+    private void initialYear(/*LayoutInflater inflater, @Nullable ViewGroup container*/) {
         PersianCalendar pCal = new PersianCalendar(yearCal);
         pCal.persianSet(Calendar.MONTH, 0);
         yearCal.setTime(pCal.getMiladiDate().getTime());
         yearMonth = new MonthView[1];
-        for (int i = 0; i < 1 ; i++) {
+        for (int i = 0; i < 1; i++) {
             yearMonth[i] = MonthView.newInstance(yearCal);
             monthViewList.add(yearMonth[i]);
             yearCal.add(Calendar.MONTH, 1);

@@ -53,7 +53,7 @@ public class NavigationDrawerFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private CustomDrawer mDrawerLayout;
-//    private ListView mDrawerListView;
+    //    private ListView mDrawerListView;
     private ExpandableListView mDrawerExpListView;
     private View mFragmentContainerView;
 

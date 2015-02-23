@@ -8,7 +8,8 @@
         android:id="@+id/event_item_text"
         android:layout_width="60dp"
         android:layout_height="match_parent"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:text="test"/>
 
     <FrameLayout
         android:id="@+id/event_item_event_frame"

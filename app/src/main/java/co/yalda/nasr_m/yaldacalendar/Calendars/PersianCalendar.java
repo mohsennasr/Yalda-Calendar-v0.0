@@ -12,9 +12,9 @@ public class PersianCalendar {
     private Calendar miladiDate = getInstance();
     private int iPersianYear, iPersianMonth, iPersianDate, iPersianWeekDay, iPersianFirstDayOfWeek;
     private String persianMonthName, persianDayName, sPersianFirstDayOfWeek;
-    private String[] persianMonthNames = new String[]{"فروردین","اردیبهشت","خرداد"
-            ,"تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند" };
-    private String[] persianWeekDayNames = new String[]{"شنبه","یکشنبه","دوشنبه","سه شنبه","چهارشنبه","پنج شنبه","چمعه"};
+    private String[] persianMonthNames = new String[]{"فروردین", "اردیبهشت", "خرداد"
+            , "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
+    private String[] persianWeekDayNames = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه"};
     private int[] monthDays = new int[]{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
 
     public PersianCalendar(Calendar date) {
@@ -23,7 +23,7 @@ public class PersianCalendar {
         iPersianFirstDayOfWeek = 7;
     }
 
-    private void calculateDate(){
+    private void calculateDate() {
         String[] convertedDate = MiladiToSolarConverter.getCurrentShamsidate(miladiDate);
         iPersianYear = Integer.valueOf(convertedDate[0]);
         iPersianMonth = Integer.valueOf(convertedDate[1]);
@@ -33,58 +33,58 @@ public class PersianCalendar {
         iPersianWeekDay = miladiDate.get(DAY_OF_WEEK);
     }
 
-    public int getMaxDayOfMonth(){
-        if(iPersianMonth == 11 && isLeap(iPersianYear))
+    public int getMaxDayOfMonth() {
+        if (iPersianMonth == 11 && isLeap(iPersianYear))
             return 30;
         else
-            return monthDays[iPersianMonth-1];
+            return monthDays[iPersianMonth - 1];
     }
 
-    public int getPersianWeekNumber(){
+    public int getPersianWeekNumber() {
         int firstWeekDays, daysCount = 0, weekNum;
 
 //        if(iPersianMonth == 0)
 //            daysCount = iPersianDate;
-        if(iPersianMonth<=6)
-            daysCount += (iPersianMonth-1)*31 + iPersianDate -1;
+        if (iPersianMonth <= 6)
+            daysCount += (iPersianMonth - 1) * 31 + iPersianDate - 1;
         else
-            daysCount += 6*31 + (iPersianMonth-7)*30 + iPersianDate -1;
+            daysCount += 6 * 31 + (iPersianMonth - 7) * 30 + iPersianDate - 1;
 
         miladiDate.add(DATE, -(daysCount));
         firstWeekDays = (miladiDate.get(DAY_OF_WEEK) - iPersianFirstDayOfWeek + 7) % 7;
         daysCount = daysCount + firstWeekDays;
-        weekNum = ((int) Math.floor(daysCount/7));
+        weekNum = ((int) Math.floor(daysCount / 7));
 
-        if(weekNum == 0 && daysCount>=3)
+        if (weekNum == 0 && daysCount >= 3)
             weekNum = 53;
-        else if (weekNum == 0 && daysCount<3)
+        else if (weekNum == 0 && daysCount < 3)
             weekNum = 1;
 
         miladiDate.add(DATE, daysCount);
         return weekNum;
     }
 
-    public int getFirstWeekNumberOfMonth(){
-        miladiDate.add(DATE, -(iPersianDate-1));
+    public int getFirstWeekNumberOfMonth() {
+        miladiDate.add(DATE, -(iPersianDate - 1));
         calculateDate();
         int weekNum = getPersianWeekNumber();
-        miladiDate.add(DATE, iPersianDate-1);
+        miladiDate.add(DATE, iPersianDate - 1);
         calculateDate();
         return weekNum;
     }
 
-    public int persianPreMonthRemainingDay(){
-        miladiDate.add(DATE, -(iPersianDate-1));
+    public int persianPreMonthRemainingDay() {
+        miladiDate.add(DATE, -(iPersianDate - 1));
 
         int firsDayOfMonth = miladiDate.get(DAY_OF_WEEK);
         int remainingDay = (firsDayOfMonth - iPersianFirstDayOfWeek + 7) % 7;
 
-        miladiDate.add(DATE, iPersianDate-1);
+        miladiDate.add(DATE, iPersianDate - 1);
         return remainingDay;
     }
 
-    public void persianSet(int field, int amount){
-        switch (field){
+    public void persianSet(int field, int amount) {
+        switch (field) {
             case YEAR:
                 miladiDate.add(YEAR, amount - iPersianYear + 1);
                 calculateDate();
@@ -100,7 +100,7 @@ public class PersianCalendar {
         }
     }
 
-    private boolean isLeap(int year){
+    private boolean isLeap(int year) {
         return ((Math.abs(year - 1395) % 4) == 0);
     }
 
@@ -157,7 +157,7 @@ public class PersianCalendar {
         return miladiDate;
     }
 
-    public String getPersianFullDate(){
+    public String getPersianFullDate() {
         return (persianDayName + " " + iPersianDate + " " + persianMonthName + " " + iPersianYear);
     }
 }

@@ -10,9 +10,10 @@ public class SecondCalendar {
     public SecondCalendar(Calendar cal) {
     }
 
-    public void setTime(PersianCalendar pcal){}
+    public void setTime(PersianCalendar pcal) {
+    }
 
-    public String get(int field){
+    public String get(int field) {
         return "2";
     }
 }

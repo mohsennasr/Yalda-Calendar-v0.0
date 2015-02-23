@@ -25,7 +25,7 @@ import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, ActionBar.TabListener {
 
-    public static enum viewMode{
+    public static enum viewMode {
         Year,
         Month,
         DayHeader,
@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity
         Week
     }
 
-    public static enum calendarType{
+    public static enum calendarType {
         Solar,
         Gregorian,
         Hejri
@@ -184,7 +184,7 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public class TabViewPagerAdapter extends FragmentPagerAdapter{
+    public class TabViewPagerAdapter extends FragmentPagerAdapter {
 
         public TabViewPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -192,7 +192,7 @@ public class MainActivity extends ActionBarActivity
 
         @Override
         public Fragment getItem(int position) {
-            switch (position){
+            switch (position) {
                 case 0:
                     return DayListView.newInstance(Calendar.getInstance());
                 case 1:

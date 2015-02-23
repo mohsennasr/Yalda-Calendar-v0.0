@@ -21,7 +21,7 @@ import co.yalda.nasr_m.yaldacalendar.R;
 /**
  * Created by Nasr_M on 2/21/2015.
  */
-public class MonthView extends Fragment{
+public class MonthView extends Fragment {
 
     private DayUC[] dayUC;                    //day user control object
     private View rootView;
@@ -38,7 +38,7 @@ public class MonthView extends Fragment{
     So, for making Fragment Class with custom input value new method should be written to create
     class objects and set private attributes according to input values
      */
-    public static MonthView newInstance(Calendar monthCal){
+    public static MonthView newInstance(Calendar monthCal) {
         MonthView monthView = new MonthView();
         monthView.monthCal.setTime(monthCal.getTime());
         return monthView;
@@ -59,7 +59,7 @@ public class MonthView extends Fragment{
     }
 
     //initial attributes
-    private void initialMonth(){
+    private void initialMonth() {
         PersianCalendar pCal = new PersianCalendar(monthCal);
         int maxDayMonth = pCal.getMaxDayOfMonth();
         pCal.persianSet(Calendar.DATE, 1);
@@ -67,8 +67,8 @@ public class MonthView extends Fragment{
         int remainDay = pCal.persianPreMonthRemainingDay();
         monthCal.add(Calendar.DATE, -remainDay);
         dayUC = new DayUC[42];
-        for (int i = 0; i < 42 ; i++) {
-            dayUC[i] = DayUC.newInstance(monthCal, !(i<remainDay | i>(maxDayMonth+remainDay)) , MainActivity.viewMode.Month);
+        for (int i = 0; i < 42; i++) {
+            dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i > (maxDayMonth + remainDay)), MainActivity.viewMode.Month);
             dayUCList.add(dayUC[i]);
             monthCal.add(Calendar.DATE, 1);
         }

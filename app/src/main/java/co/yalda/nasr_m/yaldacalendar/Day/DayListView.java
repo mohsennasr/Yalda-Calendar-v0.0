@@ -36,7 +36,7 @@ public class DayListView extends Fragment {
     private ListView dayEventLV;            //day events list view
     private FrameLayout dayListHeaderFrame; //day notes frame view
     private Notes noteList;                 //day notes
-//    private Events eventList;               //day events
+    //    private Events eventList;               //day events
     private Button addButton;               //add button for adding new note or event
 
     private ArrayList<String> eventList;    //event list array
@@ -50,7 +50,7 @@ public class DayListView extends Fragment {
     So, for making Fragment Class with custom input value new method should be written to create
     class objects and set private attributes according to input values
      */
-    public static DayListView newInstance(Calendar dayCal){
+    public static DayListView newInstance(Calendar dayCal) {
         DayListView dayListView = new DayListView();
 //        dayListView.dayUC = DayUC.newInstance(dayCal, true, MainActivity.viewMode.DayHeader);
 //        dayListView.dayUC = new DayUC(dayCal);
@@ -67,11 +67,11 @@ public class DayListView extends Fragment {
     }
 
     //initial attributes
-    private void initialDay(){
+    private void initialDay() {
 
 //        dayUC = (DayUC) getFragmentManager().findFragmentByTag("DayList");
 //        if (dayUC == null){
-            dayUC = DayUC.newInstance(Calendar.getInstance(), true, MainActivity.viewMode.DayHeader);
+        dayUC = DayUC.newInstance(Calendar.getInstance(), true, MainActivity.viewMode.DayHeader);
 //            dayUC.setTargetFragment(this, 0);
 //            getFragmentManager().beginTransaction().add(dayUC, "DayList").commit();
 //        }
@@ -93,7 +93,7 @@ public class DayListView extends Fragment {
     }
 
     //set values for elements
-    public void setData(){
+    public void setData() {
         dayDateTV.setText("28");
         dayDayNameTV.setText("Tuesday");
     }

@@ -11,7 +11,7 @@ import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
 /**
  * Created by Nasr_M on 2/21/2015.
  */
-public class YearGridViewAdapter extends BaseAdapter{
+public class YearGridViewAdapter extends BaseAdapter {
 
     private ArrayList<MonthView> gridList;      //list of grid DayUC objects
 

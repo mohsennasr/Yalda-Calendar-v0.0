@@ -25,7 +25,7 @@ public class AESCrosPlatform {
     private final String cipherTransformation = "AES/CBC/PKCS5Padding";
     private final String aesEncryptionAlgorithm = "AES";
 
-    public  byte[] decrypt(byte[] cipherText, byte[] key, byte [] initialVector) throws NoSuchPaddingException,
+    public byte[] decrypt(byte[] cipherText, byte[] key, byte[] initialVector) throws NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException,
             IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance(cipherTransformation);
@@ -36,9 +36,9 @@ public class AESCrosPlatform {
         return cipherText;
     }
 
-    public byte[] encrypt(byte[] plainText, byte[] key, byte [] initialVector) throws NoSuchAlgorithmException,
+    public byte[] encrypt(byte[] plainText, byte[] key, byte[] initialVector) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException,
-            IllegalBlockSizeException, BadPaddingException{
+            IllegalBlockSizeException, BadPaddingException {
         Cipher cipher = Cipher.getInstance(cipherTransformation);
         SecretKeySpec secretKeySpec = new SecretKeySpec(key, aesEncryptionAlgorithm);
         IvParameterSpec ivParameterSpec = new IvParameterSpec(initialVector);
@@ -48,8 +48,8 @@ public class AESCrosPlatform {
     }
 
     private byte[] getKeyBytes(String key) throws UnsupportedEncodingException {
-        byte[] keyBytes= new byte[16];
-        byte[] parameterKeyBytes= key.getBytes(characterEncoding);
+        byte[] keyBytes = new byte[16];
+        byte[] parameterKeyBytes = key.getBytes(characterEncoding);
         System.arraycopy(parameterKeyBytes, 0, keyBytes, 0, Math.min(parameterKeyBytes.length, keyBytes.length));
         return keyBytes;
     }
@@ -62,7 +62,7 @@ public class AESCrosPlatform {
     /// <returns>Base64 encoded string</returns>
     public String encrypt(String plainText, String key) throws UnsupportedEncodingException,
             InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-            InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{
+            InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         byte[] plainTextbytes = plainText.getBytes(characterEncoding);
         byte[] keyBytes = getKeyBytes(key);
         return Base64.encodeToString(encrypt(plainTextbytes, keyBytes, keyBytes), Base64.DEFAULT);

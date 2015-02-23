@@ -11,14 +11,14 @@ import java.util.Calendar;
 /**
  * Created by Nasr_M on 2/16/2015.
  */
-public class DayFullView extends Fragment{
+public class DayFullView extends Fragment {
 
     private DayUC dayUC;
     private View rootView;
     private RelativeLayout rootLayout;      //root layout of UC. UC will be linked to this layout
 //    private EventClass eventList;    //day event list
 
-    public static DayFullView newInstance(Calendar dayCal){
+    public static DayFullView newInstance(Calendar dayCal) {
         DayFullView dayAgendaView = new DayFullView();
 //        dayAgendaView.dayUC = new DayUC(dayCal);
         return dayAgendaView;
@@ -37,11 +37,11 @@ public class DayFullView extends Fragment{
 
     }
 
-    private void initialDay(/*LayoutInflater inflater, @Nullable ViewGroup container*/){
+    private void initialDay(/*LayoutInflater inflater, @Nullable ViewGroup container*/) {
 
     }
 
-    public void setData(){
+    public void setData() {
 
 
     }
