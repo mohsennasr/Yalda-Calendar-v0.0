@@ -9,19 +9,14 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Random;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
-import co.yalda.nasr_m.yaldacalendar.Utilities.AESCrosPlatform;
-import co.yalda.nasr_m.yaldacalendar.Utilities.GetDeviceID;
 
 /**
  * Created by Nasr_M on 2/21/2015.
@@ -78,43 +73,10 @@ public class MonthView extends Fragment{
             monthCal.add(Calendar.DATE, 1);
         }
 
-//        monthHeader_tv.setText(pCal.getPersianMonthName() + " " + String.valueOf(pCal.getiPersianYear()));
-
-        String devId = (new GetDeviceID(getActivity())).getDEVICE_ID();
-        monthHeader_tv.setText("Device ID (IMEI) is: " + devId);
-
-//        gridViewAdapter = new MonthGridViewAdapter(getActivity(), dayUCList);
-//        monthGridView.setAdapter(gridViewAdapter);
-//        gridViewAdapter.notifyDataSetChanged();
-
-        ArrayList<String> arrlist = new ArrayList<>();
-
-        String skey = "p@$$w0rd";
-        arrlist.add("Encryption/Decryption Key is: " + skey);
-
-        String decrypted, plainText, AESen, AESde, AESCPencrypted, AESCPdecrypted;
-        byte[] encrypted;
-        AESCrosPlatform aesCrosPlatform = new AESCrosPlatform();
+        monthHeader_tv.setText(pCal.getPersianMonthName() + " " + String.valueOf(pCal.getiPersianYear()));
 
 
-        Random random = new Random();
-        plainText = ("این یک متن نمونه برای رمزنگاری به کمک الگوریتم AES است");
-
-        try {
-
-            AESCPencrypted = aesCrosPlatform.encrypt(plainText, skey);
-            AESCPdecrypted = aesCrosPlatform.decrypt(AESCPencrypted, skey);
-
-            arrlist.add(AESCPencrypted);
-            arrlist.add(AESCPdecrypted);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-            arrlist.add("Exception: " + e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        gridViewAdapter = new MonthGridViewAdapter(getActivity(), arrlist);
+        gridViewAdapter = new MonthGridViewAdapter(getActivity(), dayUCList);
         monthGridView.setAdapter(gridViewAdapter);
         gridViewAdapter.notifyDataSetChanged();
     }

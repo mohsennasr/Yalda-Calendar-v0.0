@@ -50,7 +50,7 @@ public class DayUC extends Fragment{
             case DayFull:
                 break;
             case Month:
-                rootView = inflater.inflate(R.layout.day_uc_month_view, container, false);
+                rootView = inflater.inflate(R.layout.day_uc_month_view_1, container, false);
                 initialMonth();
                 break;
         }
