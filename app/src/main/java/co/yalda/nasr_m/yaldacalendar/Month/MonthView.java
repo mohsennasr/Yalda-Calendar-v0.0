@@ -3,13 +3,13 @@ package co.yalda.nasr_m.yaldacalendar.Month;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,8 +20,7 @@ import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
-import co.yalda.nasr_m.yaldacalendar.Utilities.AESEncryption;
-import co.yalda.nasr_m.yaldacalendar.Utilities.Crypto;
+import co.yalda.nasr_m.yaldacalendar.Utilities.AESCrosPlatform;
 import co.yalda.nasr_m.yaldacalendar.Utilities.GetDeviceID;
 
 /**
@@ -90,37 +89,29 @@ public class MonthView extends Fragment{
 
         ArrayList<String> arrlist = new ArrayList<>();
 
-        String skey = "co.yalda.YaldaBahamCalendarco.yalda.YaldaBahamCalendarco.yalda.YaldaBahamCalendarco.yalda.YaldaBahamCalendar1234567891234567891234567890";
+        String skey = "p@$$w0rd";
         arrlist.add("Encryption/Decryption Key is: " + skey);
 
-        String decrypted, plainText, AESen, AESde;
+        String decrypted, plainText, AESen, AESde, AESCPencrypted, AESCPdecrypted;
         byte[] encrypted;
-
-        Crypto crypto = new Crypto();
-        AESEncryption aesEncryption = new AESEncryption();
+        AESCrosPlatform aesCrosPlatform = new AESCrosPlatform();
 
 
-        for (int i=0; i<10; i++) {
+        Random random = new Random();
+        plainText = ("این یک متن نمونه برای رمزنگاری به کمک الگوریتم AES است");
 
-            Random random = new Random();
-            plainText = String.valueOf(random.nextLong()) + " IMEI = " + devId;
+        try {
 
-            try {
-                encrypted = crypto.encrypt(skey, plainText);
-                decrypted = crypto.decrypt(skey, encrypted);
+            AESCPencrypted = aesCrosPlatform.encrypt(plainText, skey);
+            AESCPdecrypted = aesCrosPlatform.decrypt(AESCPencrypted, skey);
 
-                arrlist.add("Crypto Encrypted Value: " + Base64.encodeToString(encrypted, Base64.DEFAULT));
-                arrlist.add("Crypto Decrypted Value: " + decrypted);
-
-                AESen = aesEncryption.encrypt(plainText);
-                AESde = aesEncryption.decrypt(AESen);
-
-                arrlist.add("AES Encrypted Value: " + AESen);
-                arrlist.add("AES Decrypted Value: " + AESde);
-            } catch (GeneralSecurityException e) {
-                e.printStackTrace();
-                arrlist.add("Exception: " + e.getMessage());
-            }
+            arrlist.add(AESCPencrypted);
+            arrlist.add(AESCPdecrypted);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            arrlist.add("Exception: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         gridViewAdapter = new MonthGridViewAdapter(getActivity(), arrlist);
