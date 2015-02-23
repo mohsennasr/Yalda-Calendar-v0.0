@@ -1,5 +1,6 @@
 package co.yalda.nasr_m.yaldacalendar.Year;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -66,6 +67,11 @@ public class YearView extends Fragment {
             monthViewList.add(yearMonth[i]);
             yearCal.add(Calendar.MONTH, 1);
         }
+
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            yearGridView.setNumColumns(3);
+        else
+            yearGridView.setNumColumns(4);
 
         yearHeader_tv.setText(String.valueOf(pCal.getiPersianYear()));
         yearGridAdapter = new YearGridViewAdapter(monthViewList);

@@ -33,9 +33,13 @@ public class MonthView extends Fragment {
     //Month View attributes
     private TextView monthHeader_tv;        //month name TextView
     private GridView monthGridView;         //month days gridView
+    private GridView weekDaysGrid;         //month days gridView
+    private GridView weekNumGrid;         //month days gridView
     private MonthGridViewAdapter gridViewAdapter;   //month grid adapter
+    private SimpleAdapter weekDaysAdapter, weekNumAdapter;
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
     private MainActivity.viewMode viewMode;
+    private String[] weekDays = new String[]{"ی", "د", "س", "چ", "پ", "ج", "ش"};
 
     /*
     Fragment Classes have their own constructor method that we can't modify input parameter.
@@ -52,6 +56,8 @@ public class MonthView extends Fragment {
 
         monthView.monthHeader_tv = (TextView) monthView.rootView.findViewById(R.id.month_view_header);
         monthView.monthGridView = (GridView) monthView.rootView.findViewById(R.id.month_view_day_grid);
+        monthView.weekDaysGrid = (GridView) monthView.rootView.findViewById(R.id.month_week_day_name_grid);
+        monthView.weekNumGrid = (GridView) monthView.rootView.findViewById(R.id.month_week_number_grid);
 
         if (monthView.dayUCList == null)
             monthView.dayUCList = new ArrayList<>();
@@ -84,27 +90,23 @@ public class MonthView extends Fragment {
 
         monthHeader_tv.setText(pCal.getPersianMonthName() + " " + String.valueOf(pCal.getiPersianYear()));
 
-
         gridViewAdapter = new MonthGridViewAdapter(dayUCList);
         monthGridView.setAdapter(gridViewAdapter);
         gridViewAdapter.notifyDataSetChanged();
 
         //Week Day Name Grid View
-        String[] weekDays = new String[]{"یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه", "شنبه"};
-        GridView weekDaysGrid = (GridView) rootView.findViewById(R.id.month_week_day_name_grid);
         ArrayList<String> weekDaysArrayList = new ArrayList<>();
         weekDaysArrayList.addAll(Arrays.asList(weekDays));
-        SimpleAdapter weekDaysAdapter = new SimpleAdapter(weekDaysArrayList);
+        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
 
         //Week Numbers Grid View
         String[] weekNums = new String[]{"1", "2", "3", "4", "5", "6"};
-        GridView weekNumGrid = (GridView) rootView.findViewById(R.id.month_week_number_grid);
         ArrayList<String> weekNumArrayList = new ArrayList<>();
         weekNumArrayList.addAll(Arrays.asList(weekNums));
-        SimpleAdapter weekNumAadapter = new SimpleAdapter(weekNumArrayList);
-        weekNumGrid.setAdapter(weekNumAadapter);
-        weekNumAadapter.notifyDataSetChanged();
+        weekNumAdapter = new SimpleAdapter(weekNumArrayList);
+        weekNumGrid.setAdapter(weekNumAdapter);
+        weekNumAdapter.notifyDataSetChanged();
     }
 }

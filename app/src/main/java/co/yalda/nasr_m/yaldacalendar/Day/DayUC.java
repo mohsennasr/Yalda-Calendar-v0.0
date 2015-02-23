@@ -1,9 +1,12 @@
 package co.yalda.nasr_m.yaldacalendar.Day;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -53,6 +56,11 @@ public class DayUC extends Fragment {
         }
 
         return dayUC;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return rootView;
     }
 
     private void initialDayHeader() {
