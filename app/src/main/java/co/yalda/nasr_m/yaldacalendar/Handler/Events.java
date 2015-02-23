@@ -41,7 +41,7 @@ public class Events {
         eventListView.setAdapter(adapter);
 
         eventList.addAll(Arrays.asList(eventClock));
-        adapter = new ListViewAdapter(context, eventList);
+        adapter = new ListViewAdapter(eventList);
         adapter.notifyDataSetChanged();
     }
 

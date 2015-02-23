@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 /**
@@ -17,13 +18,11 @@ import co.yalda.nasr_m.yaldacalendar.R;
 public class EventListViewAdapter extends BaseAdapter {
 
     private ArrayList<String> list;
-    private Context context;
     private LayoutInflater layoutInflater;
 
-    public EventListViewAdapter(Context context, ArrayList<String> list) {
+    public EventListViewAdapter(ArrayList<String> list) {
         this.list = list;
-        this.context = context;
-        this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.layoutInflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override

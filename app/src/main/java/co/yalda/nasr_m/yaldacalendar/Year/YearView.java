@@ -14,6 +14,7 @@ import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.YearGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
 import co.yalda.nasr_m.yaldacalendar.R;
 
@@ -41,7 +42,7 @@ public class YearView extends Fragment {
         rootView = inflater.inflate(R.layout.year_view, container, false);
 
         yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
-//        yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
+        yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
 
         return rootView;
     }
@@ -59,18 +60,16 @@ public class YearView extends Fragment {
         PersianCalendar pCal = new PersianCalendar(yearCal);
         pCal.persianSet(Calendar.MONTH, 0);
         yearCal.setTime(pCal.getMiladiDate().getTime());
-        yearMonth = new MonthView[1];
-        for (int i = 0; i < 1; i++) {
-            yearMonth[i] = MonthView.newInstance(yearCal);
+        yearMonth = new MonthView[12];
+        for (int i = 0; i < 12; i++) {
+            yearMonth[i] = MonthView.newInstance(yearCal, MainActivity.viewMode.Year);
             monthViewList.add(yearMonth[i]);
             yearCal.add(Calendar.MONTH, 1);
         }
 
-        getFragmentManager().beginTransaction().replace(R.id.year_frame, yearMonth[0]).commit();
-
         yearHeader_tv.setText(String.valueOf(pCal.getiPersianYear()));
-//        yearGridAdapter = new YearGridViewAdapter(monthViewList);
-//        yearGridView.setAdapter(yearGridAdapter);
-//        yearGridAdapter.notifyDataSetChanged();
+        yearGridAdapter = new YearGridViewAdapter(monthViewList);
+        yearGridView.setAdapter(yearGridAdapter);
+        yearGridAdapter.notifyDataSetChanged();
     }
 }

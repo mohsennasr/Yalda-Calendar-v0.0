@@ -1,11 +1,9 @@
 package co.yalda.nasr_m.yaldacalendar.Day;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -21,9 +19,9 @@ public class DayUC extends Fragment {
 
     private boolean isHoliday;                  //is it holiday
     private boolean isEnable = true;         //should be clickable
-    private View rootView;                      // root view of fragment
-    public PersianCalendar persianCalendar;
-    public Calendar miladiCalendar = Calendar.getInstance();
+    public View rootView;                      // root view of fragment
+    private PersianCalendar persianCalendar;
+    private Calendar miladiCalendar = Calendar.getInstance();
     private MainActivity.viewMode viewMode;
 
     public TextView mainDate_TV, secondDate_TV, thirdDate_TV;
@@ -34,59 +32,28 @@ public class DayUC extends Fragment {
         dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);
         dayUC.isEnable = isEnable;
         dayUC.viewMode = viewMode;
-        return dayUC;
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        LayoutInflater mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         switch (viewMode) {
             case DayHeader:
-                rootView = inflater.inflate(R.layout.day_uc_header_mode_view, container, false);
-                initialDayHeader();
+                dayUC.rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
+                dayUC.initialDayHeader();
                 break;
-            case DaySimple:
+            case Year:
+                dayUC.rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
+                dayUC.initialMonth();
                 break;
             case DayFull:
-
                 break;
             case Month:
-                rootView = inflater.inflate(R.layout.day_uc_month_view, container, false);
-                initialMonth();
+                dayUC.rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
+                dayUC.initialMonth();
                 break;
         }
 
-
-        return rootView;
+        return dayUC;
     }
-
-
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setRetainInstance(true);
-//    }
-//
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//
-//        switch (viewMode){
-//            case DayHeader:
-//                initialDayHeader();
-//                break;
-//            case DaySimple:
-//                initialDaySimple();
-//                break;
-//            case DayFull:
-//                initialDayFull();
-//                break;
-//            case Month:
-////                initialMonth();
-//                break;
-//        }
-//
-//    }
 
     private void initialDayHeader() {
         mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_header_mode_tv);
@@ -125,7 +92,7 @@ public class DayUC extends Fragment {
                 break;
         }
 
-        if (MainActivity.secondCalendarType != null) {
+        if ((MainActivity.secondCalendarType != null) && (viewMode != MainActivity.viewMode.DaySimple)) {
             secondDate_TV = (TextView) rootView.findViewById(R.id.day_uc_second_date);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
@@ -142,7 +109,7 @@ public class DayUC extends Fragment {
             }
         }
 
-        if (MainActivity.thirdCalendarType != null) {
+        if ((MainActivity.thirdCalendarType != null) && (viewMode != MainActivity.viewMode.DaySimple)) {
             thirdDate_TV = (TextView) rootView.findViewById(R.id.day_uc_third_date);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:

@@ -36,6 +36,6 @@ public class YearGridViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return gridList.get(position).getView();
+        return gridList.get(position).rootView;
     }
 }

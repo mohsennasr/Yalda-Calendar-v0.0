@@ -1,5 +1,6 @@
 package co.yalda.nasr_m.yaldacalendar.Month;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,7 +27,7 @@ import co.yalda.nasr_m.yaldacalendar.R;
 public class MonthView extends Fragment {
 
     private DayUC[] dayUC;                    //day user control object
-    private View rootView;
+    public View rootView;
     private Calendar monthCal = Calendar.getInstance();
 
     //Month View attributes
@@ -34,29 +35,33 @@ public class MonthView extends Fragment {
     private GridView monthGridView;         //month days gridView
     private MonthGridViewAdapter gridViewAdapter;   //month grid adapter
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
+    private MainActivity.viewMode viewMode;
 
     /*
     Fragment Classes have their own constructor method that we can't modify input parameter.
     So, for making Fragment Class with custom input value new method should be written to create
     class objects and set private attributes according to input values
      */
-    public static MonthView newInstance(Calendar monthCal) {
+    public static MonthView newInstance(Calendar monthCal, MainActivity.viewMode viewMode) {
         MonthView monthView = new MonthView();
         monthView.monthCal.setTime(monthCal.getTime());
+        monthView.viewMode = viewMode;
+
+        LayoutInflater mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        monthView.rootView = mInfalater.inflate(R.layout.month_view, null);
+
+        monthView.monthHeader_tv = (TextView) monthView.rootView.findViewById(R.id.month_view_header);
+        monthView.monthGridView = (GridView) monthView.rootView.findViewById(R.id.month_view_day_grid);
+
+        if (monthView.dayUCList == null)
+            monthView.dayUCList = new ArrayList<>();
+        monthView.initialMonth();
+
         return monthView;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.month_view, container, false);
-
-        monthHeader_tv = (TextView) rootView.findViewById(R.id.month_view_header);
-        monthGridView = (GridView) rootView.findViewById(R.id.month_view_day_grid);
-
-        if (dayUCList == null)
-            dayUCList = new ArrayList<>();
-        initialMonth();
-
         return rootView;
     }
 
@@ -71,7 +76,8 @@ public class MonthView extends Fragment {
         monthCal.add(Calendar.DATE, -remainDay);
         dayUC = new DayUC[42];
         for (int i = 0; i < 42; i++) {
-            dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i > (maxDayMonth + remainDay)), MainActivity.viewMode.Month);
+            dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i > (maxDayMonth + remainDay))
+                    , viewMode);
             dayUCList.add(dayUC[i]);
             monthCal.add(Calendar.DATE, 1);
         }
@@ -79,7 +85,7 @@ public class MonthView extends Fragment {
         monthHeader_tv.setText(pCal.getPersianMonthName() + " " + String.valueOf(pCal.getiPersianYear()));
 
 
-        gridViewAdapter = new MonthGridViewAdapter(getActivity(), dayUCList);
+        gridViewAdapter = new MonthGridViewAdapter(dayUCList);
         monthGridView.setAdapter(gridViewAdapter);
         gridViewAdapter.notifyDataSetChanged();
 
@@ -88,7 +94,7 @@ public class MonthView extends Fragment {
         GridView weekDaysGrid = (GridView) rootView.findViewById(R.id.month_week_day_name_grid);
         ArrayList<String> weekDaysArrayList = new ArrayList<>();
         weekDaysArrayList.addAll(Arrays.asList(weekDays));
-        SimpleAdapter weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, getActivity());
+        SimpleAdapter weekDaysAdapter = new SimpleAdapter(weekDaysArrayList);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
 
@@ -97,7 +103,7 @@ public class MonthView extends Fragment {
         GridView weekNumGrid = (GridView) rootView.findViewById(R.id.month_week_number_grid);
         ArrayList<String> weekNumArrayList = new ArrayList<>();
         weekNumArrayList.addAll(Arrays.asList(weekNums));
-        SimpleAdapter weekNumAadapter = new SimpleAdapter(weekNumArrayList, getActivity());
+        SimpleAdapter weekNumAadapter = new SimpleAdapter(weekNumArrayList);
         weekNumGrid.setAdapter(weekNumAadapter);
         weekNumAadapter.notifyDataSetChanged();
     }

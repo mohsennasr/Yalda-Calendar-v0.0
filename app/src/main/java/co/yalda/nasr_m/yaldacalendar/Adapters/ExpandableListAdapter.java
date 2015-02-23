@@ -11,17 +11,17 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
 
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
+
 /**
  * Created by Nasr_M on 2/16/2015.
  */
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private Context context;
     private List<String> parentList;
     private HashMap<String, List<String>> childList;
 
-    public ExpandableListAdapter(Context context, List<String> parentList, HashMap<String, List<String>> childList) {
-        this.context = context;
+    public ExpandableListAdapter(List<String> parentList, HashMap<String, List<String>> childList) {
         this.parentList = parentList;
         this.childList = childList;
     }
@@ -65,7 +65,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this.context
+            LayoutInflater infalInflater = (LayoutInflater) MainActivity.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(android.R.layout.simple_expandable_list_item_2, null);
         }
@@ -83,7 +83,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         final String childText = (String) getChild(groupPosition, childPosition);
 
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this.context
+            LayoutInflater infalInflater = (LayoutInflater) MainActivity.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
         }

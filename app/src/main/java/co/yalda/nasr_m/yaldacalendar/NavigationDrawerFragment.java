@@ -113,7 +113,7 @@ public class NavigationDrawerFragment extends Fragment {
 //                        getString(R.string.title_section3),
 //                }));
         ExpandableListPreparation expListData = new ExpandableListPreparation();
-        mDrawerExpListView.setAdapter(new ExpandableListAdapter(getActivity(), expListData.getParentList(),
+        mDrawerExpListView.setAdapter(new ExpandableListAdapter(expListData.getParentList(),
                 expListData.getChildList()));
         mDrawerExpListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerExpListView;

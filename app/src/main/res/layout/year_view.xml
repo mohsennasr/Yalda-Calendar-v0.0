@@ -7,11 +7,13 @@
     <TextView
         android:id="@+id/year_view_header"
         android:layout_width="match_parent"
+        android:gravity="center"
         android:layout_height="48dp" />
 
-    <FrameLayout
-        android:id="@+id/year_frame"
+    <GridView
+        android:id="@+id/year_grid_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:numColumns="3"/>
 
 </LinearLayout>

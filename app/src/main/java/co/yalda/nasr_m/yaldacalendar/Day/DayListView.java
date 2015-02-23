@@ -52,8 +52,6 @@ public class DayListView extends Fragment {
      */
     public static DayListView newInstance(Calendar dayCal) {
         DayListView dayListView = new DayListView();
-//        dayListView.dayUC = DayUC.newInstance(dayCal, true, MainActivity.viewMode.DayHeader);
-//        dayListView.dayUC = new DayUC(dayCal);
         return dayListView;
     }
 
@@ -68,14 +66,7 @@ public class DayListView extends Fragment {
 
     //initial attributes
     private void initialDay() {
-
-//        dayUC = (DayUC) getFragmentManager().findFragmentByTag("DayList");
-//        if (dayUC == null){
         dayUC = DayUC.newInstance(Calendar.getInstance(), true, MainActivity.viewMode.DayHeader);
-//            dayUC.setTargetFragment(this, 0);
-//            getFragmentManager().beginTransaction().add(dayUC, "DayList").commit();
-//        }
-
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUC).commit();
 
 
@@ -84,7 +75,7 @@ public class DayListView extends Fragment {
         eventList = new ArrayList<String>();
 
         eventList.addAll(Arrays.asList(eventClock));
-        adapter = new EventListViewAdapter(getActivity(), eventList);
+        adapter = new EventListViewAdapter(eventList);
 
         //set list view adapter
         dayEventLV.setAdapter(adapter);

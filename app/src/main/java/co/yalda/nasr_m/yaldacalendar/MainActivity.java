@@ -1,6 +1,7 @@
 package co.yalda.nasr_m.yaldacalendar;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,10 +17,10 @@ import java.util.Calendar;
 import java.util.List;
 
 import co.yalda.nasr_m.yaldacalendar.Day.DayListView;
-import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomDrawer;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomViewPager;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
+import co.yalda.nasr_m.yaldacalendar.Year.YearView;
 
 
 public class MainActivity extends ActionBarActivity
@@ -53,6 +54,7 @@ public class MainActivity extends ActionBarActivity
     private TabViewPagerAdapter tabPagerAdapter;
     private String[] tabNames = new String[]{"First", "Second", "Third"};
     private int currentTab = 0;
+    public static Context context;
 
 
     /**
@@ -71,6 +73,8 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         setContentView(R.layout.activity_main);
+
+        context = getApplicationContext();
 
 //        if (savedInstanceState == null)
 //            getSupportFragmentManager().beginTransaction()
@@ -196,10 +200,9 @@ public class MainActivity extends ActionBarActivity
                 case 0:
                     return DayListView.newInstance(Calendar.getInstance());
                 case 1:
-                    return MonthView.newInstance(Calendar.getInstance());
+                    return MonthView.newInstance(Calendar.getInstance(), viewMode.Month);
                 case 2:
-//                    return YearView.newInstance(Calendar.getInstance());
-                    return DayUC.newInstance(Calendar.getInstance(), true, viewMode.Month);
+                    return YearView.newInstance(Calendar.getInstance());
             }
             return null;
         }

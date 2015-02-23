@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 /**
@@ -21,13 +22,11 @@ import co.yalda.nasr_m.yaldacalendar.R;
 public class ListViewAdapter extends BaseAdapter {
 
     private ArrayList<String> list;
-    private Context context;
     private LayoutInflater layoutInflater;
 
-    public ListViewAdapter(Context context, ArrayList<String> list) {
+    public ListViewAdapter(ArrayList<String> list) {
         this.list = list;
-        this.context = context;
-        this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.layoutInflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class ListViewAdapter extends BaseAdapter {
                 TextView noteViewTV = (TextView) noteViewLayout.findViewById(R.id.note_item_text);
                 noteViewTV.setText(list.get(position));
 
-                AlertDialog.Builder noteViewDialog = new AlertDialog.Builder(context);
+                AlertDialog.Builder noteViewDialog = new AlertDialog.Builder(MainActivity.context);
                 noteViewDialog.setTitle("مشاهده یادداشت");
                 noteViewDialog.setView(noteViewLayout);
 
@@ -97,7 +96,7 @@ public class ListViewAdapter extends BaseAdapter {
                 final EditText noteEditET = (EditText) noteEditLayout.findViewById(R.id.note_edit_tv);
                 noteEditET.setText(list.get(position));
 
-                AlertDialog.Builder noteEditDialog = new AlertDialog.Builder(context);
+                AlertDialog.Builder noteEditDialog = new AlertDialog.Builder(MainActivity.context);
                 noteEditDialog.setTitle("ویرایش یادداشت");
                 noteEditDialog.setView(noteEditLayout);
 
@@ -128,7 +127,7 @@ public class ListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder noteRemoveDialog = new AlertDialog.Builder(context);
+                AlertDialog.Builder noteRemoveDialog = new AlertDialog.Builder(MainActivity.context);
                 noteRemoveDialog.setTitle("حذف یادداشت");
                 noteRemoveDialog.setMessage("آیا از حذف یادداشت مطمئن هستید؟");
 

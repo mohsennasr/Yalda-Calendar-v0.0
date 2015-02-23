@@ -9,17 +9,17 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
+
 /**
  * Created by Nasr_M on 2/23/2015.
  */
 public class SimpleAdapter extends BaseAdapter {
 
     private ArrayList<String> list;
-    private Context context;
 
-    public SimpleAdapter(ArrayList<String> list, Context context) {
+    public SimpleAdapter(ArrayList<String> list) {
         this.list = list;
-        this.context = context;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class SimpleAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater minflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater minflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null)
             convertView = minflater.inflate(android.R.layout.simple_list_item_1, null);
