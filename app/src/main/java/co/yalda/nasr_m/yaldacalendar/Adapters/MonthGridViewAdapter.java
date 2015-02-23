@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.Day.DayLinearLayout;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
@@ -49,7 +50,7 @@ public class MonthGridViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater mInflater = (LayoutInflater) this.context
+        LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null)
             convertView = mInflater.inflate(R.layout.day_uc_month_view, null);
@@ -107,6 +108,9 @@ public class MonthGridViewAdapter extends BaseAdapter {
             }
         }
 
-        return convertView;
+        DayLinearLayout day = DayLinearLayout.newInstance(context, Calendar.getInstance(), true, MainActivity.viewMode.Month);
+        return day.rootView;
+
+//        return convertView;
     }
 }

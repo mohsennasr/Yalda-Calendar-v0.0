@@ -20,7 +20,7 @@ public class DayLinearLayout extends Fragment {
 
     private boolean isHoliday;                  //is it holiday
     private boolean isEnable = true;         //should be clickable
-    private View rootView;                      // root view of fragment
+    public View rootView;                      // root view of fragment
     private ViewGroup parent;
     private PersianCalendar persianCalendar;
     private Calendar miladiCalendar = Calendar.getInstance();

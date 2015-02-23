@@ -1,19 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        android:id="@+id/month_view_header"
-        android:layout_width="match_parent"
-        android:textSize="24sp"
-        android:layout_height="48dp"/>
+    android:layout_height="wrap_content">
 
     <GridView
-        android:id="@+id/month_view_day_grid"
-        android:layout_width="match_parent"
+        android:id="@+id/month_week_number_grid"
+        android:layout_width="48dp"
         android:layout_height="match_parent"
-        android:numColumns="7"/>
+        android:numColumns="1"
+        android:layout_marginTop="96dp"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/month_view_header"
+            android:layout_width="match_parent"
+            android:textSize="24sp"
+            android:gravity="center"
+            android:layout_height="48dp"/>
+
+        <GridView
+            android:id="@+id/month_week_day_name_grid"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:numColumns="7"/>
+
+        <GridView
+            android:id="@+id/month_view_day_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:numColumns="7"/>
+
+    </LinearLayout>
 
 </LinearLayout>

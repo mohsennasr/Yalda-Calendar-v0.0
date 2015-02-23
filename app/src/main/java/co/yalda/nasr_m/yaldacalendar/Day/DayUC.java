@@ -43,15 +43,16 @@ public class DayUC extends Fragment {
         switch (viewMode) {
             case DayHeader:
                 rootView = inflater.inflate(R.layout.day_uc_header_mode_view, container, false);
-//                initialDayHeader();
+                initialDayHeader();
                 break;
             case DaySimple:
                 break;
             case DayFull:
+
                 break;
             case Month:
                 rootView = inflater.inflate(R.layout.day_uc_month_view, container, false);
-//                initialMonth();
+                initialMonth();
                 break;
         }
 
@@ -60,32 +61,32 @@ public class DayUC extends Fragment {
     }
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        switch (viewMode){
-            case DayHeader:
-                initialDayHeader();
-                break;
-            case DaySimple:
-                initialDaySimple();
-                break;
-            case DayFull:
-                initialDayFull();
-                break;
-            case Month:
-//                initialMonth();
-                break;
-        }
-
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setRetainInstance(true);
+//    }
+//
+//    @Override
+//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+//        super.onActivityCreated(savedInstanceState);
+//
+//        switch (viewMode){
+//            case DayHeader:
+//                initialDayHeader();
+//                break;
+//            case DaySimple:
+//                initialDaySimple();
+//                break;
+//            case DayFull:
+//                initialDayFull();
+//                break;
+//            case Month:
+////                initialMonth();
+//                break;
+//        }
+//
+//    }
 
     private void initialDayHeader() {
         mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_header_mode_tv);

@@ -10,9 +10,11 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.SimpleAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
@@ -60,6 +62,7 @@ public class MonthView extends Fragment {
 
     //initial attributes
     private void initialMonth() {
+        monthCal.setFirstDayOfWeek(Calendar.SATURDAY);
         PersianCalendar pCal = new PersianCalendar(monthCal);
         int maxDayMonth = pCal.getMaxDayOfMonth();
         pCal.persianSet(Calendar.DATE, 1);
@@ -79,5 +82,23 @@ public class MonthView extends Fragment {
         gridViewAdapter = new MonthGridViewAdapter(getActivity(), dayUCList);
         monthGridView.setAdapter(gridViewAdapter);
         gridViewAdapter.notifyDataSetChanged();
+
+        //Week Day Name Grid View
+        String[] weekDays = new String[]{"یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه", "شنبه"};
+        GridView weekDaysGrid = (GridView) rootView.findViewById(R.id.month_week_day_name_grid);
+        ArrayList<String> weekDaysArrayList = new ArrayList<>();
+        weekDaysArrayList.addAll(Arrays.asList(weekDays));
+        SimpleAdapter weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, getActivity());
+        weekDaysGrid.setAdapter(weekDaysAdapter);
+        weekDaysAdapter.notifyDataSetChanged();
+
+        //Week Numbers Grid View
+        String[] weekNums = new String[]{"1", "2", "3", "4", "5", "6"};
+        GridView weekNumGrid = (GridView) rootView.findViewById(R.id.month_week_number_grid);
+        ArrayList<String> weekNumArrayList = new ArrayList<>();
+        weekNumArrayList.addAll(Arrays.asList(weekNums));
+        SimpleAdapter weekNumAadapter = new SimpleAdapter(weekNumArrayList, getActivity());
+        weekNumGrid.setAdapter(weekNumAadapter);
+        weekNumAadapter.notifyDataSetChanged();
     }
 }
