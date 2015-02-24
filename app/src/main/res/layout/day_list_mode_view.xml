@@ -11,28 +11,13 @@
     <FrameLayout
         android:id="@+id/day_list_mode_frame"
         android:layout_width="match_parent"
-        android:layout_height="60dp" />
+        android:layout_height="80dp" />
 
-    <RelativeLayout
+    <ListView
+        android:id="@+id/day_list_mode_event_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fastScrollEnabled="true"/>
 
-        <ListView
-            android:id="@+id/day_list_mode_event_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fastScrollEnabled="true"/>
-
-        <Button
-            android:id="@+id/day_list_mode_add_bt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginBottom="30dp"
-            android:layout_marginLeft="30dp"
-            android:background="@drawable/ic_add"/>
-
-    </RelativeLayout>
 
 </LinearLayout>

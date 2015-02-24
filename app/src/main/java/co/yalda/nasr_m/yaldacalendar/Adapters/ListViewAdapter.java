@@ -23,9 +23,11 @@ public class ListViewAdapter extends BaseAdapter {
 
     private ArrayList<String> list;
     private LayoutInflater layoutInflater;
+    private Context context;
 
-    public ListViewAdapter(ArrayList<String> list) {
+    public ListViewAdapter(Context context, ArrayList<String> list) {
         this.list = list;
+        this.context = context;
         this.layoutInflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -64,18 +66,20 @@ public class ListViewAdapter extends BaseAdapter {
         noteEditBT = (Button) convertView.findViewById(R.id.note_edit_bt);         //button for edit text of list item
         noteRemoveBT = (Button) convertView.findViewById(R.id.note_remove_bt);     ////button for remove list item
 
+        listItemTV.setText(list.get(position));
+
         //view item button click listener
         noteViewBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 //inflate dialog layout
-                View noteViewLayout = layoutInflater.inflate(R.layout.note_view_dialog, parent);
+                View noteViewLayout = layoutInflater.inflate(R.layout.note_view_dialog, null);
 
-                TextView noteViewTV = (TextView) noteViewLayout.findViewById(R.id.note_item_text);
+                TextView noteViewTV = (TextView) noteViewLayout.findViewById(R.id.note_view_tv);
                 noteViewTV.setText(list.get(position));
 
-                AlertDialog.Builder noteViewDialog = new AlertDialog.Builder(MainActivity.context);
+                AlertDialog.Builder noteViewDialog = new AlertDialog.Builder(context);
                 noteViewDialog.setTitle("مشاهده یادداشت");
                 noteViewDialog.setView(noteViewLayout);
 
@@ -91,12 +95,12 @@ public class ListViewAdapter extends BaseAdapter {
         noteEditBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View noteEditLayout = layoutInflater.inflate(R.layout.note_edit_dialog, parent);
+                View noteEditLayout = layoutInflater.inflate(R.layout.note_edit_dialog, null);
 
                 final EditText noteEditET = (EditText) noteEditLayout.findViewById(R.id.note_edit_tv);
                 noteEditET.setText(list.get(position));
 
-                AlertDialog.Builder noteEditDialog = new AlertDialog.Builder(MainActivity.context);
+                AlertDialog.Builder noteEditDialog = new AlertDialog.Builder(context);
                 noteEditDialog.setTitle("ویرایش یادداشت");
                 noteEditDialog.setView(noteEditLayout);
 
@@ -127,7 +131,7 @@ public class ListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder noteRemoveDialog = new AlertDialog.Builder(MainActivity.context);
+                AlertDialog.Builder noteRemoveDialog = new AlertDialog.Builder(context);
                 noteRemoveDialog.setTitle("حذف یادداشت");
                 noteRemoveDialog.setMessage("آیا از حذف یادداشت مطمئن هستید؟");
 

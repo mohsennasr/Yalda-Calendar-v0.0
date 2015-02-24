@@ -21,8 +21,6 @@ import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.simpleListViewMode.MonthWeekDays;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.simpleListViewMode.YearWeekDays;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.Month;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.Year;
 
@@ -44,6 +42,7 @@ public class MonthView extends Fragment {
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
     private MainActivity.viewMode viewMode;
     private String[] weekDays = new String[]{"", "ش", "ی", "د", "س", "چ", "پ", "ج"};
+    private String[] weekDaysFull = new String[]{"", "شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه"};
 
     /*
     Fragment Classes have their own constructor method that we can't modify input parameter.
@@ -129,20 +128,13 @@ public class MonthView extends Fragment {
 
         //Week Day Name Grid View
         ArrayList<String> weekDaysArrayList = new ArrayList<>();
-        weekDaysArrayList.addAll(Arrays.asList(weekDays));
-        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, viewMode == Month ?
-                MonthWeekDays : YearWeekDays);
+        if (viewMode == Month)
+            weekDaysArrayList.addAll(Arrays.asList(weekDaysFull));
+        else
+            weekDaysArrayList.addAll(Arrays.asList(weekDays));
+        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, viewMode);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
-
-//        //Week Numbers Grid View
-////        String[] weekNums = new String[]{"1", "2", "3", "4", "5", "6"};
-//
-////        weekNumArrayList.addAll(Arrays.asList(weekNums));
-//        weekNumAdapter = new SimpleAdapter(weekNumArrayList, viewMode == Month ?
-//                MonthWeekNumbers:YearWeekNumbers);
-//        weekNumGrid.setAdapter(weekNumAdapter);
-//        weekNumAdapter.notifyDataSetChanged();
     }
 
     @Override

@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -40,7 +39,6 @@ public class DayListView extends Fragment implements View.OnTouchListener{
     private FrameLayout dayListHeaderFrame; //day notes frame view
     private Notes noteList;                 //day notes
     //    private Events eventList;               //day events
-    private Button addButton;               //add button for adding new note or event
 
     private ArrayList<String> eventList;    //event list array
     private EventListViewAdapter adapter;        //list view adapter
@@ -78,8 +76,7 @@ public class DayListView extends Fragment implements View.OnTouchListener{
         //initiate event list array and list view
         eventList = new ArrayList<String>();
 
-
-        adapter = new EventListViewAdapter(eventList);
+        adapter = new EventListViewAdapter(eventList, getActivity());
 
         //set list view adapter
         dayEventLV.setAdapter(adapter);
@@ -97,7 +94,6 @@ public class DayListView extends Fragment implements View.OnTouchListener{
 
         // TODO Event List should be derived from DB
     }
-
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -192,6 +188,4 @@ public class DayListView extends Fragment implements View.OnTouchListener{
 //        }
         return true;
     }
-
-    
 }

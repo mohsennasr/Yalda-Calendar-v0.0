@@ -16,8 +16,8 @@ import android.view.View;
 import java.util.Calendar;
 import java.util.List;
 
-import co.yalda.nasr_m.yaldacalendar.Day.DayFullView;
 import co.yalda.nasr_m.yaldacalendar.Day.DayListView;
+import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomDrawer;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomViewPager;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
@@ -173,7 +173,7 @@ public class MainActivity extends ActionBarActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.menu_main, menu);
+            getMenuInflater().inflate(R.menu.menu, menu);
             restoreActionBar();
             return true;
         }
@@ -211,7 +211,7 @@ public class MainActivity extends ActionBarActivity
                 case 2:
                     return YearView.newInstance(Calendar.getInstance());
                 case 3:
-                    return DayFullView.newInstance();
+                    return DayUC.newInstance(Calendar.getInstance(), true, viewMode.DayFull);
             }
             return null;
         }

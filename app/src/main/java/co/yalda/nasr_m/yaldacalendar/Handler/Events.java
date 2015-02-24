@@ -5,7 +5,6 @@ import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.ListViewAdapter;
@@ -38,11 +37,11 @@ public class Events {
         eventList = new ArrayList<String>();
 
         //set list view adapter
-        eventListView.setAdapter(adapter);
-
-        eventList.addAll(Arrays.asList(eventClock));
-        adapter = new ListViewAdapter(eventList);
-        adapter.notifyDataSetChanged();
+//        eventListView.setAdapter(adapter);
+//
+//        eventList.addAll(Arrays.asList(eventClock));
+//        adapter = new ListViewAdapter(eventList);
+//        adapter.notifyDataSetChanged();
     }
 
     public ArrayList<String> getEventList() {

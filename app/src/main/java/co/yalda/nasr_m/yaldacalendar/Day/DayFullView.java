@@ -17,8 +17,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import co.yalda.nasr_m.yaldacalendar.Adapters.Converters.ArabicDateConverter;
-import co.yalda.nasr_m.yaldacalendar.Adapters.Converters.PersianUtil;
+import co.yalda.nasr_m.yaldacalendar.Converters.ArabicDateConverter;
+import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Adapters.ListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
@@ -184,7 +184,7 @@ public class DayFullView extends Fragment{
         holyDayNote.setTextColor(Color.BLACK);
 
         noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
-        adapter = new ListViewAdapter(notes);
+        adapter = new ListViewAdapter(getActivity(), notes);
         noteList.setAdapter(adapter);
 
         dayDate = (TextView) rootView.findViewById(R.id.date_tv);

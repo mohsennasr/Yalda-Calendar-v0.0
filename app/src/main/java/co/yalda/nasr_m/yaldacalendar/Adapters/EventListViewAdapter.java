@@ -15,13 +15,15 @@ import co.yalda.nasr_m.yaldacalendar.R;
 /**
  * Created by Nasr_M on 2/18/2015.
  */
-public class EventListViewAdapter extends BaseAdapter {
+public class EventListViewAdapter extends BaseAdapter{
 
     private ArrayList<String> list;
     private LayoutInflater layoutInflater;
+    private Context context;
 
-    public EventListViewAdapter(ArrayList<String> list) {
+    public EventListViewAdapter(ArrayList<String> list, Context context) {
         this.list = list;
+        this.context = context;
         this.layoutInflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -60,4 +62,6 @@ public class EventListViewAdapter extends BaseAdapter {
 
         return convertView;
     }
+
+
 }
