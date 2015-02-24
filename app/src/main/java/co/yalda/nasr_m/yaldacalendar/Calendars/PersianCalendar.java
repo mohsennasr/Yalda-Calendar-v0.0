@@ -86,7 +86,7 @@ public class PersianCalendar {
     public void persianSet(int field, int amount) {
         switch (field) {
             case YEAR:
-                miladiDate.add(YEAR, amount - iPersianYear + 1);
+                miladiDate.add(YEAR, amount - iPersianYear);
                 calculateDate();
                 break;
             case MONTH:
@@ -94,7 +94,7 @@ public class PersianCalendar {
                 calculateDate();
                 break;
             case DATE:
-                miladiDate.add(DATE, amount - iPersianDate + 1);
+                miladiDate.add(DATE, amount - iPersianDate);
                 calculateDate();
                 break;
         }

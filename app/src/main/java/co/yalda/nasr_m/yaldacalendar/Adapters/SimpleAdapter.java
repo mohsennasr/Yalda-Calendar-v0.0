@@ -1,6 +1,7 @@
 package co.yalda.nasr_m.yaldacalendar.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import co.yalda.nasr_m.yaldacalendar.MainActivity;
+import co.yalda.nasr_m.yaldacalendar.R;
+
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.simpleListViewMode;
 
 /**
  * Created by Nasr_M on 2/23/2015.
@@ -17,9 +21,11 @@ import co.yalda.nasr_m.yaldacalendar.MainActivity;
 public class SimpleAdapter extends BaseAdapter {
 
     private ArrayList<String> list;
+    private simpleListViewMode view;
 
-    public SimpleAdapter(ArrayList<String> list) {
+    public SimpleAdapter(ArrayList<String> list, simpleListViewMode view) {
         this.list = list;
+        this.view = view;
     }
 
     @Override
@@ -39,14 +45,44 @@ public class SimpleAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater minflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater minflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null)
-            convertView = minflater.inflate(android.R.layout.simple_list_item_1, null);
+            convertView = minflater.inflate(R.layout.simple_list_item, null);
 
-        TextView itemText = (TextView) convertView.findViewById(android.R.id.text1);
-        itemText.setGravity(View.TEXT_ALIGNMENT_CENTER);
+//        LinearLayout simpleRoot = (LinearLayout) convertView.findViewById(R.id.simple_layout);
+
+//        TextView item = new TextView(context);
+//        ViewGroup.LayoutParams dayNameParams = new ViewGroup.LayoutParams(80,40);
+//        ViewGroup.LayoutParams weekNumParams = new ViewGroup.LayoutParams(40,80);
+
+        TextView itemText = (TextView) convertView.findViewById(R.id.simple_text);
         itemText.setText(list.get(position));
+        itemText.setTextColor(Color.BLACK);
+
+//        switch (view){
+//            case MonthWeekDays:
+//                item.setLayoutParams(dayNameParams);
+//                break;
+//            case MonthWeekNumbers:
+//                item.setLayoutParams(weekNumParams);
+//                break;
+//            case YearWeekDays:
+//                itemText.setMinHeight(20);
+//                itemText.setMinWidth(20);
+//                break;
+//            case YearWeekNumbers:
+//                itemText.setMinHeight(20);
+//                itemText.setMinWidth(20);
+//                break;
+//        }
+
+//        item.setText(list.get(position));
+//        item.setVisibility(View.VISIBLE);
+//        item.setTextColor(Color.BLACK);
+//        item.setGravity(View.TEXT_ALIGNMENT_CENTER);
+//
+//        simpleRoot.addView(item);
 
         return convertView;
     }

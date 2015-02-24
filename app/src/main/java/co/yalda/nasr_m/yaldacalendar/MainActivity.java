@@ -16,6 +16,7 @@ import android.view.View;
 import java.util.Calendar;
 import java.util.List;
 
+import co.yalda.nasr_m.yaldacalendar.Day.DayFullView;
 import co.yalda.nasr_m.yaldacalendar.Day.DayListView;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomDrawer;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomViewPager;
@@ -35,6 +36,13 @@ public class MainActivity extends ActionBarActivity
         Week
     }
 
+    public static enum simpleListViewMode {
+        MonthWeekNumbers,
+        YearWeekNumbers,
+        MonthWeekDays,
+        YearWeekDays
+    }
+
     public static enum calendarType {
         Solar,
         Gregorian,
@@ -44,7 +52,7 @@ public class MainActivity extends ActionBarActivity
     public static calendarType mainCalendarType = calendarType.Solar;
     public static calendarType secondCalendarType = calendarType.Gregorian;
     public static calendarType thirdCalendarType = calendarType.Gregorian;
-    public static Calendar originalSelectedDate;
+    public static Calendar originalSelectedDate = Calendar.getInstance();
 
     public static List<Byte> dayWeekHoliday;
     public static List<OCCVAC> holiday;
@@ -52,7 +60,7 @@ public class MainActivity extends ActionBarActivity
     private CustomViewPager viewPager;
     private ActionBar actionBar;
     private TabViewPagerAdapter tabPagerAdapter;
-    private String[] tabNames = new String[]{"First", "Second", "Third"};
+    private String[] tabNames = new String[]{"First", "Second", "Third", "Fourth"};
     private int currentTab = 0;
     public static Context context;
 
@@ -202,13 +210,15 @@ public class MainActivity extends ActionBarActivity
                     return MonthView.newInstance(Calendar.getInstance(), viewMode.Month);
                 case 2:
                     return YearView.newInstance(Calendar.getInstance());
+                case 3:
+                    return DayFullView.newInstance();
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
     }
 

@@ -49,7 +49,7 @@ public class ListViewAdapter extends BaseAdapter {
 
     @Override
     //get item view. return TextView of item in position
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
 
         TextView listItemTV;
         final Button noteViewBT, noteEditBT, noteRemoveBT;
@@ -70,7 +70,7 @@ public class ListViewAdapter extends BaseAdapter {
             public void onClick(View v) {
 
                 //inflate dialog layout
-                View noteViewLayout = layoutInflater.inflate(R.layout.note_view_dialog, null);
+                View noteViewLayout = layoutInflater.inflate(R.layout.note_view_dialog, parent);
 
                 TextView noteViewTV = (TextView) noteViewLayout.findViewById(R.id.note_item_text);
                 noteViewTV.setText(list.get(position));
@@ -91,7 +91,7 @@ public class ListViewAdapter extends BaseAdapter {
         noteEditBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View noteEditLayout = layoutInflater.inflate(R.layout.note_edit_dialog, null);
+                View noteEditLayout = layoutInflater.inflate(R.layout.note_edit_dialog, parent);
 
                 final EditText noteEditET = (EditText) noteEditLayout.findViewById(R.id.note_edit_tv);
                 noteEditET.setText(list.get(position));

@@ -1,0 +1,243 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/back"
+    android:animateLayoutChanges="true">
+
+    <LinearLayout
+        android:id="@+id/Date"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="30"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+        <TextView
+            android:id="@+id/date_tv"
+            android:layout_weight="33"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textDirection="rtl"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:layout_weight="33"
+            android:layout_marginLeft="0dp"
+            android:orientation="vertical"
+            android:weightSum="100">
+
+            <TextView
+                android:id="@+id/day_name_tv"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="21"
+                android:gravity="center"
+                android:singleLine="true"
+                android:textDirection="rtl"
+                android:textStyle="bold"
+                android:layout_margin="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="0dp"
+                android:layout_marginBottom="0dp"
+                android:textAlignment="gravity"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="28"
+                android:weightSum="100">
+
+                <TextView
+                    android:id="@+id/jalali_date_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_weight="82"
+                    android:singleLine="true"
+                    android:textDirection="rtl"
+                    android:textStyle="bold"
+                    android:layout_margin="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="0dp" />
+
+                <TextView
+                    android:id="@+id/jalali_date_full_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_weight="18"
+                    android:singleLine="true"
+                    android:textDirection="rtl"
+                    android:textStyle="bold"
+                    android:layout_margin="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="0dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="27"
+                android:weightSum="100">
+
+                <TextView
+                    android:id="@+id/arabic_date_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_weight="82"
+                    android:singleLine="true"
+                    android:textDirection="rtl"
+                    android:textStyle="bold"
+                    android:layout_margin="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="0dp" />
+
+                <TextView
+                    android:id="@+id/arabic_date_full_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_weight="18"
+                    android:singleLine="true"
+                    android:textDirection="rtl"
+                    android:textStyle="bold"
+                    android:layout_margin="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="0dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="28"
+                android:weightSum="100">
+
+                <TextView
+                    android:id="@+id/miladi_date_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_weight="82"
+                    android:singleLine="true"
+                    android:textDirection="rtl"
+                    android:textStyle="bold"
+                    android:layout_margin="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="0dp" />
+
+                <TextView
+                    android:id="@+id/miladi_date_full_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:layout_weight="18"
+                    android:singleLine="true"
+                    android:textDirection="rtl"
+                    android:textStyle="bold"
+                    android:layout_margin="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="10dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/month_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="34"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textDirection="rtl"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/holyday_note_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="right"
+        android:layout_marginRight="10dp"
+        android:layout_weight="39"/>
+
+    <ListView
+        android:id="@+id/note_list_lv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="21"
+        android:gravity="right"
+        android:textDirection="rtl"/>
+
+
+
+    <LinearLayout
+        android:id="@+id/note"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="31"
+        android:layout_marginLeft="0dp"
+        android:orientation="vertical"
+        android:weightSum="100"
+        android:layout_marginBottom="0dp"
+        android:layout_marginRight="0dp">
+
+        <TextView
+            android:id="@+id/dayli_note_1_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:lineSpacingMultiplier="0.7"
+            android:maxLines="2"
+            android:singleLine="false"
+            android:textDirection="rtl"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/dayli_note_2_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:lineSpacingMultiplier="0.7"
+            android:maxLines="2"
+            android:singleLine="false"
+            android:textDirection="rtl"
+            android:textStyle="bold"/>
+    </LinearLayout>
+</LinearLayout>
