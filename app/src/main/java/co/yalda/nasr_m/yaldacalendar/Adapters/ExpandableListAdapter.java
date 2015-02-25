@@ -68,12 +68,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             LayoutInflater infalInflater = (LayoutInflater) MainActivity.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(android.R.layout.simple_expandable_list_item_2, null);
+            TextView lblListHeader = (TextView) convertView
+                    .findViewById(android.R.id.text2);
+            lblListHeader.setTypeface(null, Typeface.BOLD);
+            lblListHeader.setText(headerTitle);
         }
-
-        TextView lblListHeader = (TextView) convertView
-                .findViewById(android.R.id.text2);
-        lblListHeader.setTypeface(null, Typeface.BOLD);
-        lblListHeader.setText(headerTitle);
 
         return convertView;
     }
@@ -86,12 +85,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             LayoutInflater infalInflater = (LayoutInflater) MainActivity.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
+            TextView txtListChild = (TextView) convertView
+                    .findViewById(android.R.id.text1);
+
+            txtListChild.setText(childText);
         }
-
-        TextView txtListChild = (TextView) convertView
-                .findViewById(android.R.id.text1);
-
-        txtListChild.setText(childText);
         return convertView;
     }
 

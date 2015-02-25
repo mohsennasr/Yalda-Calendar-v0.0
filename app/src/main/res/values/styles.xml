@@ -5,4 +5,6 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <color name="LightGreen">#00ff00</color>
+
 </resources>

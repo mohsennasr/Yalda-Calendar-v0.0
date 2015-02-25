@@ -1,6 +1,7 @@
 package co.yalda.nasr_m.yaldacalendar.Handler;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,7 +31,6 @@ public class Events extends Fragment {
         Events events = new Events();
         events.context = context;
         events.cal = cal;
-        events.initializer();
         return events;
     }
 
@@ -51,9 +51,11 @@ public class Events extends Fragment {
         rootView = mInflater.inflate(R.layout.event_view, null);
 
         title_tv = (TextView) rootView.findViewById(R.id.event_title);
+        title_tv.setTextColor(Color.BLACK);
         description_tv = (TextView) rootView.findViewById(R.id.event_description);
+        description_tv.setTextColor(Color.BLACK);
 
-        if (!title.isEmpty())
+        if (title != null)
             setData();
     }
 
@@ -67,5 +69,6 @@ public class Events extends Fragment {
         this.description = description;
         this.startTime = startTime;
         this.endTime = endTime;
+        initializer();
     }
 }

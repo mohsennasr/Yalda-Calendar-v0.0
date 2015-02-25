@@ -2,7 +2,7 @@ package co.yalda.nasr_m.yaldacalendar;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,8 +10,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Calendar;
@@ -34,8 +36,10 @@ public class MainActivity extends ActionBarActivity
     public static Calendar originalSelectedDate = Calendar.getInstance();
     public static List<Byte> dayWeekHoliday;
     public static List<OCCVAC> holiday;
-    public static int[] viewPagerSize = new int[2];
     public static Context context;
+    public static int[] viewSize;
+
+
     private CustomViewPager viewPager;
     private ActionBar actionBar;
     private TabViewPagerAdapter tabPagerAdapter;
@@ -60,7 +64,7 @@ public class MainActivity extends ActionBarActivity
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         setContentView(R.layout.activity_main);
 
-        context = getApplicationContext();
+        context = this;
 
 //        if (savedInstanceState == null)
 //            getSupportFragmentManager().beginTransaction()
@@ -81,7 +85,7 @@ public class MainActivity extends ActionBarActivity
         viewPager = (CustomViewPager) findViewById(R.id.view_pager);
 
         //declare page offset limit in view pager
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(4);
 
         //assign action bar
         actionBar = getSupportActionBar();
@@ -112,12 +116,23 @@ public class MainActivity extends ActionBarActivity
             actionBar.setSelectedNavigationItem(currentTab);
         }
 
+        Point dim = new Point();
+        getWindowManager().getDefaultDisplay().getSize(dim);
+        viewSize = new int[2];
+        viewSize[0] = dim.x;
+        viewSize[1] = dim.y - getSupportActionBar().getHeight();
+
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+            viewSize[1] -= actionBarHeight;
+        }
+
+
         dayUCList = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayList);
         dayUCFull = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayFull);
         monthView = MonthView.newInstance(Calendar.getInstance(), dayViewMode.Month);
         yearView = YearView.newInstance(Calendar.getInstance());
-
-        viewPagerSize = viewPager.getDimention(getApplicationContext());
     }
 
     @Override
@@ -196,16 +211,155 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (yearView != null)
-            yearView.setColumns();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("Current_Selected_Tab", viewPager.getCurrentItem());
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        String swipeDirection = "";
+
+        switch (viewPager.getCurrentItem()) {
+            case 0:             //day list view
+        }
+
+//        if (viewPager.getCurrentItem() == 2 && event.getPointerCount() >= 2) {
+//            SWIPE_ACTION = false;
+//            if (progressDialog != null){
+//                progressDialog.dismiss();
+//                progressDialog = null;
+//            }
+//
+//            if (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
+//                startPoint[0] = event.getX(0);
+//                startPoint[1] = event.getY(0);
+//                startPoint[2] = event.getX(1);
+//                startPoint[3] = event.getY(1);
+//            }else if (event.getActionMasked() == MotionEvent.ACTION_POINTER_UP){
+//                endPoint[0] = event.getX(0);
+//                endPoint[1] = event.getY(0);
+//                endPoint[2] = event.getX(1);
+//                endPoint[3] = event.getY(1);
+//
+//                //start distance
+//                distance[0] = (float) Math.sqrt(Math.pow ((startPoint[0] - startPoint[2]), 2)
+//                        + Math.pow ((startPoint[1] - startPoint[3]), 2));
+//
+//                //end distance
+//                distance[1] = (float) Math.sqrt(Math.pow ((endPoint[0] - endPoint[2]), 2)
+//                        + Math.pow ((endPoint[1] - startPoint[3]), 2));
+//
+//                if (distance[0] < distance[1]) { //zoom in
+//                    //change view to show year list
+//                    yearCal.yearListView("IN");
+//                }else if (distance[0] > distance[1]) { //zoom out
+//                    //change view to show current year
+//                    yearCal.yearListView("OUT");
+//                }
+//            }
+//
+////            SGD.onTouchEvent(event);
+////            return true;
+//        }
+//        if (SWIPE_ACTION)
+//            switch (event.getAction()) {
+//                case MotionEvent.ACTION_DOWN:
+//                    getWindowManager().getDefaultDisplay().getSize(point);
+//                    if ((event.getX() > point.x - 40) || (event.getY() <= getActionBar().getHeight()) || drawerOpen) {
+//                        IS_IN_VIEWPAGER_AREA = false;
+//                        return super.dispatchTouchEvent(event);
+//                    } else
+//                        IS_IN_VIEWPAGER_AREA = true;
+//                    startPoint[0] = event.getX();
+//                    startPoint[1] = event.getY();
+//                    break;
+//                case MotionEvent.ACTION_UP:
+//                    if (!IS_IN_VIEWPAGER_AREA)
+//                        return super.dispatchTouchEvent(event);
+//                    endPoint[0] = event.getX();
+//                    endPoint[1] = event.getY();
+//                    float dx, dy;
+//                    dx = Math.abs(endPoint[0] - startPoint[0]);
+//                    dy = Math.abs(endPoint[1] - startPoint[1]);
+//
+//                    if ((dx >= dy) && (startPoint[0] >= endPoint[0])) {
+//                        swipeDirection = "R2L";
+//                    } else if ((dx > dy) && (startPoint[0] < endPoint[0])) {
+//                        swipeDirection = "L2R";
+//                    } else if ((dx < dy) && (startPoint[1] >= endPoint[1])) {
+//                        swipeDirection = "D2U";
+//                        if (progressDialog != null)
+//                            progressDialog.dismiss();
+//                    } else if ((dx < dy) && (startPoint[1] < endPoint[1])) {
+//                        swipeDirection = "U2D";
+//                        if (progressDialog != null)
+//                            progressDialog.dismiss();
+//                    }
+//                    if (dx > 10) {
+//                        startPoint[0] = endPoint[0] = startPoint[1] = endPoint[1] = 0;
+//                        switch (customViewPager.getCurrentItem()) {
+//                            case 0:     //Day Tab
+//                                TOUCH_ACTION_MOVE = false;
+//                                if (swipeDirection == "R2L") {
+//                                    cal.add(Calendar.DATE, 1);
+//                                    todayCal.updateDay(1);
+//                                } else if (swipeDirection == "L2R") {
+//                                    cal.add(Calendar.DATE, -1);
+//                                    todayCal.updateDay(-1);
+//                                }
+//                                break;
+//                            case 1:     //Month Tab
+//                                TOUCH_ACTION_MOVE = false;
+//                                if (swipeDirection == "R2L") {
+//                                    cal.add(Calendar.MONTH, 1);
+//                                    monthCal.updateThreadStart(1);
+//                                } else if (swipeDirection == "L2R") {
+//                                    cal.add(Calendar.MONTH, -1);
+//                                    monthCal.updateThreadStart(-1);
+//                                } else if (swipeDirection == "D2U") {
+//                                    cal.add(Calendar.YEAR, 1);
+//                                    monthCal.updateThreadStart(1);
+//                                } else if (swipeDirection == "U2D") {
+//                                    cal.add(Calendar.YEAR, -1);
+//                                    monthCal.updateThreadStart(-1);
+//                                }
+//                                break;
+//                            case 2:     //Year Tab
+//                                if (!yearCal.YEAR_LIST) {
+//                                    TOUCH_ACTION_MOVE = false;
+//                                    if (swipeDirection == "R2L") {
+//                                        cal.add(Calendar.YEAR, 1);
+//                                        yearCal.updateYear(1);
+//                                    } else if (swipeDirection == "L2R") {
+//                                        cal.add(Calendar.YEAR, -1);
+//                                        yearCal.updateYear(-1);
+//                                    }
+//                                }
+//                                break;
+//                        }
+//                    }
+//                    break;
+//                case MotionEvent.ACTION_MOVE:
+//                    if (customViewPager.getCurrentItem() == 2
+//                            && Math.abs(event.getX() - startPoint[0]) > 10
+//                            && Math.abs(event.getY() - startPoint[1]) < Math.abs(event.getY() - startPoint[0])
+//                            && progressDialog == null
+//                            && IS_IN_VIEWPAGER_AREA
+//                            && SWIPE_ACTION
+//                            && !yearCal.YEAR_LIST) {
+//                        progressDialog = new ProgressDialog(this);
+//                        progressDialog.setTitle("لطفاً منتظر بمانید...");
+//                        progressDialog.setCancelable(false);
+//                        progressDialog.show();
+//                    }
+//                    break;
+//            }
+//        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+//            SWIPE_ACTION = true;
+//        }
+
+        return super.dispatchTouchEvent(ev);
     }
 
     public static enum dayViewMode {
@@ -221,6 +375,13 @@ public class MainActivity extends ActionBarActivity
         SimpleWeek,
         WeekList
     }
+
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//        if (yearView != null)
+//            yearView.setColumns();
+//    }
 
     public static enum simpleListViewMode {
         MonthWeekNumbers,

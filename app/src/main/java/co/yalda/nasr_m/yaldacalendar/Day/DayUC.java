@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,7 +42,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class DayUC extends android.support.v4.app.Fragment implements View.OnTouchListener {
+public class DayUC extends Fragment implements View.OnTouchListener {
 
     public View rootView;                      // root view of fragment
     public TextView mainDate_TV, secondDate_TV, thirdDate_TV;
@@ -68,6 +68,7 @@ public class DayUC extends android.support.v4.app.Fragment implements View.OnTou
             endPoint = new float[4],
             distance = new float[2];
     private Typeface tahomaFont;
+    private DayUC dayUCListHeader;
 
     public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode) {
         DayUC dayUC = new DayUC();
@@ -161,6 +162,14 @@ public class DayUC extends android.support.v4.app.Fragment implements View.OnTou
         return rootView;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (dayViewMode == DayHeader) {
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUCListHeader).commit();
+        }
+    }
+
     private void initialDayHeader() {
         mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_header_mode_tv);
         mainDate_TV.setClickable(isEnable);
@@ -185,6 +194,11 @@ public class DayUC extends android.support.v4.app.Fragment implements View.OnTou
 //                .inflate(R.layout.day_uc_month_view, null);
         mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_main_date);
         mainDate_TV.setClickable(isEnable);
+        if (!isEnable)
+            mainDate_TV.setBackgroundColor(Color.LTGRAY);
+        else
+            mainDate_TV.setBackgroundColor(Color.GREEN);
+//        mainDate_TV.setLayoutParams(new ViewGroup.LayoutParams((MainActivity.viewSize[0] - 40)/7,(MainActivity.viewSize[1] - 100)/6 ));
 
         switch (MainActivity.mainCalendarType) {
             case Solar:
@@ -243,12 +257,13 @@ public class DayUC extends android.support.v4.app.Fragment implements View.OnTou
     }
 
     private void initialDayList() {
+        dayUCListHeader = DayUC.newInstance(originalSelectedDate, false, DayHeader);
         dayEventLV = (ListView) rootView.findViewById(R.id.day_list_mode_event_list);
         //initiate event list array and list view
         eventTimeList = new ArrayList<>();
         eventDetailList = new HashMap<>();
 
-        dayListadapter = new EventListViewAdapter(eventTimeList, eventDetailList, getActivity());
+        dayListadapter = new EventListViewAdapter(eventTimeList, eventDetailList, context);
 
         //set list view adapter
         dayEventLV.setAdapter(dayListadapter);
@@ -280,7 +295,7 @@ public class DayUC extends android.support.v4.app.Fragment implements View.OnTou
         holyDayNote.setTextColor(Color.BLACK);
 
         ListView noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
-        adapter = new ListViewAdapter(getActivity(), notes);
+        adapter = new ListViewAdapter(context, notes);
         noteList.setAdapter(adapter);
 
         dayDate = (TextView) rootView.findViewById(R.id.date_tv);
@@ -319,22 +334,22 @@ public class DayUC extends android.support.v4.app.Fragment implements View.OnTou
     }
 
     public void dayListSetData() {
-        DayUC dayUC = DayUC.newInstance(originalSelectedDate, false, DayHeader);
-        ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUC).commit();
 
         // TODO Event List should be derived from DB
 
         List<Events> eventlist1 = new ArrayList<>();
         List<Events> eventlist2 = new ArrayList<>();
-        Events event = Events.newInstance(getActivity(), Calendar.getInstance());
-        eventTimeList.add("10:00");
-        event.setEvent("یادآوری 1", "اولین یادآوری", "10:00", "11:00");
-        eventlist1.add(event);
-        event.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
-        eventlist1.add(event);
-        eventTimeList.add("16:00");
-        event.setEvent("یادآوری 3", "سومین یادآوری", "16:00", "17:00");
-        eventlist2.add(event);
+        Events event1 = Events.newInstance(context, Calendar.getInstance());
+        Events event2 = Events.newInstance(context, Calendar.getInstance());
+        Events event3 = Events.newInstance(context, Calendar.getInstance());
+        eventTimeList.add("10:00" + " - " + "11:00");
+        event1.setEvent("یادآوری 1", "اولین یادآوری", "10:00", "11:00");
+        eventlist1.add(event1);
+        event2.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
+        eventlist1.add(event2);
+        eventTimeList.add("16:00" + " - " + "17:00");
+        event3.setEvent("یادآوری 3", "سومین یادآوری", "16:00", "17:00");
+        eventlist2.add(event3);
 
         eventDetailList.put(eventTimeList.get(0), eventlist1);
         eventDetailList.put(eventTimeList.get(1), eventlist2);
@@ -445,7 +460,6 @@ public class DayUC extends android.support.v4.app.Fragment implements View.OnTou
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        dayEventLV.onTouchEvent(event);
         Toast.makeText(context, "touch event . . . ", Toast.LENGTH_SHORT);
         return true;
     }

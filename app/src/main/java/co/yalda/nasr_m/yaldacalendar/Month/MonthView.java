@@ -104,8 +104,7 @@ public class MonthView extends Fragment {
         monthCal.add(Calendar.DATE, -remainDay);
         dayUC = new DayUC[42];
         for (int i = 0; i < 42; i++) {
-            dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i > (maxDayMonth + remainDay))
-                    && (dayViewMode == Month)
+            dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i >= (maxDayMonth + remainDay))
                     , dayViewMode);
             dayUCList.add(dayUC[i]);
             monthCal.add(Calendar.DATE, 1);
@@ -124,6 +123,7 @@ public class MonthView extends Fragment {
 
         gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList);
         monthGridView.setAdapter(gridViewAdapter);
+        monthGridView.setMotionEventSplittingEnabled(false);
         gridViewAdapter.notifyDataSetChanged();
 
         //Week Day Name Grid View

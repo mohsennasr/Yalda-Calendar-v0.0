@@ -46,15 +46,16 @@ public class SimpleAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater minflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if (convertView == null)
+        if (convertView == null) {
             convertView = minflater.inflate(R.layout.simple_list_item, null);
 
-        TextView itemText = (TextView) convertView.findViewById(R.id.simple_text);
-        itemText.setText(list.get(position));
-        if (view == MainActivity.dayViewMode.Month)
-            itemText.setTextSize(24);
-        else
-            itemText.setTextSize(12);
+            TextView itemText = (TextView) convertView.findViewById(R.id.simple_text);
+            itemText.setText(list.get(position));
+            if (view == MainActivity.dayViewMode.Month)
+                itemText.setTextSize(24);
+            else
+                itemText.setTextSize(12);
+        }
 
         return convertView;
     }

@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     android:backgroundTint="@color/background_floating_material_dark"
     android:backgroundTintMode="multiply"
-    android:minHeight="100dp"
+    android:minHeight="80dp"
     android:orientation="horizontal"
     android:showDividers="middle">
 

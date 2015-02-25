@@ -52,17 +52,17 @@ public class EventListViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null)
+        if (convertView == null) {
             convertView = mInflater.inflate(R.layout.event_list_item, null);
 
-        TextView time = (TextView) convertView.findViewById(R.id.event_item_text);
-        time.setText(timeList.get(position));
+            TextView time = (TextView) convertView.findViewById(R.id.event_item_text);
+            time.setText(timeList.get(position));
 
-        LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.event_item_event_frame);
-        for (int i = 0; i < eventList.get(timeList.get(position)).size(); i++) {
-            layout.addView(eventList.get(timeList.get(position)).get(i).rootView);
+            LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.event_item_event_frame);
+            for (int i = 0; i < eventList.get(timeList.get(position)).size(); i++) {
+                layout.addView(eventList.get(timeList.get(position)).get(i).rootView);
+            }
         }
-
         return convertView;
     }
 }
