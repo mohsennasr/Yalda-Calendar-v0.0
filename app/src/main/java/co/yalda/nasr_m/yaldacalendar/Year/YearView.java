@@ -63,19 +63,23 @@ public class YearView extends Fragment {
         yearCal.setTime(pCal.getMiladiDate().getTime());
         yearMonth = new MonthView[12];
         for (int i = 0; i < 12; i++) {
-            yearMonth[i] = MonthView.newInstance(yearCal, MainActivity.viewMode.Year);
+            yearMonth[i] = MonthView.newInstance(yearCal, MainActivity.dayViewMode.Year);
             monthViewList.add(yearMonth[i]);
             yearCal.add(Calendar.MONTH, 1);
         }
 
-        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-            yearGridView.setNumColumns(3);
-        else
-            yearGridView.setNumColumns(4);
+        setColumns();
 
         yearHeader_tv.setText(String.valueOf(pCal.getiPersianYear()));
         yearGridAdapter = new YearGridViewAdapter(monthViewList);
         yearGridView.setAdapter(yearGridAdapter);
         yearGridAdapter.notifyDataSetChanged();
+    }
+
+    public void setColumns() {
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            yearGridView.setNumColumns(3);
+        else
+            yearGridView.setNumColumns(4);
     }
 }

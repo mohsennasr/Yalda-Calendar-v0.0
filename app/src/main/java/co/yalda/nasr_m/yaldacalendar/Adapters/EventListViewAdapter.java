@@ -5,63 +5,64 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
+import co.yalda.nasr_m.yaldacalendar.Handler.Events;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 /**
  * Created by Nasr_M on 2/18/2015.
  */
-public class EventListViewAdapter extends BaseAdapter{
+public class EventListViewAdapter extends BaseAdapter {
 
-    private ArrayList<String> list;
-    private LayoutInflater layoutInflater;
+    private ArrayList<String> timeList;
+    private HashMap<String, List<Events>> eventList;
+    private LayoutInflater mInflater;
     private Context context;
 
-    public EventListViewAdapter(ArrayList<String> list, Context context) {
-        this.list = list;
+    public EventListViewAdapter(ArrayList<String> timeList, HashMap<String, List<Events>> eventList, Context context) {
+        this.timeList = timeList;
+        Collections.sort(this.timeList);
         this.context = context;
-        this.layoutInflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.eventList = eventList;
+        this.mInflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
-    //get number of elements in list
     public int getCount() {
-        return list.size();
+        return timeList.size();
     }
 
     @Override
-    //get list item in position
-    public String getItem(int position) {
-        return list.get(position);
+    public Object getItem(int position) {
+        return timeList.get(position);
     }
 
     @Override
-    //get item id (itemId = position)
     public long getItemId(int position) {
         return position;
     }
 
     @Override
-    //get item view. return TextView of item in position
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null)
+            convertView = mInflater.inflate(R.layout.event_list_item, null);
 
-        TextView listItemTV;
+        TextView time = (TextView) convertView.findViewById(R.id.event_item_text);
+        time.setText(timeList.get(position));
 
-        //if first time item created, create view for it. else update view
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.event_list_item, null);
+        LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.event_item_event_frame);
+        for (int i = 0; i < eventList.get(timeList.get(position)).size(); i++) {
+            layout.addView(eventList.get(timeList.get(position)).get(i).rootView);
         }
-
-        listItemTV = (TextView) convertView.findViewById(R.id.event_item_text);          //list item View
-
-        listItemTV.setText(list.get(position));
 
         return convertView;
     }
-
-
 }

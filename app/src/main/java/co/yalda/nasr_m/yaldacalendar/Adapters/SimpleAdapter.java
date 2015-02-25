@@ -20,9 +20,9 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 public class SimpleAdapter extends BaseAdapter {
 
     private ArrayList<String> list;
-    private MainActivity.viewMode view;
+    private MainActivity.dayViewMode view;
 
-    public SimpleAdapter(ArrayList<String> list, MainActivity.viewMode view) {
+    public SimpleAdapter(ArrayList<String> list, MainActivity.dayViewMode view) {
         this.list = list;
         this.view = view;
     }
@@ -51,7 +51,7 @@ public class SimpleAdapter extends BaseAdapter {
 
         TextView itemText = (TextView) convertView.findViewById(R.id.simple_text);
         itemText.setText(list.get(position));
-        if (view == MainActivity.viewMode.Month)
+        if (view == MainActivity.dayViewMode.Month)
             itemText.setTextSize(24);
         else
             itemText.setTextSize(12);

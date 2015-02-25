@@ -21,16 +21,16 @@ import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.Month;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.Year;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Year;
 
 /**
  * Created by Nasr_M on 2/21/2015.
  */
 public class MonthView extends Fragment {
 
-    private DayUC[] dayUC;                    //day user control object
     public View rootView;
+    private DayUC[] dayUC;                    //day user control object
     private Calendar monthCal = Calendar.getInstance();
 
     //Month View attributes
@@ -40,7 +40,7 @@ public class MonthView extends Fragment {
     private MonthGridViewAdapter gridViewAdapter;   //month grid adapter
     private SimpleAdapter weekDaysAdapter, weekNumAdapter;
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
-    private MainActivity.viewMode viewMode;
+    private MainActivity.dayViewMode dayViewMode;
     private String[] weekDays = new String[]{"", "ش", "ی", "د", "س", "چ", "پ", "ج"};
     private String[] weekDaysFull = new String[]{"", "شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه"};
 
@@ -49,10 +49,10 @@ public class MonthView extends Fragment {
     So, for making Fragment Class with custom input value new method should be written to create
     class objects and set private attributes according to input values
      */
-    public static MonthView newInstance(Calendar monthCal, MainActivity.viewMode viewMode) {
+    public static MonthView newInstance(Calendar monthCal, MainActivity.dayViewMode dayViewMode) {
         MonthView monthView = new MonthView();
         monthView.monthCal.setTime(monthCal.getTime());
-        monthView.viewMode = viewMode;
+        monthView.dayViewMode = dayViewMode;
         monthView.firstInitialization();
         monthView.initialMonth();
         return monthView;
@@ -62,12 +62,12 @@ public class MonthView extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null)
-            switch (savedInstanceState.getString("ViewMode")){
+            switch (savedInstanceState.getString("ViewMode")) {
                 case "Month":
-                    viewMode = Month;
+                    dayViewMode = Month;
                     break;
                 case "Year":
-                    viewMode = Year;
+                    dayViewMode = Year;
                     break;
             }
         if (rootView == null) {
@@ -81,7 +81,7 @@ public class MonthView extends Fragment {
         return rootView;
     }
 
-    private void firstInitialization(){
+    private void firstInitialization() {
         LayoutInflater mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         rootView = mInfalater.inflate(R.layout.month_view, null);
 
@@ -105,13 +105,13 @@ public class MonthView extends Fragment {
         dayUC = new DayUC[42];
         for (int i = 0; i < 42; i++) {
             dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i > (maxDayMonth + remainDay))
-                    && (viewMode == Month)
-                    , viewMode);
+                    && (dayViewMode == Month)
+                    , dayViewMode);
             dayUCList.add(dayUC[i]);
             monthCal.add(Calendar.DATE, 1);
         }
 
-        if (viewMode == Month)
+        if (dayViewMode == Month)
             monthHeader_tv.setText(pCal.getPersianMonthName() + " " + String.valueOf(pCal.getiPersianYear()));
         else
             monthHeader_tv.setText(pCal.getPersianMonthName());
@@ -119,7 +119,7 @@ public class MonthView extends Fragment {
         ArrayList<String> weekNumArrayList = new ArrayList<>();
 
         int weekNum = pCal.getFirstWeekNumberOfMonth();
-        for (int i = weekNum; i< weekNum+6; i++)
+        for (int i = weekNum; i < weekNum + 6; i++)
             weekNumArrayList.add(String.valueOf(i));
 
         gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList);
@@ -128,18 +128,18 @@ public class MonthView extends Fragment {
 
         //Week Day Name Grid View
         ArrayList<String> weekDaysArrayList = new ArrayList<>();
-        if (viewMode == Month)
+        if (dayViewMode == Month)
             weekDaysArrayList.addAll(Arrays.asList(weekDaysFull));
         else
             weekDaysArrayList.addAll(Arrays.asList(weekDays));
-        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, viewMode);
+        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, dayViewMode);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString("ViewMode", viewMode.toString());
+        outState.putString("ViewMode", dayViewMode.toString());
         super.onSaveInstanceState(outState);
     }
 }

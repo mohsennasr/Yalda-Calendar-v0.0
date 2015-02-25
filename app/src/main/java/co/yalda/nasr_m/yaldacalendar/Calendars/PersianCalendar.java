@@ -2,7 +2,11 @@ package co.yalda.nasr_m.yaldacalendar.Calendars;
 
 import java.util.Calendar;
 
-import static java.util.Calendar.*;
+import static java.util.Calendar.DATE;
+import static java.util.Calendar.DAY_OF_WEEK;
+import static java.util.Calendar.MONTH;
+import static java.util.Calendar.YEAR;
+import static java.util.Calendar.getInstance;
 
 /**
  * Created by Nasr_M on 2/17/2015.
@@ -104,15 +108,6 @@ public class PersianCalendar {
         return ((Math.abs(year - 1395) % 4) == 0);
     }
 
-    public void setMiladiDate(Calendar miladiDate) {
-        this.miladiDate.setTime(miladiDate.getTime());
-        calculateDate();
-    }
-
-    public void setiPersianFirstDayOfWeek(int iPersianFirstDayOfWeek) {
-        this.iPersianFirstDayOfWeek = iPersianFirstDayOfWeek;
-    }
-
     public int getiPersianYear() {
         return iPersianYear;
     }
@@ -131,6 +126,10 @@ public class PersianCalendar {
 
     public int getiPersianFirstDayOfWeek() {
         return iPersianFirstDayOfWeek;
+    }
+
+    public void setiPersianFirstDayOfWeek(int iPersianFirstDayOfWeek) {
+        this.iPersianFirstDayOfWeek = iPersianFirstDayOfWeek;
     }
 
     public String getPersianMonthName() {
@@ -157,7 +156,19 @@ public class PersianCalendar {
         return miladiDate;
     }
 
+    public void setMiladiDate(Calendar miladiDate) {
+        this.miladiDate.setTime(miladiDate.getTime());
+        calculateDate();
+    }
+
     public String getPersianFullDate() {
         return (persianDayName + " " + iPersianDate + " " + persianMonthName + " " + iPersianYear);
+    }
+
+    public String getPersianDateIndex() {
+        String date, month;
+        date = iPersianDate < 10 ? "0" + String.valueOf(iPersianDate) : String.valueOf(iPersianDate);
+        month = iPersianMonth < 10 ? "0" + String.valueOf(iPersianMonth) : String.valueOf(iPersianMonth);
+        return month + "/" + date;
     }
 }

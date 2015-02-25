@@ -1,54 +1,71 @@
 package co.yalda.nasr_m.yaldacalendar.Handler;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
-import co.yalda.nasr_m.yaldacalendar.Adapters.ListViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.R;
 
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class Events {
+public class Events extends Fragment {
 
+    public View rootView;
     private Context context;
     private Calendar cal = Calendar.getInstance();                   //event object date
-    private View rootView;                  //root view
-    private ListView eventListView;         //list view for showing events list
-    private ArrayList<String> eventList;    //event list array
-    private ListViewAdapter adapter;        //list view adapter
-    private String[] eventClock = new String[]{"00:00", "01:00", "02:00", "03:00", "04:00", "05:00"
-            , "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"
-            , "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00"};
+    private String startTime, endTime;
+    private String title, description;
+    private boolean hasReminder;
+    private TextView title_tv, description_tv;
 
-    public Events(Context context, Calendar cal, ListView eventListView) {
-        this.context = context;
-        this.cal = cal;
-        this.eventListView = eventListView;
-        initialize();
+    public static Events newInstance(Context context, Calendar cal) {
+        Events events = new Events();
+        events.context = context;
+        events.cal = cal;
+        events.initializer();
+        return events;
     }
 
-    private void initialize() {
-
-        //initiate event list array and list view
-        eventList = new ArrayList<String>();
-
-        //set list view adapter
-//        eventListView.setAdapter(adapter);
-//
-//        eventList.addAll(Arrays.asList(eventClock));
-//        adapter = new ListViewAdapter(eventList);
-//        adapter.notifyDataSetChanged();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (rootView == null)
+            initializer();
     }
 
-    public ArrayList<String> getEventList() {
-        return eventList;
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return rootView;
     }
 
-    public ListViewAdapter getAdapter() {
-        return adapter;
+    private void initializer() {
+        LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        rootView = mInflater.inflate(R.layout.event_view, null);
+
+        title_tv = (TextView) rootView.findViewById(R.id.event_title);
+        description_tv = (TextView) rootView.findViewById(R.id.event_description);
+
+        if (!title.isEmpty())
+            setData();
+    }
+
+    private void setData() {
+        title_tv.setText(title);
+        description_tv.setText(description);
+    }
+
+    public void setEvent(String title, String description, String startTime, String endTime) {
+        this.title = title;
+        this.description = description;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 }

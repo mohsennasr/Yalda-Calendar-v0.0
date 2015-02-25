@@ -26,4 +26,13 @@ public class CustomViewPager extends ViewPager {
     public boolean onTouchEvent(MotionEvent ev) {
         return false;
     }
+
+    public int[] getDimention(Context context) {
+        int[] dim = new int[2];
+//        Point point = new Point();
+//        ((Activity) context).getWindowManager().getDefaultDisplay().getSize(point);
+        dim[0] = this.getHeight();
+        dim[1] = this.getWidth();
+        return dim;
+    }
 }

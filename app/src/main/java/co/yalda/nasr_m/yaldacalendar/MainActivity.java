@@ -2,6 +2,7 @@ package co.yalda.nasr_m.yaldacalendar;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,7 +17,6 @@ import android.view.View;
 import java.util.Calendar;
 import java.util.List;
 
-import co.yalda.nasr_m.yaldacalendar.Day.DayListView;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomDrawer;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomViewPager;
@@ -27,49 +27,27 @@ import co.yalda.nasr_m.yaldacalendar.Year.YearView;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, ActionBar.TabListener {
 
-    public static enum viewMode {
-        Year,
-        Month,
-        DayHeader,
-        DayFull,
-        DaySimple,
-        Week
-    }
-
-    public static enum simpleListViewMode {
-        MonthWeekNumbers,
-        YearWeekNumbers,
-        MonthWeekDays,
-        YearWeekDays
-    }
-
-    public static enum calendarType {
-        Solar,
-        Gregorian,
-        Hejri
-    }
-
+    public static String[] holidayList = new String[]{"01/01", "01/02", "01/03", "01/04"};
     public static calendarType mainCalendarType = calendarType.Solar;
     public static calendarType secondCalendarType = calendarType.Gregorian;
     public static calendarType thirdCalendarType = calendarType.Gregorian;
     public static Calendar originalSelectedDate = Calendar.getInstance();
-
     public static List<Byte> dayWeekHoliday;
     public static List<OCCVAC> holiday;
-
+    public static int[] viewPagerSize = new int[2];
+    public static Context context;
     private CustomViewPager viewPager;
     private ActionBar actionBar;
     private TabViewPagerAdapter tabPagerAdapter;
     private String[] tabNames = new String[]{"First", "Second", "Third", "Fourth"};
     private int currentTab = 0;
-    public static Context context;
-
-
+    private DayUC dayUCList, dayUCFull;
+    private MonthView monthView;
+    private YearView yearView;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -133,6 +111,13 @@ public class MainActivity extends ActionBarActivity
             tabPagerAdapter.notifyDataSetChanged();
             actionBar.setSelectedNavigationItem(currentTab);
         }
+
+        dayUCList = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayList);
+        dayUCFull = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayFull);
+        monthView = MonthView.newInstance(Calendar.getInstance(), dayViewMode.Month);
+        yearView = YearView.newInstance(Calendar.getInstance());
+
+        viewPagerSize = viewPager.getDimention(getApplicationContext());
     }
 
     @Override
@@ -169,15 +154,15 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.menu, menu);
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
+//        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        // Only show items in the action bar relevant to this screen
+        // if the drawer is not showing. Otherwise, let the drawer
+        // decide what to show in the action bar.
+        getMenuInflater().inflate(R.menu.menu, menu);
+//            restoreActionBar();
+        return true;
+//        }
+//        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -193,33 +178,6 @@ public class MainActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public class TabViewPagerAdapter extends FragmentPagerAdapter {
-
-        public TabViewPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return DayListView.newInstance(Calendar.getInstance());
-                case 1:
-                    return MonthView.newInstance(Calendar.getInstance(), viewMode.Month);
-                case 2:
-                    return YearView.newInstance(Calendar.getInstance());
-                case 3:
-                    return DayUC.newInstance(Calendar.getInstance(), true, viewMode.DayFull);
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return 4;
-        }
     }
 
     @Override
@@ -238,8 +196,69 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (yearView != null)
+            yearView.setColumns();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("Current_Selected_Tab", viewPager.getCurrentItem());
+    }
+
+    public static enum dayViewMode {
+        Year,
+        Month,
+        DayHeader,
+        DayFull,
+        DayList,
+        Week
+    }
+
+    public static enum weekViewMode {
+        SimpleWeek,
+        WeekList
+    }
+
+    public static enum simpleListViewMode {
+        MonthWeekNumbers,
+        YearWeekNumbers,
+        MonthWeekDays,
+        YearWeekDays
+    }
+
+    public static enum calendarType {
+        Solar,
+        Gregorian,
+        Hejri
+    }
+
+    public class TabViewPagerAdapter extends FragmentPagerAdapter {
+
+        public TabViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return dayUCList;
+                case 1:
+                    return dayUCFull;
+                case 2:
+                    return monthView;
+                case 3:
+                    return yearView;
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 4;
+        }
     }
 }

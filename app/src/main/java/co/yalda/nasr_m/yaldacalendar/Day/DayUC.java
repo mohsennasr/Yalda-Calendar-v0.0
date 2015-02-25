@@ -6,60 +6,80 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 
+import co.yalda.nasr_m.yaldacalendar.Adapters.EventListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.ListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.ArabicDateConverter;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
+import co.yalda.nasr_m.yaldacalendar.Handler.Events;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 import static android.graphics.Typeface.createFromAsset;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayFull;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayHeader;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayList;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Year;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.DayFull;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.DayHeader;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.Month;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewMode.Year;
 
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class DayUC extends Fragment {
+public class DayUC extends android.support.v4.app.Fragment implements View.OnTouchListener {
 
+    public View rootView;                      // root view of fragment
+    public TextView mainDate_TV, secondDate_TV, thirdDate_TV;
     private boolean isHoliday;                  //is it holiday
     private boolean isEnable = true;         //should be clickable
-    public View rootView;                      // root view of fragment
     private PersianCalendar persianCalendar;
     private Calendar miladiCalendar = Calendar.getInstance();
-    private MainActivity.viewMode viewMode;
+    private MainActivity.dayViewMode dayViewMode;
     private TextView dayName, dayDate, dayliNote1, dayliNote2, monthName, miladiFullDate, jalaliFulldate,
             arabicFullDate, miladiDate, jalaliDate, arabicdate, holyDayNote;
     private String DateIndex;
     private String[] MonthName = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
     private ListViewAdapter adapter;
     private ArrayList<String> notes = new ArrayList<String>();
+    private ArrayList<String> eventTimeList;    //event list array
+    private HashMap<String, List<Events>> eventDetailList;
+    private EventListViewAdapter dayListadapter;        //list view adapter
+    private String[] eventClock = new String[]{"00:00", "01:00", "02:00", "03:00", "04:00", "05:00"
+            , "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"
+            , "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
+    private ListView dayEventLV;            //day events list view
+    private float[] startPoint = new float[4],
+            endPoint = new float[4],
+            distance = new float[2];
+    private Typeface tahomaFont;
 
-    public TextView mainDate_TV, secondDate_TV, thirdDate_TV;
-
-    public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.viewMode viewMode) {
+    public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode) {
         DayUC dayUC = new DayUC();
         dayUC.miladiCalendar.setTime(miladiDate.getTime());
         dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);
+        dayUC.persianCalendar = new PersianCalendar(dayUC.miladiCalendar);
         dayUC.isEnable = isEnable;
-        dayUC.viewMode = viewMode;
+        dayUC.dayViewMode = dayViewMode;
 
         LayoutInflater mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        switch (viewMode) {
+        switch (dayViewMode) {
             case DayHeader:
                 dayUC.rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
                 dayUC.initialDayHeader();
@@ -69,10 +89,16 @@ public class DayUC extends Fragment {
                 dayUC.initialMonth();
                 break;
             case DayFull:
+                dayUC.rootView = mInfalater.inflate(R.layout.day_full_view, null);
+                dayUC.initialDayFull();
                 break;
             case Month:
                 dayUC.rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
                 dayUC.initialMonth();
+                break;
+            case DayList:
+                dayUC.rootView = mInfalater.inflate(R.layout.day_list_mode_view, null);
+                dayUC.initialDayList();
                 break;
         }
 
@@ -86,23 +112,26 @@ public class DayUC extends Fragment {
         if (savedInstanceState != null)
             switch (savedInstanceState.getString("ViewMode")){
                 case "Month":
-                    viewMode = Month;
+                    dayViewMode = Month;
                     break;
                 case "Year":
-                    viewMode = Year;
+                    dayViewMode = Year;
                     break;
                 case "DayHeader":
-                    viewMode = DayHeader;
+                    dayViewMode = DayHeader;
                     break;
                 case "DayFull":
-                    viewMode = DayFull;
+                    dayViewMode = DayFull;
+                    break;
+                case "DayList":
+                    dayViewMode = DayList;
                     break;
             }
 
         if (rootView == null){
             LayoutInflater mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            switch (viewMode) {
+            switch (dayViewMode) {
                 case DayHeader:
                     rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
                     initialDayHeader();
@@ -118,6 +147,10 @@ public class DayUC extends Fragment {
                 case Month:
                     rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
                     initialMonth();
+                    break;
+                case DayList:
+                    rootView = mInfalater.inflate(R.layout.day_list_mode_view, null);
+                    initialDayList();
                     break;
             }
         }
@@ -135,6 +168,8 @@ public class DayUC extends Fragment {
             case Solar:
                 persianCalendar = new PersianCalendar(miladiCalendar);
                 mainDate_TV.setText(persianCalendar.getPersianFullDate());
+                tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
+                mainDate_TV.setTypeface(tahomaFont);
                 break;
             case Gregorian:
                 mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -165,7 +200,7 @@ public class DayUC extends Fragment {
                 break;
         }
 
-        if ((MainActivity.secondCalendarType != null) && (viewMode != MainActivity.viewMode.Year)) {
+        if ((MainActivity.secondCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
             secondDate_TV = (TextView) rootView.findViewById(R.id.day_uc_second_date);
             secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
@@ -183,7 +218,7 @@ public class DayUC extends Fragment {
             }
         }
 
-        if ((MainActivity.thirdCalendarType != null) && (viewMode != MainActivity.viewMode.Year)) {
+        if ((MainActivity.thirdCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
             thirdDate_TV = (TextView) rootView.findViewById(R.id.day_uc_third_date);
             thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
@@ -203,20 +238,112 @@ public class DayUC extends Fragment {
     }
 
     private void initialDayFull() {
-        Initializer();
-        putData();
+        dayFullInitializer();
+        dayFullPutData();
     }
 
-    private void initialDaySimple() {
+    private void initialDayList() {
+        dayEventLV = (ListView) rootView.findViewById(R.id.day_list_mode_event_list);
+        //initiate event list array and list view
+        eventTimeList = new ArrayList<>();
+        eventDetailList = new HashMap<>();
 
+        dayListadapter = new EventListViewAdapter(eventTimeList, eventDetailList, getActivity());
+
+        //set list view adapter
+        dayEventLV.setAdapter(dayListadapter);
+
+        dayListSetData();
     }
 
-    private void checkHoliday() {
+    private void dayFullInitializer() {
 
+        //TODO DB connection should be set
+        //create DB object
+//        try {
+//            calendarDB = new MyDB(MainActivity.context);
+//            calendarDB.openDB();
+//            calendarDB.commentDBPull();
+//            calendarDB.setHD();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+
+        //set typefaces for text view fonts
+        Typeface iranNastaliq = createFromAsset(MainActivity.context.getAssets(), "iran_nastaliq.ttf");
+        Typeface homa = createFromAsset(MainActivity.context.getAssets(), "homa.ttf");
+        Typeface arabic = createFromAsset(MainActivity.context.getAssets(), "arabic.ttf");
+        Typeface times = createFromAsset(MainActivity.context.getAssets(), "times.ttf");
+
+        holyDayNote = (TextView) rootView.findViewById(R.id.holyday_note_tv);
+        holyDayNote.setTypeface(homa);
+        holyDayNote.setTextColor(Color.BLACK);
+
+        ListView noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
+        adapter = new ListViewAdapter(getActivity(), notes);
+        noteList.setAdapter(adapter);
+
+        dayDate = (TextView) rootView.findViewById(R.id.date_tv);
+        dayDate.setTypeface(homa);
+        dayDate.setTextColor(Color.BLACK);
+        dayliNote1 = (TextView) rootView.findViewById(R.id.dayli_note_1_tv);
+        dayliNote1.setTypeface(homa);
+        dayliNote1.setTextColor(Color.BLACK);
+        dayliNote2 = (TextView) rootView.findViewById(R.id.dayli_note_2_tv);
+        dayliNote2.setTypeface(homa);
+        dayliNote2.setTextColor(Color.BLACK);
+        dayName = (TextView) rootView.findViewById(R.id.day_name_tv);
+        dayName.setTypeface(homa);
+        dayName.setTextColor(Color.BLACK);
+        monthName = (TextView) rootView.findViewById(R.id.month_name_tv);
+        monthName.setTypeface(homa);
+        monthName.setTextColor(Color.BLACK);
+        jalaliFulldate = (TextView) rootView.findViewById(R.id.jalali_date_full_tv);
+        jalaliFulldate.setTypeface(homa);
+        jalaliDate = (TextView) rootView.findViewById(R.id.jalali_date_tv);
+        jalaliDate.setTypeface(homa);
+        jalaliFulldate.setTextColor(Color.WHITE);
+        jalaliDate.setTextColor(Color.WHITE);
+        arabicFullDate = (TextView) rootView.findViewById(R.id.arabic_date_full_tv);
+        arabicFullDate.setTypeface(arabic);
+        arabicFullDate.setTextColor(Color.WHITE);
+        arabicdate = (TextView) rootView.findViewById(R.id.arabic_date_tv);
+        arabicdate.setTypeface(arabic);
+        arabicdate.setTextColor(Color.WHITE);
+        miladiFullDate = (TextView) rootView.findViewById(R.id.miladi_date_full_tv);
+        miladiFullDate.setTypeface(times);
+        miladiFullDate.setTextColor(Color.WHITE);
+        miladiDate = (TextView) rootView.findViewById(R.id.miladi_date_tv);
+        miladiDate.setTypeface(times);
+        miladiDate.setTextColor(Color.WHITE);
+    }
+
+    public void dayListSetData() {
+        DayUC dayUC = DayUC.newInstance(originalSelectedDate, false, DayHeader);
+        ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUC).commit();
+
+        // TODO Event List should be derived from DB
+
+        List<Events> eventlist1 = new ArrayList<>();
+        List<Events> eventlist2 = new ArrayList<>();
+        Events event = Events.newInstance(getActivity(), Calendar.getInstance());
+        eventTimeList.add("10:00");
+        event.setEvent("یادآوری 1", "اولین یادآوری", "10:00", "11:00");
+        eventlist1.add(event);
+        event.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
+        eventlist1.add(event);
+        eventTimeList.add("16:00");
+        event.setEvent("یادآوری 3", "سومین یادآوری", "16:00", "17:00");
+        eventlist2.add(event);
+
+        eventDetailList.put(eventTimeList.get(0), eventlist1);
+        eventDetailList.put(eventTimeList.get(1), eventlist2);
+
+        dayListadapter.notifyDataSetChanged();
     }
 
     //set calendar data
-    public void putData() {
+    public void dayFullPutData() {
         ContentValues calendarContent, noteContents;
 
         //clear notes list for referesh
@@ -306,72 +433,20 @@ public class DayUC extends Fragment {
         arabicdate.setText(ADate[2]);
     }
 
-    //initial calendar
-    private void Initializer() {
-
-        //TODO DB connection should be set
-        //create DB object
-//        try {
-//            calendarDB = new MyDB(MainActivity.context);
-//            calendarDB.openDB();
-//            calendarDB.commentDBPull();
-//            calendarDB.setHD();
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-
-        //set typefaces for text view fonts
-        Typeface iranNastaliq = createFromAsset(MainActivity.context.getAssets(), "iran_nastaliq.ttf");
-        Typeface homa = createFromAsset(MainActivity.context.getAssets(), "homa.ttf");
-        Typeface arabic = createFromAsset(MainActivity.context.getAssets(), "arabic.ttf");
-        Typeface times = createFromAsset(MainActivity.context.getAssets(), "times.ttf");
-
-        holyDayNote = (TextView) rootView.findViewById(R.id.holyday_note_tv);
-        holyDayNote.setTypeface(homa);
-        holyDayNote.setTextColor(Color.BLACK);
-
-        ListView noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
-        adapter = new ListViewAdapter(getActivity(), notes);
-        noteList.setAdapter(adapter);
-
-        dayDate = (TextView) rootView.findViewById(R.id.date_tv);
-        dayDate.setTypeface(homa);
-        dayDate.setTextColor(Color.BLACK);
-        dayliNote1 = (TextView) rootView.findViewById(R.id.dayli_note_1_tv);
-        dayliNote1.setTypeface(homa);
-        dayliNote1.setTextColor(Color.BLACK);
-        dayliNote2 = (TextView) rootView.findViewById(R.id.dayli_note_2_tv);
-        dayliNote2.setTypeface(homa);
-        dayliNote2.setTextColor(Color.BLACK);
-        dayName = (TextView) rootView.findViewById(R.id.day_name_tv);
-        dayName.setTypeface(homa);
-        dayName.setTextColor(Color.BLACK);
-        monthName = (TextView) rootView.findViewById(R.id.month_name_tv);
-        monthName.setTypeface(homa);
-        monthName.setTextColor(Color.BLACK);
-        jalaliFulldate = (TextView) rootView.findViewById(R.id.jalali_date_full_tv);
-        jalaliFulldate.setTypeface(homa);
-        jalaliDate = (TextView) rootView.findViewById(R.id.jalali_date_tv);
-        jalaliDate.setTypeface(homa);
-        jalaliFulldate.setTextColor(Color.WHITE);
-        jalaliDate.setTextColor(Color.WHITE);
-        arabicFullDate = (TextView) rootView.findViewById(R.id.arabic_date_full_tv);
-        arabicFullDate.setTypeface(arabic);
-        arabicFullDate.setTextColor(Color.WHITE);
-        arabicdate = (TextView) rootView.findViewById(R.id.arabic_date_tv);
-        arabicdate.setTypeface(arabic);
-        arabicdate.setTextColor(Color.WHITE);
-        miladiFullDate = (TextView) rootView.findViewById(R.id.miladi_date_full_tv);
-        miladiFullDate.setTypeface(times);
-        miladiFullDate.setTextColor(Color.WHITE);
-        miladiDate = (TextView) rootView.findViewById(R.id.miladi_date_tv);
-        miladiDate.setTypeface(times);
-        miladiDate.setTextColor(Color.WHITE);
+    private void checkHoliday() {
+        isHoliday = Arrays.asList(MainActivity.holidayList).contains(persianCalendar.getPersianDateIndex());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString("ViewMode", viewMode.toString());
+        outState.putString("ViewMode", dayViewMode.toString());
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        dayEventLV.onTouchEvent(event);
+        Toast.makeText(context, "touch event . . . ", Toast.LENGTH_SHORT);
+        return true;
     }
 }
