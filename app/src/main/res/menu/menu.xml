@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/ab_today_item"
         android:icon="@android:drawable/ic_menu_my_calendar"
+        android:showAsAction="always|withText"
         android:title="امروز"
         android:visible="true"
-        android:showAsAction="ifRoom"
         tools:ignore="AppCompatResource" />
+
+    <item
+        android:id="@+id/ab_date_picker_item"
+        android:icon="@android:drawable/ic_menu_today"
+        android:showAsAction="always|withText"
+        android:title="انتخاب تاریخ"
+        android:visible="true"
+        tools:ignore="AppCompatResource" />
+
     <item
         android:id="@+id/ab_add_note_item"
         android:icon="@android:drawable/ic_menu_edit"
+        android:showAsAction="always|withText"
         android:title="اضافه کردن یادداشت"
         android:visible="true"
-        android:showAsAction="ifRoom"
         tools:ignore="AppCompatResource" />
     <item
         android:id="@+id/ab_add_event_item"
         android:icon="@android:drawable/ic_input_add"
+        android:showAsAction="always|withText"
         android:title="اضافه کردن رویداد"
         android:visible="true"
-        android:showAsAction="ifRoom"
         tools:ignore="AppCompatResource" />
 
 </menu>

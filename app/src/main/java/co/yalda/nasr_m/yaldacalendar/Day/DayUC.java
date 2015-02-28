@@ -1,20 +1,25 @@
 package co.yalda.nasr_m.yaldacalendar.Day;
 
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,8 +27,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-import co.yalda.nasr_m.yaldacalendar.Adapters.EventListViewAdapter;
-import co.yalda.nasr_m.yaldacalendar.Adapters.ListViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.DayListViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.NoteListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.ArabicDateConverter;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
@@ -43,7 +48,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class DayUC extends Fragment implements View.OnTouchListener {
+public class DayUC extends Fragment {
 
     public View rootView;                                           // Root View of Fragment
     public TextView mainDate_TV, secondDate_TV, thirdDate_TV;       // Date TextViews (Month & Year View Mode
@@ -57,11 +62,11 @@ public class DayUC extends Fragment implements View.OnTouchListener {
     private String DateIndex;
     private String[] MonthName = {"January", "February", "March", "April", "May", "June", "July",   // Miladi Month Names
             "August", "September", "October", "November", "December"};
-    private ListViewAdapter adapter;                                // List View Adapter for Note ListView in DayFull Mode
+    private NoteListViewAdapter adapter;                                // List View Adapter for Note ListView in DayFull Mode
     private ArrayList<String> notes = new ArrayList<String>();      // Notes Array List for DayFull View Mode
     private ArrayList<String> eventTimeList;                        // Event List Array for DayList Mode
     private HashMap<String, List<Events>> eventDetailList;          // HashMap for Mapping Times and Events in DayList View Mode
-    private EventListViewAdapter dayListadapter;                    // Event List View Adapter for DayList View Mode
+    private DayListViewAdapter dayListadapter;                    // Event List View Adapter for DayList View Mode
     private ListView dayEventLV;                                    // Events List View
     private float[] startPoint = new float[4],                      // TouchEvent Positions
             endPoint = new float[4],
@@ -93,7 +98,7 @@ public class DayUC extends Fragment implements View.OnTouchListener {
 
         // Retrieve ViewMode From SaveInstanceState
         if (savedInstanceState != null)
-            switch (savedInstanceState.getString("ViewMode")){
+            switch (savedInstanceState.getString("ViewMode")) {
                 case "Month":
                     dayViewMode = Month;
                     break;
@@ -112,7 +117,7 @@ public class DayUC extends Fragment implements View.OnTouchListener {
             }
 
         // In Activity Restart (for rotation) Initialization rootView == Null, so Initial it
-        if (rootView == null){
+        if (rootView == null) {
             mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             viewSelector();
         }
@@ -265,7 +270,7 @@ public class DayUC extends Fragment implements View.OnTouchListener {
         eventTimeList = new ArrayList<>();
         eventDetailList = new HashMap<>();
 
-        dayListadapter = new EventListViewAdapter(eventTimeList, eventDetailList, context);
+        dayListadapter = new DayListViewAdapter(eventTimeList, eventDetailList, context);
 
         //set list view adapter
         dayEventLV.setAdapter(dayListadapter);
@@ -296,9 +301,65 @@ public class DayUC extends Fragment implements View.OnTouchListener {
         holyDayNote.setTypeface(homa);
         holyDayNote.setTextColor(Color.BLACK);
 
-        ListView noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
-        adapter = new ListViewAdapter(context, notes);
+        final ListView noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
+        adapter = new NoteListViewAdapter(context, notes);
         noteList.setAdapter(adapter);
+        noteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final TextView input = new TextView(context);
+                input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+                final String[] value = {new String()};
+                final boolean[] mo2 = {false};
+                value[0] = notes.get(position);
+                input.setText(value[0]);
+
+                AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
+                inputNote.setTitle("مشاهده یادداشت");
+                inputNote.setView(input);
+
+                inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+                inputNote.show();
+            }
+        });
+
+        noteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final EditText input = new EditText(context);
+                input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+                final String[] value = {new String()};
+                value[0] = notes.get(position);
+                input.setText(value[0]);
+
+                AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
+                inputNote.setTitle("ویرایش یادداشت");
+                inputNote.setView(input);
+
+                inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //TODO update edited note in listView and DB
+                    }
+                });
+                inputNote.setNeutralButton("Remove", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //TODO remove note from DB and listView
+                    }
+                });
+                inputNote.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // do nothing
+                    }
+                });
+                inputNote.show();
+                return false;
+            }
+        });
 
         dayDate = (TextView) rootView.findViewById(R.id.date_tv);
         dayDate.setTypeface(homa);
@@ -341,17 +402,22 @@ public class DayUC extends Fragment implements View.OnTouchListener {
 
         List<Events> eventlist1 = new ArrayList<>();
         List<Events> eventlist2 = new ArrayList<>();
-        Events event1 = Events.newInstance(context, Calendar.getInstance());
-        Events event2 = Events.newInstance(context, Calendar.getInstance());
-        Events event3 = Events.newInstance(context, Calendar.getInstance());
+
+//        Events event2 = Events.newInstance(context, Calendar.getInstance());
+
         eventTimeList.add("10:00" + " - " + "11:00");
-        event1.setEvent("یادآوری 1", "اولین یادآوری", "10:00", "11:00");
-        eventlist1.add(event1);
-        event2.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
-        eventlist1.add(event2);
         eventTimeList.add("16:00" + " - " + "17:00");
-        event3.setEvent("یادآوری 3", "سومین یادآوری", "16:00", "17:00");
-        eventlist2.add(event3);
+        for (int i = 0; i < 10; i++) {
+            Events event1 = Events.newInstance(context, Calendar.getInstance());
+            Events event2 = Events.newInstance(context, Calendar.getInstance());
+            event1.setEvent("یادآوری " + i, "اولین یادآوری", "10:00", "11:00");
+            eventlist1.add(event1);
+            event2.setEvent("یادآوری " + i, "دومین یادآوری", "16:00", "17:00");
+            eventlist2.add(event2);
+        }
+//        event2.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
+//        eventlist1.add(event2);
+
 
         eventDetailList.put(eventTimeList.get(0), eventlist1);
         eventDetailList.put(eventTimeList.get(1), eventlist2);
@@ -391,7 +457,7 @@ public class DayUC extends Fragment implements View.OnTouchListener {
         //add notes to array list
 //            for(int i=0; i< noteContents.size() ; i++)
 //                notes.add(noteContents.getAsString(MyDB.COLUMN_NOTE + i));
-        for(int i=0; i< 5 ; i++)
+        for (int i = 0; i < 15; i++)
             notes.add("یادداشت " + i);
 
         //update array list adapter
@@ -423,12 +489,12 @@ public class DayUC extends Fragment implements View.OnTouchListener {
         ADate[2] = PersianUtil.convertDigitstoArabic(ADate[2]);
 
         //set text color to RED for holidays
-        if(PDate[4] == "جمعه"  || !holyDayNote.getText().toString().isEmpty()){
+        if (PDate[4] == "جمعه" || !holyDayNote.getText().toString().isEmpty()) {
             monthName.setTextColor(Color.RED);
             dayName.setTextColor(Color.RED);
             dayDate.setTextColor(Color.RED);
             holyDayNote.setTextColor(Color.RED);
-        }else{
+        } else {
             monthName.setTextColor(Color.BLACK);
             dayName.setTextColor(Color.BLACK);
             dayDate.setTextColor(Color.BLACK);
@@ -455,14 +521,14 @@ public class DayUC extends Fragment implements View.OnTouchListener {
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        Toast.makeText(context, "touch event . . . ", Toast.LENGTH_SHORT).show();
-        return true;
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("ViewMode", dayViewMode.toString());
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
     }
 }

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="25dp">
+
+    <EditText
+        android:id="@+id/event_title_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="عنوان رویداد"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/event_detail_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_title_et"
+        android:layout_marginTop="15dp"
+        android:hint="شرح"
+        android:maxLines="4"
+        android:minLines="2"
+        android:textSize="24sp" />
+
+    <LinearLayout
+        android:id="@+id/event_time_selector_l"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_detail_et"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/hole_day_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="تمام روز"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <Switch
+                android:id="@+id/hole_day_s"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true" />
+
+            <TextView
+                android:id="@+id/start_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/hole_day_tv"
+                android:layout_marginTop="5dp"
+                android:text="زمان شروع"
+                android:textSize="16dp" />
+
+            <TimePicker
+                android:id="@+id/start_timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/start_time_tv" />
+
+            <TextView
+                android:id="@+id/end_time_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/start_timePicker"
+                android:text="زمان خاتمه"
+                android:textSize="16dp" />
+
+            <TimePicker
+                android:id="@+id/end_timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/end_time_tv" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/datePicker_holder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:orientation="horizontal" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_time_selector_l"
+        android:text="یادآوری: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/event_time_selector_l"
+        android:gravity="bottom">
+
+        <Button
+            android:id="@+id/event_ok_bt"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="Ok" />
+
+        <Button
+            android:id="@+id/event_cancel_bt"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="Cancel" />
+
+    </LinearLayout>
+
+</RelativeLayout>

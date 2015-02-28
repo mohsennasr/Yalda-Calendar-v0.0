@@ -18,12 +18,12 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 /**
  * Created by Nasr_M on 2/23/2015.
  */
-public class SimpleAdapter extends BaseAdapter {
+public class CalendarItemAdaoter extends BaseAdapter {
 
     private ArrayList<String> list;
     private MainActivity.dayViewMode view;
 
-    public SimpleAdapter(ArrayList<String> list, MainActivity.dayViewMode view) {
+    public CalendarItemAdaoter(ArrayList<String> list, MainActivity.dayViewMode view) {
         this.list = list;
         this.view = view;
     }

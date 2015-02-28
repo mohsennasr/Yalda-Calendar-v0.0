@@ -1,6 +1,7 @@
 package co.yalda.nasr_m.yaldacalendar.Calendars;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.DAY_OF_WEEK;
@@ -21,11 +22,18 @@ public class PersianCalendar {
     private String[] persianWeekDayNames = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه"};
     private int[] monthDays = new int[]{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
 
-    public PersianCalendar(Calendar date) {
-        this.miladiDate.setTime(date.getTime());
+    public PersianCalendar(Calendar cal) {
+        this.miladiDate.setTime(cal.getTime());
         calculateDate();
         iPersianFirstDayOfWeek = 7;
     }
+
+    public PersianCalendar(Date date) {
+        this.miladiDate.set(date.getYear(), date.getMonth(), date.getDate());
+        calculateDate();
+        iPersianFirstDayOfWeek = 7;
+    }
+
 
     private void calculateDate() {
         String[] convertedDate = MiladiToSolarConverter.getCurrentShamsidate(miladiDate);
@@ -170,5 +178,12 @@ public class PersianCalendar {
         date = iPersianDate < 10 ? "0" + String.valueOf(iPersianDate) : String.valueOf(iPersianDate);
         month = iPersianMonth < 10 ? "0" + String.valueOf(iPersianMonth) : String.valueOf(iPersianMonth);
         return month + "/" + date;
+    }
+
+    public void setPersian(int year, int month, int day) {
+        miladiDate.add(YEAR, year - iPersianYear);
+        miladiDate.add(YEAR, month - iPersianMonth + 1);
+        miladiDate.add(YEAR, day - iPersianDate);
+        calculateDate();
     }
 }

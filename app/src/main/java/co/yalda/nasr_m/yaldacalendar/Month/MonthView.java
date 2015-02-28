@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import co.yalda.nasr_m.yaldacalendar.Adapters.CalendarItemAdaoter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
-import co.yalda.nasr_m.yaldacalendar.Adapters.SimpleAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
@@ -40,7 +40,7 @@ public class MonthView extends Fragment {
     private GridView monthGridView;         //month days gridView
     private GridView weekDaysGrid;         //month days gridView
     private MonthGridViewAdapter gridViewAdapter;   //month grid adapter
-    private SimpleAdapter weekDaysAdapter, weekNumAdapter;
+    private CalendarItemAdaoter weekDaysAdapter, weekNumAdapter;
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
     private MainActivity.dayViewMode viewMode;
     private String[] weekDays = new String[]{"", "ش", "ی", "د", "س", "چ", "پ", "ج"};
@@ -144,7 +144,7 @@ public class MonthView extends Fragment {
             monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 32));
         }
 
-        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, viewMode);
+        weekDaysAdapter = new CalendarItemAdaoter(weekDaysArrayList, viewMode);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
     }

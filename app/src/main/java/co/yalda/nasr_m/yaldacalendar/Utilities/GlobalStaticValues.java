@@ -3,7 +3,7 @@ package co.yalda.nasr_m.yaldacalendar.Utilities;
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class GlobalStativValues {
+public class GlobalStaticValues {
 
     //Static Values
     public static final String DAY = "DAY";

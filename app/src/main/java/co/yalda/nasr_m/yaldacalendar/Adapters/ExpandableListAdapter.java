@@ -1,7 +1,6 @@
 package co.yalda.nasr_m.yaldacalendar.Adapters;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +69,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(android.R.layout.simple_expandable_list_item_2, null);
             TextView lblListHeader = (TextView) convertView
                     .findViewById(android.R.id.text2);
-            lblListHeader.setTypeface(null, Typeface.BOLD);
+//            lblListHeader.setTypeface(null, Typeface.BOLD);
             lblListHeader.setText(headerTitle);
         }
 
