@@ -7,4 +7,8 @@
 
     <color name="LightGreen">#00ff00</color>
 
+    <style name="BoldText">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

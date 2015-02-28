@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,64 +45,44 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
  */
 public class DayUC extends Fragment implements View.OnTouchListener {
 
-    public View rootView;                      // root view of fragment
-    public TextView mainDate_TV, secondDate_TV, thirdDate_TV;
-    private boolean isHoliday;                  //is it holiday
-    private boolean isEnable = true;         //should be clickable
-    private PersianCalendar persianCalendar;
-    private Calendar miladiCalendar = Calendar.getInstance();
-    private MainActivity.dayViewMode dayViewMode;
-    private TextView dayName, dayDate, dayliNote1, dayliNote2, monthName, miladiFullDate, jalaliFulldate,
+    public View rootView;                                           // Root View of Fragment
+    public TextView mainDate_TV, secondDate_TV, thirdDate_TV;       // Date TextViews (Month & Year View Mode
+    private boolean isHoliday;                                      // Is It Holiday
+    private boolean isEnable = true;                                // Should be Clickable
+    private PersianCalendar persianCalendar;                        // Persian Calendar
+    private Calendar miladiCalendar = Calendar.getInstance();       // Day Base Calendar
+    private MainActivity.dayViewMode dayViewMode;                   // Day View Mode -> Year, Month, DayList, DayFull
+    private TextView dayName, dayDate, dayliNote1, dayliNote2, monthName, miladiFullDate, jalaliFulldate,       // Day Full View Mode TextViews
             arabicFullDate, miladiDate, jalaliDate, arabicdate, holyDayNote;
     private String DateIndex;
-    private String[] MonthName = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-    private ListViewAdapter adapter;
-    private ArrayList<String> notes = new ArrayList<String>();
-    private ArrayList<String> eventTimeList;    //event list array
-    private HashMap<String, List<Events>> eventDetailList;
-    private EventListViewAdapter dayListadapter;        //list view adapter
-    private String[] eventClock = new String[]{"00:00", "01:00", "02:00", "03:00", "04:00", "05:00"
-            , "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"
-            , "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
-    private ListView dayEventLV;            //day events list view
-    private float[] startPoint = new float[4],
+    private String[] MonthName = {"January", "February", "March", "April", "May", "June", "July",   // Miladi Month Names
+            "August", "September", "October", "November", "December"};
+    private ListViewAdapter adapter;                                // List View Adapter for Note ListView in DayFull Mode
+    private ArrayList<String> notes = new ArrayList<String>();      // Notes Array List for DayFull View Mode
+    private ArrayList<String> eventTimeList;                        // Event List Array for DayList Mode
+    private HashMap<String, List<Events>> eventDetailList;          // HashMap for Mapping Times and Events in DayList View Mode
+    private EventListViewAdapter dayListadapter;                    // Event List View Adapter for DayList View Mode
+    private ListView dayEventLV;                                    // Events List View
+    private float[] startPoint = new float[4],                      // TouchEvent Positions
             endPoint = new float[4],
             distance = new float[2];
     private Typeface tahomaFont;
-    private DayUC dayUCListHeader;
+    private DayUC dayUCListHeader;                                  // DayUC Object for Showing in DayList View Mode (Header)
+    private LayoutInflater mInfalater;
 
     public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode) {
         DayUC dayUC = new DayUC();
         dayUC.miladiCalendar.setTime(miladiDate.getTime());
-        dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);
-        dayUC.persianCalendar = new PersianCalendar(dayUC.miladiCalendar);
-        dayUC.isEnable = isEnable;
-        dayUC.dayViewMode = dayViewMode;
+        dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);              // Set First Day of Week Based on Primary Calendar
+        dayUC.persianCalendar = new PersianCalendar(dayUC.miladiCalendar);      // Initial Persian Calendar
+        // TODO Third Calendar (Arabic) Shoul be Added
+        dayUC.isEnable = isEnable;                                              // Set Day Clickable
+        dayUC.dayViewMode = dayViewMode;                                        // Set Day View Mode
 
-        LayoutInflater mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        // Create Layout Inflater
+        dayUC.mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        switch (dayViewMode) {
-            case DayHeader:
-                dayUC.rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
-                dayUC.initialDayHeader();
-                break;
-            case Year:
-                dayUC.rootView = mInfalater.inflate(R.layout.day_uc_year_view, null);
-                dayUC.initialMonth();
-                break;
-            case DayFull:
-                dayUC.rootView = mInfalater.inflate(R.layout.day_full_view, null);
-                dayUC.initialDayFull();
-                break;
-            case Month:
-                dayUC.rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
-                dayUC.initialMonth();
-                break;
-            case DayList:
-                dayUC.rootView = mInfalater.inflate(R.layout.day_list_mode_view, null);
-                dayUC.initialDayList();
-                break;
-        }
+        dayUC.viewSelector();
 
         return dayUC;
     }
@@ -110,6 +91,7 @@ public class DayUC extends Fragment implements View.OnTouchListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Retrieve ViewMode From SaveInstanceState
         if (savedInstanceState != null)
             switch (savedInstanceState.getString("ViewMode")){
                 case "Month":
@@ -129,47 +111,60 @@ public class DayUC extends Fragment implements View.OnTouchListener {
                     break;
             }
 
+        // In Activity Restart (for rotation) Initialization rootView == Null, so Initial it
         if (rootView == null){
-            LayoutInflater mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            switch (dayViewMode) {
-                case DayHeader:
-                    rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
-                    initialDayHeader();
-                    break;
-                case Year:
-                    rootView = mInfalater.inflate(R.layout.day_uc_year_view, null);
-                    initialMonth();
-                    break;
-                case DayFull:
-                    rootView = mInfalater.inflate(R.layout.day_full_view, null);
-                    initialDayFull();
-                    break;
-                case Month:
-                    rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
-                    initialMonth();
-                    break;
-                case DayList:
-                    rootView = mInfalater.inflate(R.layout.day_list_mode_view, null);
-                    initialDayList();
-                    break;
-            }
+            mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            viewSelector();
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return rootView;
+        // If in DayList View Mode, Attach DayList Fragment to rootView
+        if (dayViewMode == DayList)
+            ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUCListHeader).commit();
+        return rootView;        // Return RootView of Fragment
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (dayViewMode == DayHeader) {
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUCListHeader).commit();
+    }
+
+    private void viewSelector() {
+        // Set RootView and Initial it Based on ViewMode
+        switch (dayViewMode) {
+            // Header Mode for Showing in DayList View Mode
+            case DayHeader:
+                rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
+                initialDayHeader();
+                break;
+            // Single Date for Showing in YearView
+            case Year:
+                rootView = mInfalater.inflate(R.layout.day_uc_year_view, null);
+                initialMonth();
+                break;
+            // Full Calendar View
+            case DayFull:
+                rootView = mInfalater.inflate(R.layout.day_full_view, null);
+                initialDayFull();
+                break;
+            // Triple Calendar for Showing in MonthView Mode
+            case Month:
+                rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
+                initialMonth();
+                break;
+            // Day List View Mode
+            case DayList:
+                rootView = mInfalater.inflate(R.layout.day_list_mode_view, null);
+                initialDayList();
+                break;
         }
     }
 
+    /*
+    Initial DayHeader Mode for Showing as Header Frame in DayListView Mode
+     */
     private void initialDayHeader() {
         mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_header_mode_tv);
         mainDate_TV.setClickable(isEnable);
@@ -184,21 +179,21 @@ public class DayUC extends Fragment implements View.OnTouchListener {
                 mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
                 break;
             case Hejri:
-//                mainDate_TV.setText(String.valueOf(arabicCalendar.getDate()));
+                // TODO Arabic Calendar Should Be Added
                 break;
         }
     }
 
+    /*
+    Initial Triple Date Mode for Showing in MonthView Mode
+     */
     private void initialMonth() {
-//        View root = ((LayoutInflater)(getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)))
-//                .inflate(R.layout.day_uc_month_view, null);
         mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_main_date);
         mainDate_TV.setClickable(isEnable);
         if (!isEnable)
             mainDate_TV.setBackgroundColor(Color.LTGRAY);
         else
             mainDate_TV.setBackgroundColor(Color.GREEN);
-//        mainDate_TV.setLayoutParams(new ViewGroup.LayoutParams((MainActivity.viewSize[0] - 40)/7,(MainActivity.viewSize[1] - 100)/6 ));
 
         switch (MainActivity.mainCalendarType) {
             case Solar:
@@ -251,13 +246,20 @@ public class DayUC extends Fragment implements View.OnTouchListener {
         }
     }
 
+    /*
+    Initial Complete Calendar for DayFullView Mode
+     */
     private void initialDayFull() {
         dayFullInitializer();
         dayFullPutData();
     }
 
+    /*
+    Initial DayList Mode
+     */
     private void initialDayList() {
-        dayUCListHeader = DayUC.newInstance(originalSelectedDate, false, DayHeader);
+        dayUCListHeader = DayUC.newInstance(miladiCalendar, false, DayHeader);
+
         dayEventLV = (ListView) rootView.findViewById(R.id.day_list_mode_event_list);
         //initiate event list array and list view
         eventTimeList = new ArrayList<>();
@@ -453,14 +455,14 @@ public class DayUC extends Fragment implements View.OnTouchListener {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString("ViewMode", dayViewMode.toString());
-        super.onSaveInstanceState(outState);
+    public boolean onTouch(View v, MotionEvent event) {
+        Toast.makeText(context, "touch event . . . ", Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        Toast.makeText(context, "touch event . . . ", Toast.LENGTH_SHORT);
-        return true;
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("ViewMode", dayViewMode.toString());
     }
 }

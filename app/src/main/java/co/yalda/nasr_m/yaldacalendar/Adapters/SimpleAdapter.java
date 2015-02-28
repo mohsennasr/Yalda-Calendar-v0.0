@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -51,10 +52,14 @@ public class SimpleAdapter extends BaseAdapter {
 
             TextView itemText = (TextView) convertView.findViewById(R.id.simple_text);
             itemText.setText(list.get(position));
-            if (view == MainActivity.dayViewMode.Month)
+            itemText.setTextAppearance(context, R.style.BoldText);
+            if (view == MainActivity.dayViewMode.Month) {
                 itemText.setTextSize(24);
-            else
+                itemText.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 45));
+            } else {
                 itemText.setTextSize(12);
+                itemText.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 22));
+            }
         }
 
         return convertView;

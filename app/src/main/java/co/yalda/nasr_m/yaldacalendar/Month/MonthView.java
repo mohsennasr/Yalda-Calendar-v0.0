@@ -1,6 +1,7 @@
 package co.yalda.nasr_m.yaldacalendar.Month;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ public class MonthView extends Fragment {
     private MonthGridViewAdapter gridViewAdapter;   //month grid adapter
     private SimpleAdapter weekDaysAdapter, weekNumAdapter;
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
-    private MainActivity.dayViewMode dayViewMode;
+    private MainActivity.dayViewMode viewMode;
     private String[] weekDays = new String[]{"", "ش", "ی", "د", "س", "چ", "پ", "ج"};
     private String[] weekDaysFull = new String[]{"", "شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه"};
 
@@ -52,7 +54,7 @@ public class MonthView extends Fragment {
     public static MonthView newInstance(Calendar monthCal, MainActivity.dayViewMode dayViewMode) {
         MonthView monthView = new MonthView();
         monthView.monthCal.setTime(monthCal.getTime());
-        monthView.dayViewMode = dayViewMode;
+        monthView.viewMode = dayViewMode;
         monthView.firstInitialization();
         monthView.initialMonth();
         return monthView;
@@ -64,10 +66,10 @@ public class MonthView extends Fragment {
         if (savedInstanceState != null)
             switch (savedInstanceState.getString("ViewMode")) {
                 case "Month":
-                    dayViewMode = Month;
+                    viewMode = Month;
                     break;
                 case "Year":
-                    dayViewMode = Year;
+                    viewMode = Year;
                     break;
             }
         if (rootView == null) {
@@ -105,41 +107,51 @@ public class MonthView extends Fragment {
         dayUC = new DayUC[42];
         for (int i = 0; i < 42; i++) {
             dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i >= (maxDayMonth + remainDay))
-                    , dayViewMode);
+                    , viewMode);
             dayUCList.add(dayUC[i]);
             monthCal.add(Calendar.DATE, 1);
         }
 
-        if (dayViewMode == Month)
-            monthHeader_tv.setText(pCal.getPersianMonthName() + " " + String.valueOf(pCal.getiPersianYear()));
-        else
-            monthHeader_tv.setText(pCal.getPersianMonthName());
-
         ArrayList<String> weekNumArrayList = new ArrayList<>();
 
         int weekNum = pCal.getFirstWeekNumberOfMonth();
-        for (int i = weekNum; i < weekNum + 6; i++)
-            weekNumArrayList.add(String.valueOf(i));
+        for (int i = 0; i < 6; i++) {
+            weekNumArrayList.add(String.valueOf(weekNum));
+            if (weekNum >= 52 && pCal.getiPersianMonth() == 1)
+                weekNum = 1;
+            else
+                weekNum++;
+        }
 
-        gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList);
+        gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList, viewMode);
         monthGridView.setAdapter(gridViewAdapter);
         monthGridView.setMotionEventSplittingEnabled(false);
         gridViewAdapter.notifyDataSetChanged();
 
         //Week Day Name Grid View
         ArrayList<String> weekDaysArrayList = new ArrayList<>();
-        if (dayViewMode == Month)
+
+        if (viewMode == Month) {
             weekDaysArrayList.addAll(Arrays.asList(weekDaysFull));
-        else
+            monthHeader_tv.setText(pCal.getPersianMonthName() + " " + String.valueOf(pCal.getiPersianYear()));
+            monthHeader_tv.setTextSize(34);
+            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 60));
+        } else {
             weekDaysArrayList.addAll(Arrays.asList(weekDays));
-        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, dayViewMode);
+            monthHeader_tv.setText(pCal.getPersianMonthName());
+            monthHeader_tv.setTextSize(20);
+            monthHeader_tv.setTextColor(Color.BLACK);
+            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 32));
+        }
+
+        weekDaysAdapter = new SimpleAdapter(weekDaysArrayList, viewMode);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString("ViewMode", dayViewMode.toString());
+        outState.putString("ViewMode", viewMode.toString());
         super.onSaveInstanceState(outState);
     }
 }
