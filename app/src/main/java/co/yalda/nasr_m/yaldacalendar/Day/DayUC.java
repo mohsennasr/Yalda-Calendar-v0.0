@@ -29,11 +29,11 @@ import java.util.List;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.DayListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.NoteListViewAdapter;
-import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.ArabicDateConverter;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Handler.Events;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
+import co.yalda.nasr_m.yaldacalendar.PersianDatePicker.Util.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 import static android.graphics.Typeface.createFromAsset;
@@ -44,6 +44,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayList;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Year;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
 
 /**
  * Created by Nasr_M on 2/17/2015.
@@ -79,7 +80,7 @@ public class DayUC extends Fragment {
         DayUC dayUC = new DayUC();
         dayUC.miladiCalendar.setTime(miladiDate.getTime());
         dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);              // Set First Day of Week Based on Primary Calendar
-        dayUC.persianCalendar = new PersianCalendar(dayUC.miladiCalendar);      // Initial Persian Calendar
+        dayUC.persianCalendar = new PersianCalendar(dayUC.miladiCalendar.getTime().getTime());      // Initial Persian Calendar
         // TODO Third Calendar (Arabic) Shoul be Added
         dayUC.isEnable = isEnable;                                              // Set Day Clickable
         dayUC.dayViewMode = dayViewMode;                                        // Set Day View Mode
@@ -142,29 +143,37 @@ public class DayUC extends Fragment {
             // Header Mode for Showing in DayList View Mode
             case DayHeader:
                 rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
+                miladiCalendar = originalSelectedDate;
                 initialDayHeader();
                 break;
             // Single Date for Showing in YearView
             case Year:
                 rootView = mInfalater.inflate(R.layout.day_uc_year_view, null);
+                mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_main_date);
                 initialMonth();
                 break;
             // Full Calendar View
             case DayFull:
                 rootView = mInfalater.inflate(R.layout.day_full_view, null);
+                miladiCalendar = originalSelectedDate;
                 initialDayFull();
                 break;
             // Triple Calendar for Showing in MonthView Mode
             case Month:
                 rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
+                mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_main_date);
+                secondDate_TV = (TextView) rootView.findViewById(R.id.day_uc_second_date);
+                thirdDate_TV = (TextView) rootView.findViewById(R.id.day_uc_third_date);
                 initialMonth();
                 break;
             // Day List View Mode
             case DayList:
                 rootView = mInfalater.inflate(R.layout.day_list_mode_view, null);
+                miladiCalendar = originalSelectedDate;
                 initialDayList();
                 break;
         }
+        rootView.setClickable(!isEnable);
     }
 
     /*
@@ -175,8 +184,8 @@ public class DayUC extends Fragment {
         mainDate_TV.setClickable(isEnable);
         switch (MainActivity.mainCalendarType) {
             case Solar:
-                persianCalendar = new PersianCalendar(miladiCalendar);
-                mainDate_TV.setText(persianCalendar.getPersianFullDate());
+                persianCalendar = originalSelectedPersianDate;
+                mainDate_TV.setText(persianCalendar.getPersianLongDate());
                 tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
                 mainDate_TV.setTypeface(tahomaFont);
                 break;
@@ -192,9 +201,8 @@ public class DayUC extends Fragment {
     /*
     Initial Triple Date Mode for Showing in MonthView Mode
      */
-    private void initialMonth() {
-        mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_main_date);
-        mainDate_TV.setClickable(isEnable);
+    public void initialMonth() {
+//        mainDate_TV.setClickable(isEnable);
         if (!isEnable)
             mainDate_TV.setBackgroundColor(Color.LTGRAY);
         else
@@ -202,8 +210,8 @@ public class DayUC extends Fragment {
 
         switch (MainActivity.mainCalendarType) {
             case Solar:
-                persianCalendar = new PersianCalendar(miladiCalendar);
-                mainDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
+                persianCalendar.setTime(miladiCalendar.getTime());
+                mainDate_TV.setText(String.valueOf(persianCalendar.getPersianDay()));
                 break;
             case Gregorian:
                 mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -215,12 +223,11 @@ public class DayUC extends Fragment {
         }
 
         if ((MainActivity.secondCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-            secondDate_TV = (TextView) rootView.findViewById(R.id.day_uc_second_date);
             secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
-                    persianCalendar = new PersianCalendar(miladiCalendar);
-                    secondDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
+                    persianCalendar.setTime(miladiCalendar.getTime());
+                    secondDate_TV.setText(String.valueOf(persianCalendar.getPersianDay()));
                     break;
                 case Gregorian:
                     secondDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -233,12 +240,11 @@ public class DayUC extends Fragment {
         }
 
         if ((MainActivity.thirdCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-            thirdDate_TV = (TextView) rootView.findViewById(R.id.day_uc_third_date);
             thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
-                    persianCalendar = new PersianCalendar(miladiCalendar);
-                    thirdDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
+                    persianCalendar.setTime(miladiCalendar.getTime());
+                    thirdDate_TV.setText(String.valueOf(persianCalendar.getPersianDay()));
                     break;
                 case Gregorian:
                     thirdDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -275,7 +281,31 @@ public class DayUC extends Fragment {
         //set list view adapter
         dayEventLV.setAdapter(dayListadapter);
 
-        dayListSetData();
+        // TODO Event List should be derived from DB
+
+        List<Events> eventlist1 = new ArrayList<>();
+        List<Events> eventlist2 = new ArrayList<>();
+
+//        Events event2 = Events.newInstance(context, Calendar.getInstance());
+
+        eventTimeList.add("10:00" + " - " + "11:00");
+        eventTimeList.add("16:00" + " - " + "17:00");
+        for (int i = 0; i < 10; i++) {
+            Events event1 = Events.newInstance(context, Calendar.getInstance());
+            Events event2 = Events.newInstance(context, Calendar.getInstance());
+            event1.setEvent("یادآوری " + i, "اولین یادآوری", "10:00", "11:00");
+            eventlist1.add(event1);
+            event2.setEvent("یادآوری " + i, "دومین یادآوری", "16:00", "17:00");
+            eventlist2.add(event2);
+        }
+//        event2.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
+//        eventlist1.add(event2);
+
+
+        eventDetailList.put(eventTimeList.get(0), eventlist1);
+        eventDetailList.put(eventTimeList.get(1), eventlist2);
+
+        dayListadapter.notifyDataSetChanged();
     }
 
     private void dayFullInitializer() {
@@ -397,9 +427,8 @@ public class DayUC extends Fragment {
     }
 
     public void dayListSetData() {
-
-        // TODO Event List should be derived from DB
-
+        eventTimeList.clear();
+        dayUCListHeader.updateDayHeader();
         List<Events> eventlist1 = new ArrayList<>();
         List<Events> eventlist2 = new ArrayList<>();
 
@@ -475,13 +504,14 @@ public class DayUC extends Fragment {
         String[] ADate = ArabicDateConverter.writeIslamicDate(temporary);
 
         //convert digits to persian digit
-        PersianCalendar pcal = new PersianCalendar(originalSelectedDate);
+        persianCalendar = originalSelectedPersianDate;
+//        PersianCalendar pcal = new PersianCalendar(originalSelectedDate);
         String[] PDate = new String[5];
-        PDate[0] = PersianUtil.convertDigits(String.valueOf(pcal.getiPersianYear()));
-        PDate[1] = PersianUtil.convertDigits(String.valueOf(pcal.getiPersianMonth()));
-        PDate[2] = PersianUtil.convertDigits(String.valueOf(pcal.getiPersianDate()));
-        PDate[3] = pcal.getPersianMonthName();
-        PDate[4] = pcal.getPersianDayName();
+        PDate[0] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getPersianYear()));
+        PDate[1] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getPersianMonth()));
+        PDate[2] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getPersianDay()));
+        PDate[3] = persianCalendar.getPersianMonthName();
+        PDate[4] = persianCalendar.getPersianWeekDayName();
 
         //convert digits to arabic digits
         ADate[0] = PersianUtil.convertDigitstoArabic(ADate[0]);
@@ -518,6 +548,26 @@ public class DayUC extends Fragment {
 
     private void checkHoliday() {
         isHoliday = Arrays.asList(MainActivity.holidayList).contains(persianCalendar.getPersianDateIndex());
+    }
+
+    public void setEnable(boolean isEnable) {
+        this.isEnable = isEnable;
+    }
+
+    public void updateDayHeader(){
+        switch (MainActivity.mainCalendarType) {
+            case Solar:
+                mainDate_TV.setText(persianCalendar.getPersianLongDate());
+                break;
+            case Gregorian:
+                mainDate_TV.setText(String.valueOf(originalSelectedDate.get(Calendar.YEAR) + " "
+                        + originalSelectedDate.get(Calendar.MONTH) + " "
+                + originalSelectedDate.get(Calendar.DATE)));
+                break;
+            case Hejri:
+                // TODO Arabic Calendar Should Be Added
+                break;
+        }
     }
 
     @Override

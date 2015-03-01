@@ -55,15 +55,12 @@ public class MonthGridViewAdapter extends BaseAdapter {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView != null) {
-//            Toast.makeText(context, "use previous values", Toast.LENGTH_SHORT).show();
-            return convertView;
+        if (convertView == null) {
+            LayoutInflater minflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = minflater.inflate(R.layout.simple_list_item, null);
         }
 
-        LayoutInflater minflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = minflater.inflate(R.layout.simple_list_item, null);
         if (position % 8 == 0) {
-
             TextView item = (TextView) convertView.findViewById(R.id.simple_text);
             item.setText(weekGridList.get(position / 8));
             item.setTextColor(Color.BLACK);
@@ -76,7 +73,7 @@ public class MonthGridViewAdapter extends BaseAdapter {
         if (viewMode == dayViewMode.Month) {
             gridList.get((position / 8) * 7 + position % 8 - 1).rootView.setLayoutParams(new AbsListView.LayoutParams(
                     (viewSize[0] - 80) / 7,
-                    (viewSize[1] - 10) / 6));
+                    (viewSize[1] - 200) / 6));
         }
         return gridList.get((position / 8) * 7 + (position % 8) - 1).rootView;
     }

@@ -8,14 +8,14 @@
     <TextView
         android:id="@+id/event_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginRight="10dp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/event_description"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginRight="15dp"
         android:singleLine="true" />
 

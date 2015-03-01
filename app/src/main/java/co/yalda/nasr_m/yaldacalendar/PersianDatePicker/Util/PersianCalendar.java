@@ -101,9 +101,12 @@ public class PersianCalendar extends GregorianCalendar {
     private int persianYear;
     private int persianMonth;
     private int persianDay;
+    private Calendar julianCalendar = getInstance();
     // use to seperate PersianDate's field and also Parse the DateString based
     // on this delimiter
     private String delimiter = "/";
+    private int[] monthDays = new int[]{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
+
 
     /**
      * default constructor
@@ -115,8 +118,8 @@ public class PersianCalendar extends GregorianCalendar {
      * GregorianCalendar by calling setTimeZone()
      */
     public PersianCalendar(long millis) {
-        setTimeInMillis(millis);
-        setFirstDayOfWeek(SATURDAY);
+        julianCalendar.setTimeInMillis(millis);
+        julianCalendar.setFirstDayOfWeek(SATURDAY);
     }
 
     /**
@@ -129,8 +132,8 @@ public class PersianCalendar extends GregorianCalendar {
      * GregorianCalendar by calling setTimeZone()
      */
     public PersianCalendar() {
-        setTimeZone(TimeZone.getTimeZone("GMT"));
-        setFirstDayOfWeek(SATURDAY);
+        julianCalendar.setTimeZone(TimeZone.getTimeZone("GMT"));
+        julianCalendar.setFirstDayOfWeek(SATURDAY);
     }
 
     private long convertToMilis(long julianDate) {
@@ -176,7 +179,7 @@ public class PersianCalendar extends GregorianCalendar {
         this.persianYear = persianYear;
         this.persianMonth = persianMonth;
         this.persianDay = persianDay;
-        setTimeInMillis(convertToMilis(PersianCalendarUtils.persianToJulian(this.persianYear > 0 ? this.persianYear : this.persianYear + 1, this.persianMonth - 1, this.persianDay)));
+        calculatePersianDate();
     }
 
     public int getPersianYear() {
@@ -365,27 +368,78 @@ public class PersianCalendar extends GregorianCalendar {
         calculatePersianDate();
     }
 
-    public int getPersianWeekNumber() {
-        int monthRemainingDay, daysCount = 0, day, month, weekNum;
-
-        month = getPersianMonth();
-        day = getPersianDay();
-
-        if (month == 0)
-            daysCount = day;
-        else if (month <= 5)
-            daysCount += month * 31 + day;
-        else
-            daysCount += 6 * 31 + (month - 6) * 30 + day;
-
-        setPersianDate(persianYear, 0, 1);
-        monthRemainingDay = get(DAY_OF_WEEK) % 7;
-        daysCount += monthRemainingDay;
-
-        weekNum = (int) Math.ceil(daysCount / 7);
-
-        setPersianDate(persianYear, month, day);
-
+    public int getFirstWeekNumberOfMonth() {
+        setPersianDate(persianYear, persianMonth, 1);
+        calculatePersianDate();
+        int weekNum = getPersianWeekNumber();
+        addPersianDate(DATE, persianDay - 1);
+        calculatePersianDate();
         return weekNum;
+    }
+
+    public int persianPreMonthRemainingDay() {
+        addPersianDate(DATE, -(persianDay - 1));
+
+        int firsDayOfMonth = get(DAY_OF_WEEK);
+        int remainingDay = firsDayOfMonth% 7;
+
+        addPersianDate(DATE, persianDay - 1);
+        return remainingDay;
+    }
+
+    public int getPersianWeekNumber() {
+        int firstWeekDays, daysCount = 0, weekNum;
+
+//        if(iPersianMonth == 0)
+//            daysCount = iPersianDate;
+        if (persianMonth <= 6)
+            daysCount += (persianMonth - 1) * 31 + persianDay - 1;
+        else
+            daysCount += 6 * 31 + (persianMonth - 7) * 30 + persianDay - 1;
+
+        addPersianDate(DATE, -(daysCount));
+        firstWeekDays = get(DAY_OF_WEEK)%7;
+        daysCount = daysCount + firstWeekDays;
+        weekNum = ((int) Math.floor(daysCount / 7));
+
+        if (weekNum == 0 && daysCount >= 3)
+            weekNum = 53;
+        else if (weekNum == 0 && daysCount < 3)
+            weekNum = 1;
+
+        addPersianDate(DATE, daysCount);
+        return weekNum;
+    }
+
+    public int getMaxDayOfMonth() {
+        if (persianMonth == 11 && isPersianLeapYear())
+            return 30;
+        else
+            return monthDays[persianMonth];
+    }
+
+    public void setPersian(int field, int amount){
+        if (field < 0 || field >= ZONE_OFFSET) {
+            throw new IllegalArgumentException();
+        }
+        switch (field){
+            case DATE:
+                persianDay = amount;
+                break;
+            case MONTH:
+                persianMonth = amount;
+                break;
+            case YEAR:
+                persianYear = amount;
+                break;
+        }
+        calculatePersianDate();
+    }
+
+    public String getPersianDateIndex() {
+        String date, month;
+        date = persianDay < 10 ? "0" + String.valueOf(persianDay) : String.valueOf(persianDay);
+        month = (persianMonth+1) < 10 ? "0" + String.valueOf((persianMonth+1)) : String.valueOf((persianMonth+1));
+        return month + "/" + date;
     }
 }

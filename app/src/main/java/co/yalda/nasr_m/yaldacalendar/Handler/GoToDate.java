@@ -20,7 +20,7 @@ public class GoToDate {
 
         //create persian date picker object and assign dates
         final PersianDatePicker persianDatePicker = new PersianDatePicker(MainActivity.context);
-        PersianCalendar pcal = new PersianCalendar(MainActivity.originalSelectedDate.getTimeInMillis());
+        PersianCalendar pcal = new PersianCalendar(MainActivity.originalSelectedDate.getTime().getTime());
         persianDatePicker.setDisplayPersianDate(pcal);
         datePicker.setView(persianDatePicker);
 

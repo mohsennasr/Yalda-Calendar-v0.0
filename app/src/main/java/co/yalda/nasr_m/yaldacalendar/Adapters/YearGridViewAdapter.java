@@ -43,7 +43,7 @@ public class YearGridViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         int width, height;
         width = viewSize[0] - 20;
-        height = viewSize[1] - 48;
+        height = viewSize[1] - 160;
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             width = width / 3;
             height = height / 4;
