@@ -14,23 +14,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.DayListViewAdapter;
-import co.yalda.nasr_m.yaldacalendar.Adapters.EventListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.NoteListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.ArabicDateConverter;
@@ -68,13 +63,10 @@ public class DayUC extends Fragment {
             "August", "September", "October", "November", "December"};
     private NoteListViewAdapter adapter;                                // List View Adapter for Note ListView in DayFull Mode
     private ArrayList<String> notes = new ArrayList<String>();      // Notes Array List for DayFull View Mode
-    private ArrayList<String> eventTimeList;                        // Event List Array for DayList Mode
-    private HashMap<String, List<Events>> eventDetailList;          // HashMap for Mapping Times and Events in DayList View Mode
+    private ArrayList<Events> eventsArrayList;
     private DayListViewAdapter dayListadapter;                    // Event List View Adapter for DayList View Mode
     private ListView dayEventLV;                                    // Events List View
-    private float[] startPoint = new float[4],                      // TouchEvent Positions
-            endPoint = new float[4],
-            distance = new float[2];
+    private ListView noteList;
     private Typeface tahomaFont;
     private DayUC dayUCListHeader;                                  // DayUC Object for Showing in DayList View Mode (Header)
     private LayoutInflater mInfalater;
@@ -169,7 +161,7 @@ public class DayUC extends Fragment {
                 break;
             // Day List View Mode
             case DayList:
-                rootView = mInfalater.inflate(R.layout.day_list_mode_view, null);
+                rootView = mInfalater.inflate(R.layout.day_uc_list_mode_view, null);
                 initialDayList();
                 break;
         }
@@ -274,75 +266,119 @@ public class DayUC extends Fragment {
         miladiCalendar.setTime(originalSelectedDate.getTime());
         dayUCListHeader = DayUC.newInstance(miladiCalendar, false, DayHeader);
 
-        final LinearLayout eventLayout = (LinearLayout) rootView.findViewById(R.id.day_list_event_layout);
+        //TODO get event list from DB
 
+        eventsArrayList = new ArrayList<>();
+        Events events = Events.newInstance(context, Calendar.getInstance());
+        events.setEvent("asdf0", "asdfasdfasdfasdfa sdf ", "10:25", "16:56");
+        eventsArrayList.add(events);
+        dayListadapter = new DayListViewAdapter(eventsArrayList, context);
 
-        for (int i=0; i<8; i++){
-            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View eventListItem = mInflater.inflate(R.layout.event_list_item, null);
-            TextView eventTime = (TextView) eventListItem.findViewById(R.id.event_item_text);
-            final ListView eventListView = (ListView) eventListItem.findViewById(R.id.event_item_event_list);
-            eventTime.setText("1" + i + ":00 - 1" + (i+1) + ":00");
-            ArrayList<Events> eventList = new ArrayList<>();
-            for (int j=0; j<8; j++) {
-                Events events = Events.newInstance(context, Calendar.getInstance());
-                events.setEvent("یادآوری " + (j+1), "یادآوری", "1" + i + ":00", "1" + (i+1) + ":00");
-                eventList.add(events);
-            }
-            EventListViewAdapter eventAdapter = new EventListViewAdapter(eventList);
-            eventListView.setAdapter(eventAdapter);
-            eventAdapter.notifyDataSetChanged();
-            eventListItem.setVisibility(View.VISIBLE);
-            eventLayout.addView(eventListItem);
-            eventListView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    eventLayout.getParent().requestDisallowInterceptTouchEvent(true);
-                    return false;
-                }
-            });
-        }
-
-
-
-        /*
         dayEventLV = (ListView) rootView.findViewById(R.id.day_list_mode_event_list);
-        //initiate event list array and list view
-        eventTimeList = new ArrayList<>();
-        eventDetailList = new HashMap<>();
-
-        dayListadapter = new DayListViewAdapter(eventTimeList, eventDetailList, context);
-
-        //set list view adapter
         dayEventLV.setAdapter(dayListadapter);
-
-        // TODO Event List should be derived from DB
-
-        List<Events> eventlist1 = new ArrayList<>();
-        List<Events> eventlist2 = new ArrayList<>();
-
-//        Events event2 = Events.newInstance(context, Calendar.getInstance());
-
-        eventTimeList.add("10:00" + " - " + "11:00");
-        eventTimeList.add("16:00" + " - " + "17:00");
-        for (int i = 0; i < 10; i++) {
-            Events event1 = Events.newInstance(context, Calendar.getInstance());
-            Events event2 = Events.newInstance(context, Calendar.getInstance());
-            event1.setEvent("یادآوری " + i, "اولین یادآوری", "10:00", "11:00");
-            eventlist1.add(event1);
-            event2.setEvent("یادآوری " + i, "دومین یادآوری", "16:00", "17:00");
-            eventlist2.add(event2);
-        }
-//        event2.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
-//        eventlist1.add(event2);
-
-
-        eventDetailList.put(eventTimeList.get(0), eventlist1);
-        eventDetailList.put(eventTimeList.get(1), eventlist2);
-
         dayListadapter.notifyDataSetChanged();
-        */
 
+        dayEventLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String title, detail, start, end;
+                title = eventsArrayList.get(position).getTitle();
+                detail = eventsArrayList.get(position).getDescription();
+                start = eventsArrayList.get(position).getStartTime();
+                end = eventsArrayList.get(position).getEndTime();
+
+                LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View eventView = mInflater.inflate(R.layout.event_show_dialog, null);
+
+                TextView titleEvent = (TextView) eventView.findViewById(R.id.event_title_view);
+                TextView detailEvent = (TextView) eventView.findViewById(R.id.event_detail_view);
+                TextView startEvent = (TextView) eventView.findViewById(R.id.start_time);
+                TextView endEvent = (TextView) eventView.findViewById(R.id.end_time);
+
+                titleEvent.setText(title);
+                detailEvent.setText(detail);
+                startEvent.setText(start);
+                endEvent.setText(end);
+
+                //create dialog
+                AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
+                inputNote.setTitle("مشاهده رویداد");
+                inputNote.setView(eventView);
+
+                //set dialog buttons
+                inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+
+                //show dialog
+                inputNote.show();
+            }
+        });
+
+//        final LinearLayout eventLayout = (LinearLayout) rootView.findViewById(R.id.day_list_event_layout);
+//
+//
+//        for (int i=0; i<8; i++){
+//            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            final View eventListItem = mInflater.inflate(R.layout.event_list_item, null);
+//            TextView eventTime = (TextView) eventListItem.findViewById(R.id.event_item_text);
+//            final ListView eventListView = (ListView) eventListItem.findViewById(R.id.event_item_event_list);
+//            eventTime.setText("1" + i + ":00 - 1" + (i+1) + ":00");
+//            ArrayList<Events> eventList = new ArrayList<>();
+//            for (int j=0; j<8; j++) {
+//                Events events = Events.newInstance(context, Calendar.getInstance());
+//                events.setEvent("یادآوری " + (j+1), "یادآوری", "1" + i + ":00", "1" + (i+1) + ":00");
+//                eventList.add(events);
+//            }
+//            EventListViewAdapter eventAdapter = new EventListViewAdapter(eventList);
+//            eventListView.setAdapter(eventAdapter);
+//            eventAdapter.notifyDataSetChanged();
+//            eventListItem.setVisibility(View.VISIBLE);
+//            eventLayout.addView(eventListItem);
+//            eventListView.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    eventLayout.getParent().requestDisallowInterceptTouchEvent(true);
+//                    return false;
+//                }
+//            });
+//        }
+//        dayEventLV = (ListView) rootView.findViewById(R.id.day_list_mode_event_list);
+//        //initiate event list array and list view
+//        eventTimeList = new ArrayList<>();
+//        eventDetailList = new HashMap<>();
+//
+//        dayListadapter = new DayListViewAdapter(eventTimeList, eventDetailList, context);
+//
+//        //set list view adapter
+//        dayEventLV.setAdapter(dayListadapter);
+//
+//        // TODO Event List should be derived from DB
+//
+//        List<Events> eventlist1 = new ArrayList<>();
+//        List<Events> eventlist2 = new ArrayList<>();
+//
+////        Events event2 = Events.newInstance(context, Calendar.getInstance());
+//
+//        eventTimeList.add("10:00" + " - " + "11:00");
+//        eventTimeList.add("16:00" + " - " + "17:00");
+//        for (int i = 0; i < 10; i++) {
+//            Events event1 = Events.newInstance(context, Calendar.getInstance());
+//            Events event2 = Events.newInstance(context, Calendar.getInstance());
+//            event1.setEvent("یادآوری " + i, "اولین یادآوری", "10:00", "11:00");
+//            eventlist1.add(event1);
+//            event2.setEvent("یادآوری " + i, "دومین یادآوری", "16:00", "17:00");
+//            eventlist2.add(event2);
+//        }
+////        event2.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
+////        eventlist1.add(event2);
+//
+//
+//        eventDetailList.put(eventTimeList.get(0), eventlist1);
+//        eventDetailList.put(eventTimeList.get(1), eventlist2);
+//
+//        dayListadapter.notifyDataSetChanged();
 
     }
 
@@ -369,7 +405,7 @@ public class DayUC extends Fragment {
         holyDayNote.setTypeface(homa);
         holyDayNote.setTextColor(Color.BLACK);
 
-        final ListView noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
+        noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
         adapter = new NoteListViewAdapter(context, notes);
         noteList.setAdapter(adapter);
         noteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -509,8 +545,8 @@ public class DayUC extends Fragment {
         //add notes to array list
 //            for(int i=0; i< noteContents.size() ; i++)
 //                notes.add(noteContents.getAsString(MyDB.COLUMN_NOTE + i));
-        for (int i = 0; i < 15; i++)
-            notes.add("یادداشت " + i);
+//        for (int i = 0; i < 15; i++)
+//            notes.add("یادداشت " + i);
 
         //update array list adapter
         adapter.notifyDataSetChanged();
@@ -653,7 +689,7 @@ public class DayUC extends Fragment {
         }
     }
 
-    public void updatedayList(){
+    public void updateDayList(){
 //        miladiCalendar.setTime(originalSelectedDate.getTime());
 //        eventTimeList.clear();
 //        dayUCListHeader.updateDayHeader();
@@ -689,6 +725,20 @@ public class DayUC extends Fragment {
                 originalSelectedPersianDate.getiPersianMonth(),
                 originalSelectedPersianDate.getiPersianDate());
         dayFullPutData();
+    }
+
+    public void addNote(String note){
+        notes.add(note);
+        adapter = new NoteListViewAdapter(context, notes);
+        noteList.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void addEvent(Events events){
+        eventsArrayList.add(events);
+        dayListadapter = new DayListViewAdapter(eventsArrayList, context);
+        dayEventLV.setAdapter(dayListadapter);
+        dayListadapter.notifyDataSetChanged();
     }
 
     @Override

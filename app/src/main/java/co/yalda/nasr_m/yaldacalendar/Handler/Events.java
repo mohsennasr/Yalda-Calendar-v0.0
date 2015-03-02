@@ -71,4 +71,20 @@ public class Events extends Fragment {
         this.endTime = endTime;
         initializer();
     }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

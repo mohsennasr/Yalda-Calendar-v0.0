@@ -181,8 +181,9 @@
         <TextView
             android:id="@+id/dayli_note_1_tv"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="1"
             android:gravity="center"
             android:lineSpacingMultiplier="0.7"
             android:singleLine="true"
@@ -191,7 +192,8 @@
         <TextView
             android:id="@+id/dayli_note_2_tv"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
             android:lineSpacingMultiplier="0.7"

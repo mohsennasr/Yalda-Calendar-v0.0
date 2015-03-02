@@ -28,13 +28,18 @@
 
     <!--</ScrollView>-->
 
-    <ListView
-        android:id="@+id/event_item_event_list"
+    <!--<ListView-->
+        <!--android:id="@+id/event_item_event_list"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:backgroundTint="@color/link_text_material_dark"-->
+        <!--android:orientation="vertical"-->
+        <!--android:minHeight="300dp"-->
+        <!--android:showDividers="middle|end|beginning" />-->
+
+    <FrameLayout
+        android:id="@+id/event_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:backgroundTint="@color/link_text_material_dark"
-        android:orientation="vertical"
-        android:minHeight="300dp"
-        android:showDividers="middle|end|beginning" />
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

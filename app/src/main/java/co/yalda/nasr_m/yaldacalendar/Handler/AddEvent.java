@@ -106,8 +106,8 @@ public class AddEvent extends Activity {
                     return;
                 }
 
-                result.putExtra("Title", eventTitle.getText());
-                result.putExtra("Detail", eventDetail.getText());
+                result.putExtra("Title", eventTitle.getText().toString());
+                result.putExtra("Detail", eventDetail.getText().toString());
                 result.putExtra("Date", datePicker.getDisplayDate().getTime());
                 result.putExtra("Start_Time_Hour", startTime.getCurrentHour());
                 result.putExtra("Start_Time_Minute", startTime.getCurrentMinute());

@@ -2,9 +2,11 @@ package co.yalda.nasr_m.yaldacalendar;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -16,11 +18,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 
 import java.lang.reflect.Field;
@@ -28,14 +32,14 @@ import java.util.Calendar;
 import java.util.List;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.ExpandableListAdapter;
+import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.Handler.AddEvent;
-import co.yalda.nasr_m.yaldacalendar.Handler.AddNote;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomDrawer;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomViewPager;
-import co.yalda.nasr_m.yaldacalendar.Handler.GoToDate;
+import co.yalda.nasr_m.yaldacalendar.Handler.Events;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
-import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.PersianDatePicker.PersianDatePicker;
 import co.yalda.nasr_m.yaldacalendar.Utilities.ExpandableListPreparation;
 import co.yalda.nasr_m.yaldacalendar.Year.YearView;
 
@@ -222,20 +226,72 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             case R.id.action_settings:
                 return true;
             case R.id.ab_add_note_item:             //add note button clicked
-                AddNote addNote = new AddNote();
+                LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                //create dialog layout
+                final EditText input = new EditText(context);
+                input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+                final String[] value = {new String()};
+
+                //create dialog
+                AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
+                inputNote.setTitle("اضافه کردن یادداشت");
+                inputNote.setView(input);
+
+                //set dialog buttons
+                inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        value[0] = input.getText().toString();
+                        dayUCFull.addNote(value[0]);
+                    }
+                });
+                inputNote.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+
+                //show dialog
+                inputNote.show();
                 //TODO add note to DB and ListView
                 return true;
             case R.id.ab_today_item:                //today button clicked
                 originalSelectedDate = Calendar.getInstance();
-                //TODO update calendar views
+                originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
+                onDateChange(dayViewMode.Year);
                 return true;
             case R.id.ab_add_event_item:            //add event button clicked
                 Intent eventActivity = new Intent(this, AddEvent.class);
                 startActivityForResult(eventActivity, 0);
                 return true;
             case R.id.ab_date_picker_item:          //date picker button clicked
-                GoToDate goToDate = new GoToDate();
-                //TODO get selected date and update dates
+                //create dialog
+                AlertDialog.Builder datePicker = new AlertDialog.Builder(context);
+                final Calendar calendar = Calendar.getInstance();
+                final PersianCalendar persianCalendar = new PersianCalendar(Calendar.getInstance());
+                //create persian date picker object and assign dates
+                final PersianDatePicker persianDatePicker = new PersianDatePicker(context);
+                PersianCalendar pcal = new PersianCalendar(originalSelectedDate);
+                persianDatePicker.setDisplayPersianDate(pcal);
+                datePicker.setView(persianDatePicker);
+
+                //set date picker dialog buttons
+                datePicker.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        calendar.setTime(persianDatePicker.getDisplayDate());
+                        persianCalendar.setMiladiDate(calendar);
+                        originalSelectedDate.setTime(calendar.getTime());
+                        originalSelectedPersianDate.setMiladiDate(persianCalendar.getMiladiDate());
+                        onDateChange(dayViewMode.Year);
+                    }
+                });
+                datePicker.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                //show dialog
+                datePicker.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -450,7 +506,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         case 0:         // DayList view Mode
 //                            originalSelectedDate.add(Calendar.MONTH, 1);
 //                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, 1);
-//                            dayUCList.updatedayList();
+//                            dayUCList.updateDayList();
 //                            break;
                             return super.dispatchTouchEvent(event);
                         case 1:         // DayFull View Mode
@@ -471,7 +527,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         case 0:         // DayList view Mode
 //                            originalSelectedDate.add(Calendar.MONTH, -1);
 //                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, -1);
-//                            dayUCList.updatedayList();
+//                            dayUCList.updateDayList();
 //                            break;
                             return super.dispatchTouchEvent(event);
                         case 1:         // DayFull View Mode
@@ -514,7 +570,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     //on swipe actions change hole date
     public void onDateChange(dayViewMode view){
         dayUCFull.updateDayFull();
-        dayUCList.updatedayList();
+        dayUCList.updateDayList();
         switch (view){
             case Month:
                 monthView.updateMonth(originalSelectedDate);
@@ -616,6 +672,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 startMin = data.getIntExtra("Start_Time_Minute", -1);
                 endHour = data.getIntExtra("End_Time_Hour", -1);
                 endMin = data.getIntExtra("End_Time_Minute", -1);
+
+                Events events = Events.newInstance(context,originalSelectedDate);
+
+                events.setEvent(eventTitle, eventDetail, startHour + ":" + startMin, endHour + ":" + endMin);
+
+                dayUCList.addEvent(events);
 
                 //TODO set event
             }
