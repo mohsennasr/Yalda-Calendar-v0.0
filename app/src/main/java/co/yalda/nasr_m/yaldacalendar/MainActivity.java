@@ -2,11 +2,9 @@ package co.yalda.nasr_m.yaldacalendar;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -18,14 +16,14 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 
+import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.List;
 
@@ -37,7 +35,7 @@ import co.yalda.nasr_m.yaldacalendar.Handler.CustomDrawer;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomViewPager;
 import co.yalda.nasr_m.yaldacalendar.Handler.GoToDate;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
-import co.yalda.nasr_m.yaldacalendar.PersianDatePicker.Util.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Utilities.ExpandableListPreparation;
 import co.yalda.nasr_m.yaldacalendar.Year.YearView;
 
@@ -58,19 +56,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static calendarType secondCalendarType = calendarType.Gregorian;
     public static calendarType thirdCalendarType = calendarType.Gregorian;
     public static Calendar originalSelectedDate = Calendar.getInstance();
-    public static PersianCalendar originalSelectedPersianDate = new PersianCalendar(Calendar.getInstance().getTime().getTime());
+    public static PersianCalendar originalSelectedPersianDate = new PersianCalendar(Calendar.getInstance());
     public static List<Byte> dayWeekHoliday;
     public static List<OCCVAC> holiday;
     public static Context context;
     public static int[] viewSize;
     public static touchEvent touchAction;
     public static ProgressDialog progressDialog;
-    public static int DAY_INCREASE = 1;
-    public static int DAY_DECREASE = -1;
-    public static int MONTH_INCREASE = 2;
-    public static int MONTH_DECREASE = -2;
-    public static int YEAR_INCREASE = 3;
-    public static int YEAR_DECREASE = -3;
     private CustomViewPager viewPager;
     private CustomDrawer drawerLayout;
     private ActionBar actionBar;
@@ -173,7 +165,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         viewPager = (CustomViewPager) findViewById(R.id.view_pager);
 
         //declare page offset limit in view pager
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(4);
 
         //assign action bar
         actionBar = getActionBar();
@@ -198,6 +190,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         dayUCFull = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayFull);
         monthView = MonthView.newInstance(Calendar.getInstance(), dayViewMode.Month);
         yearView = YearView.newInstance(Calendar.getInstance());
+
+        getOverflowMenu();
     }
 
     @Override
@@ -213,6 +207,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         } else {
             getMenuInflater().inflate(R.menu.menu, menu);
         }
+
         return true;
     }
 
@@ -265,7 +260,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        super.dispatchTouchEvent(event);
+//        super.dispatchTouchEvent(event);
         if (distance[0] != 0 && event.getAction() == MotionEvent.ACTION_UP)
             ACTION_FINISHED = true;
         if ((event.getPointerCount() >= 2) && (distance[0] != 0)) {     // multiTouch gesture
@@ -358,90 +353,137 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             }
         if (ACTION_FINISHED) {
             SWIPE_ACTION = true;
+            int month = 0, year = 0;
             switch (touchAction) {
                 case Right2Left:                                            //Increase Date by 1
                     switch (viewPager.getCurrentItem()) {
                         case 0:         // DayList view Mode
+                            month = originalSelectedPersianDate.getiPersianMonth();
+                            year = originalSelectedPersianDate.getiPersianYear();
                             originalSelectedDate.add(Calendar.DATE, 1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.DATE, 1);
-                            dayUCList.dayListSetData();
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, 1);
+                            if (originalSelectedPersianDate.getiPersianYear() != year){
+                                onDateChange(dayViewMode.Year);
+                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+                                onDateChange(dayViewMode.Month);
+                            }else {
+                                onDateChange(dayViewMode.Default);
+                            }
                             break;
                         case 1:         // DayFull View Mode
+                            month = originalSelectedPersianDate.getiPersianMonth();
+                            year = originalSelectedPersianDate.getiPersianYear();
                             originalSelectedDate.add(Calendar.DATE, 1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.DATE, 1);
-                            dayUCFull.dayFullPutData();
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, 1);
+                            if (originalSelectedPersianDate.getiPersianYear() != year){
+                                onDateChange(dayViewMode.Year);
+                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+                                onDateChange(dayViewMode.Month);
+                            }else {
+                                onDateChange(dayViewMode.Default);
+                            }
                             break;
                         case 2:         // Month View Mode
+                            year = originalSelectedPersianDate.getiPersianYear();
                             originalSelectedDate.add(Calendar.MONTH, 1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, 1);
-                            monthView.updateMonth(originalSelectedDate);
+                            originalSelectedPersianDate.addPersian(Calendar.MONTH, 1);
+                            if (originalSelectedPersianDate.getiPersianYear() != year){
+                                onDateChange(dayViewMode.Year);
+                            }else {
+                                onDateChange(dayViewMode.Month);
+                            }
                             break;
                         case 3:         // Year View Mode
                             originalSelectedDate.add(Calendar.YEAR, 1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.YEAR, 1);
-                            yearView.updateYear();
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, 1);
+                            onDateChange(dayViewMode.Year);
                             break;
                     }
                     break;
                 case Left2Right:                                            //Decrease Date by 1
                     switch (viewPager.getCurrentItem()) {
                         case 0:         // DayList view Mode
+                            month = originalSelectedPersianDate.getiPersianMonth();
+                            year = originalSelectedPersianDate.getiPersianYear();
                             originalSelectedDate.add(Calendar.DATE, -1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.DATE, -1);
-                            dayUCList.dayListSetData();
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, -1);
+                            if (originalSelectedPersianDate.getiPersianYear() != year){
+                                onDateChange(dayViewMode.Year);
+                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+                                onDateChange(dayViewMode.Month);
+                            }else {
+                                onDateChange(dayViewMode.Default);
+                            }
                             break;
                         case 1:         // DayFull View Mode
+                            month = originalSelectedPersianDate.getiPersianMonth();
+                            year = originalSelectedPersianDate.getiPersianYear();
                             originalSelectedDate.add(Calendar.DATE, -1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.DATE, -1);
-                            dayUCFull.dayFullPutData();
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, -1);
+                            if (originalSelectedPersianDate.getiPersianYear() != year){
+                                onDateChange(dayViewMode.Year);
+                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+                                onDateChange(dayViewMode.Month);
+                            }else {
+                                onDateChange(dayViewMode.Default);
+                            }
                             break;
                         case 2:         // Month View Mode
+                            year = originalSelectedPersianDate.getiPersianYear();
                             originalSelectedDate.add(Calendar.MONTH, -1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, -1);
-                            monthView.updateMonth(originalSelectedDate);
+                            originalSelectedPersianDate.addPersian(Calendar.MONTH, -1);
+                            if (originalSelectedPersianDate.getiPersianYear() != year){
+                                onDateChange(dayViewMode.Year);
+                            }else {
+                                onDateChange(dayViewMode.Month);
+                            }
                             break;
                         case 3:         // Year View Mode
                             originalSelectedDate.add(Calendar.YEAR, -1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.YEAR, -1);
-                            yearView.updateYear();
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, -1);
+                            onDateChange(dayViewMode.Year);
                             break;
                     }
                     break;
                 case Down2Up:                                               //Decrease Parent Date by 1
                     switch (viewPager.getCurrentItem()) {
-//                        case 0:         // DayList view Mode
+                        case 0:         // DayList view Mode
 //                            originalSelectedDate.add(Calendar.MONTH, 1);
 //                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, 1);
-//                            dayUCList.dayListSetData();
+//                            dayUCList.updatedayList();
 //                            break;
-//                        case 1:         // DayFull View Mode
+                            return super.dispatchTouchEvent(event);
+                        case 1:         // DayFull View Mode
 //                            originalSelectedDate.add(Calendar.MONTH, 1);
 //                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, 1);
-//                            dayUCFull.dayFullPutData();
+//                            dayUCFull.updateDayFull();
 //                            break;
+                            return super.dispatchTouchEvent(event);
                         case 2:         // Month View Mode
                             originalSelectedDate.add(Calendar.YEAR, 1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.YEAR, 1);
-                            monthView.updateMonth(originalSelectedDate);
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, 1);
+                            onDateChange(dayViewMode.Year);
                             break;
                     }
                     break;
                 case Up2Down:                                               //Increase Parent Date by 1
                     switch (viewPager.getCurrentItem()) {
-//                        case 0:         // DayList view Mode
+                        case 0:         // DayList view Mode
 //                            originalSelectedDate.add(Calendar.MONTH, -1);
 //                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, -1);
-//                            dayUCList.dayListSetData();
+//                            dayUCList.updatedayList();
 //                            break;
-//                        case 1:         // DayFull View Mode
+                            return super.dispatchTouchEvent(event);
+                        case 1:         // DayFull View Mode
 //                            originalSelectedDate.add(Calendar.MONTH, -1);
 //                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, -1);
-//                            dayUCFull.dayFullPutData();
+//                            dayUCFull.updateDayFull();
 //                            break;
+                            return super.dispatchTouchEvent(event);
                         case 2:         // Month View Mode
                             originalSelectedDate.add(Calendar.YEAR, -1);
-                            originalSelectedPersianDate.addPersianDate(Calendar.YEAR, -1);
-                            monthView.updateMonth(originalSelectedDate);
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, -1);
+                            onDateChange(dayViewMode.Year);
                             break;
                     }
                     break;
@@ -464,8 +506,39 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             startPoint = new float[4];
             endPoint = new float[4];
             distance = new float[2];
+            return true;
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    //on swipe actions change hole date
+    public void onDateChange(dayViewMode view){
+        dayUCFull.updateDayFull();
+        dayUCList.updatedayList();
+        switch (view){
+            case Month:
+                monthView.updateMonth(originalSelectedDate);
+                break;
+            case Year:
+                monthView.updateMonth(originalSelectedDate);
+                yearView.updateYear();
+                break;
+        }
+
+    }
+
+    //if there is ot enough room for menu items, make overflow menu
+    private void getOverflowMenu() {
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if(menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void onConfigurationChanged(Configuration newConfig) {
@@ -492,34 +565,34 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onBackPressed() {
         if (drawerOpen)
             drawerLayout.closeDrawers();
-        else {
-//            super.onBackPressed();
-            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            //create dialog layout
-            final TextView input = new TextView(context);
-            input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-            final String[] value = {new String()};
-            input.setText("آیا می خواهید خارج شوید؟");
-
-            //create dialog
-            AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
-            inputNote.setTitle("خروج");
-            inputNote.setView(input);
-
-            //set dialog buttons
-            inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    finish();
-                }
-            });
-            inputNote.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                }
-            });
-
-            //show dialog
-            inputNote.show();
-        }
+//        else {
+            super.onBackPressed();
+//            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            //create dialog layout
+//            final TextView input = new TextView(context);
+//            input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+//            final String[] value = {new String()};
+//            input.setText("آیا می خواهید خارج شوید؟");
+//
+//            //create dialog
+//            AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
+//            inputNote.setTitle("خروج");
+//            inputNote.setView(input);
+//
+//            //set dialog buttons
+//            inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int whichButton) {
+//                    finish();
+//                }
+//            });
+//            inputNote.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int whichButton) {
+//                }
+//            });
+//
+//            //show dialog
+//            inputNote.show();
+//        }
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -555,7 +628,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         DayHeader,
         DayFull,
         DayList,
-        Week
+        Week,
+        Default
     }
 
     public static enum weekViewMode {
@@ -576,15 +650,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         Down2Up,
         ZoomIn,
         ZoomOut
-    }
-
-    public static enum changeValue{
-        DayIncrease,
-        DayDecrease,
-        MonthIncrease,
-        MonthDecrease,
-        YearIncrease,
-        YearDecrease
     }
 
     public class TabViewPagerAdapter extends FragmentPagerAdapter {

@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
@@ -160,18 +160,12 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/holyday_note_tv"
+        android:id="@+id/holiday_note_tv"
         android:layout_width="match_parent"
         android:layout_height="25dp"
         android:layout_marginRight="10dp"
-        android:gravity="right" />
-
-    <ListView
-        android:id="@+id/note_list_lv"
-        android:layout_width="match_parent"
-        android:layout_height="265dp"
-        android:gravity="right" />
-
+        android:gravity="right"
+        android:layout_below="@+id/Date"/>
 
     <LinearLayout
         android:id="@+id/note"
@@ -180,7 +174,9 @@
         android:layout_marginBottom="0dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/LightGray"
+        android:layout_alignParentBottom="true">
 
         <TextView
             android:id="@+id/dayli_note_1_tv"
@@ -202,4 +198,13 @@
             android:singleLine="true"
             android:textStyle="bold" />
     </LinearLayout>
-</LinearLayout>
+
+    <ListView
+        android:id="@+id/note_list_lv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="right"
+        android:layout_above="@id/note"
+        android:layout_below="@id/holiday_note_tv"/>
+
+</RelativeLayout>

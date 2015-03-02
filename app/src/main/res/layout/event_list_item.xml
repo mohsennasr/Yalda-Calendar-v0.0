@@ -1,6 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:backgroundTint="@color/background_floating_material_dark"
     android:backgroundTintMode="multiply"
     android:minHeight="200dp"
@@ -16,12 +16,25 @@
         android:text="test"
         android:textColor="#000000" />
 
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
+        <!--<LinearLayout-->
+            <!--android:id="@+id/event_item_layout"-->
+            <!--android:orientation="vertical"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
+
+    <!--</ScrollView>-->
+
     <ListView
         android:id="@+id/event_item_event_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:backgroundTint="@color/link_text_material_dark"
         android:orientation="vertical"
+        android:minHeight="300dp"
         android:showDividers="middle|end|beginning" />
 
 </LinearLayout>

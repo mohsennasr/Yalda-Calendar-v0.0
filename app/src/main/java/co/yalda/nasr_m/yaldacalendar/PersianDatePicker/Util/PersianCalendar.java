@@ -179,7 +179,7 @@ public class PersianCalendar extends GregorianCalendar {
         this.persianYear = persianYear;
         this.persianMonth = persianMonth;
         this.persianDay = persianDay;
-        calculatePersianDate();
+//        calculatePersianDate();
     }
 
     public int getPersianYear() {
@@ -285,15 +285,15 @@ public class PersianCalendar extends GregorianCalendar {
             return; // Do nothing!
         }
 
-        if (field < 0 || field >= ZONE_OFFSET) {
-            throw new IllegalArgumentException();
-        }
+//        if (field < 0 || field >= ZONE_OFFSET) {
+//            throw new IllegalArgumentException();
+//        }
 
         if (field == YEAR) {
             setPersianDate(this.persianYear + amount, this.persianMonth, this.persianDay);
             return;
         } else if (field == MONTH) {
-            setPersianDate(this.persianYear + ((this.persianMonth + amount) / 12), (this.persianMonth + amount) % 12, this.persianDay);
+            setPersianDate(this.persianYear + ((amount < 0 ? (this.persianMonth + amount)+12 : (this.persianMonth + amount)) / 12), (amount < 0 ? (this.persianMonth + amount)+12 : (this.persianMonth + amount)) % 12, this.persianDay);
             return;
         } else if (field == DATE) {
             Calendar cal = getInstance();
@@ -370,10 +370,10 @@ public class PersianCalendar extends GregorianCalendar {
 
     public int getFirstWeekNumberOfMonth() {
         setPersianDate(persianYear, persianMonth, 1);
-        calculatePersianDate();
+//        calculatePersianDate();
         int weekNum = getPersianWeekNumber();
         addPersianDate(DATE, persianDay - 1);
-        calculatePersianDate();
+//        calculatePersianDate();
         return weekNum;
     }
 
@@ -433,7 +433,7 @@ public class PersianCalendar extends GregorianCalendar {
                 persianYear = amount;
                 break;
         }
-        calculatePersianDate();
+//        calculatePersianDate();
     }
 
     public String getPersianDateIndex() {

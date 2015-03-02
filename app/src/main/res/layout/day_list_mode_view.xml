@@ -13,11 +13,23 @@
         android:layout_width="match_parent"
         android:layout_height="80dp" />
 
-    <ListView
-        android:id="@+id/day_list_mode_event_list"
+    <!--<ListView-->
+        <!--android:id="@+id/day_list_mode_event_list"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:fastScrollEnabled="true"/>-->
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fastScrollEnabled="true"/>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/day_list_event_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        </ScrollView>
 
 
 </LinearLayout>

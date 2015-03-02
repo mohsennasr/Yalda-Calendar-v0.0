@@ -2,6 +2,7 @@ package co.yalda.nasr_m.yaldacalendar.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -58,7 +59,7 @@ public class DayListViewAdapter extends BaseAdapter {
             TextView time = (TextView) convertView.findViewById(R.id.event_item_text);
             time.setText(timeList.get(position));
 
-//            LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.event_item_event_frame);
+//            LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.event_item_layout);
 //            for (int i = 0; i < eventList.get(timeList.get(position)).size(); i++) {
 //                if (eventList.get(timeList.get(position)).get(i).rootView.getParent() == null)
 //                    layout.addView(eventList.get(timeList.get(position)).get(i).rootView);
@@ -72,6 +73,29 @@ public class DayListViewAdapter extends BaseAdapter {
             EventListViewAdapter adapter = new EventListViewAdapter(lists);
             listView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
+
+            final View finalConvertView = convertView;
+            listView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+//                    int action = event.getAction();
+//                    switch (action) {
+//                        case MotionEvent.ACTION_DOWN:
+//                            // Disallow ScrollView to intercept touch events.
+                            v.getParent().requestDisallowInterceptTouchEvent(true);
+//                            break;
+//
+//                        case MotionEvent.ACTION_UP:
+//                            // Allow ScrollView to intercept touch events.
+//                            finalConvertView.getParent().requestDisallowInterceptTouchEvent(false);
+//                            break;
+//                    }
+
+                    // Handle ListView touch events.
+                    v.onTouchEvent(event);
+                    return false;
+                }
+            });
         }
         return convertView;
     }

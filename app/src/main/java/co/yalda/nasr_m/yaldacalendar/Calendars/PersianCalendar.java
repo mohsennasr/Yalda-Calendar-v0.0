@@ -3,21 +3,15 @@ package co.yalda.nasr_m.yaldacalendar.Calendars;
 import java.util.Calendar;
 import java.util.Date;
 
-import static java.util.Calendar.DATE;
-import static java.util.Calendar.DAY_OF_WEEK;
-import static java.util.Calendar.MONTH;
-import static java.util.Calendar.YEAR;
-import static java.util.Calendar.getInstance;
-
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class PersianCalendar {
+public class PersianCalendar extends Calendar{
 
     private Calendar miladiDate = getInstance();
     private int iPersianYear, iPersianMonth, iPersianDate, iPersianWeekDay, iPersianFirstDayOfWeek;
     private String persianMonthName, persianDayName, sPersianFirstDayOfWeek;
-    private String[] persianMonthNames = new String[]{"فروردین", "اردیبهشت", "خرداد"
+    public static String[] persianMonthNames = new String[]{"فروردین", "اردیبهشت", "خرداد"
             , "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
     private String[] persianWeekDayNames = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه"};
     private int[] monthDays = new int[]{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
@@ -38,7 +32,7 @@ public class PersianCalendar {
     private void calculateDate() {
         String[] convertedDate = MiladiToSolarConverter.getCurrentShamsidate(miladiDate);
         iPersianYear = Integer.valueOf(convertedDate[0]);
-        iPersianMonth = Integer.valueOf(convertedDate[1]);
+        iPersianMonth = Integer.valueOf(convertedDate[1]);      // 1-12
         iPersianDate = Integer.valueOf(convertedDate[2]);
         persianMonthName = convertedDate[3];
         persianDayName = convertedDate[4];
@@ -46,7 +40,7 @@ public class PersianCalendar {
     }
 
     public int getMaxDayOfMonth() {
-        if (iPersianMonth == 11 && isLeap(iPersianYear))
+        if (iPersianMonth == 12 && isLeap(iPersianYear))
             return 30;
         else
             return monthDays[iPersianMonth - 1];
@@ -95,7 +89,7 @@ public class PersianCalendar {
         return remainingDay;
     }
 
-    public void persianSet(int field, int amount) {
+    public void setPersian(int field, int amount) {
         switch (field) {
             case YEAR:
                 miladiDate.add(YEAR, amount - iPersianYear);
@@ -112,7 +106,7 @@ public class PersianCalendar {
         }
     }
 
-    private boolean isLeap(int year) {
+    public static boolean isLeap(int year) {
         return ((Math.abs(year - 1395) % 4) == 0);
     }
 
@@ -185,5 +179,96 @@ public class PersianCalendar {
         miladiDate.add(YEAR, month - iPersianMonth + 1);
         miladiDate.add(YEAR, day - iPersianDate);
         calculateDate();
+    }
+
+    public void addPersian(int field, int amount){
+        if (amount == 0)
+            return;
+        switch (field){
+            case YEAR:
+                miladiDate.add(YEAR, amount);
+                calculateDate();
+                break;
+            case MONTH:
+                int dayCount = 0, currentYear = iPersianYear;
+                if (amount > 0) {
+                    for (int i = iPersianMonth; i < amount + iPersianMonth; i++) {
+                        if ((i / 12) >= 1) {
+                            currentYear++;
+                        }
+                        if ((i % 12) < 6) {
+                            dayCount += 31;
+                        } else if (((i % 12) < 11) || isLeap(currentYear)) {
+                            dayCount += 30;
+                        } else {
+                            dayCount += 29;
+                        }
+                    }
+                }else{
+                    for (int i = 0; i < -amount; i--) {
+                        if ((Math.abs(i) / 12) >= 1) {
+                            currentYear--;
+                        }
+                        if ((Math.abs(i) % 12) < 7 && (Math.abs(i) % 12) > 0) {
+                            dayCount += 31;
+                        } else if (((Math.abs(i) % 12) > 7) || isLeap(currentYear)) {
+                            dayCount += 30;
+                        } else {
+                            dayCount += 29;
+                        }
+                    }
+                }
+                miladiDate.add(DATE, amount>0 ? dayCount : - dayCount);
+                calculateDate();
+                break;
+            case DATE:
+                miladiDate.add(DATE, amount);
+                calculateDate();
+                break;
+        }
+    }
+
+    @Override
+    public void add(int field, int value) {
+        miladiDate.add(field, value);
+    }
+
+    @Override
+    public long getTimeInMillis() {
+        return miladiDate.getTimeInMillis();
+    }
+
+    @Override
+    protected void computeFields() {
+    }
+
+    @Override
+    protected void computeTime() {
+
+    }
+
+    @Override
+    public int getGreatestMinimum(int field) {
+        return 0;
+    }
+
+    @Override
+    public int getLeastMaximum(int field) {
+        return 0;
+    }
+
+    @Override
+    public int getMaximum(int field) {
+        return 0;
+    }
+
+    @Override
+    public int getMinimum(int field) {
+        return 0;
+    }
+
+    @Override
+    public void roll(int field, boolean increment) {
+
     }
 }

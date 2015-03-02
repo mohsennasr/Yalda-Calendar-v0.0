@@ -17,8 +17,8 @@ import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.YearGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.YearListGridAdapter;
+import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
-import co.yalda.nasr_m.yaldacalendar.PersianDatePicker.Util.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
@@ -74,9 +74,9 @@ public class YearView extends Fragment {
 
     //initial attributes
     private void initialYear(/*LayoutInflater inflater, @Nullable ViewGroup container*/) {
-        yearPersianCal = new PersianCalendar(yearCal.getTime().getTime());
+        yearPersianCal = new PersianCalendar(yearCal);
         yearPersianCal.setPersian(Calendar.MONTH, 0);
-        yearCal.setTime(yearPersianCal.getTime());
+        yearCal.setTime(yearPersianCal.getMiladiDate().getTime());
         yearMonth = new MonthView[12];
         Integer yearNum = yearCal.get(Calendar.YEAR) - 4;
         ArrayList<Integer> yearList = new ArrayList<>();
@@ -90,7 +90,7 @@ public class YearView extends Fragment {
 
         setColumns();
 
-        yearHeader_tv.setText(String.valueOf(yearPersianCal.getPersianYear()));
+        yearHeader_tv.setText(String.valueOf(yearPersianCal.getiPersianYear()));
         yearGridAdapter = new YearGridViewAdapter(monthViewList);
         yearGridView.setAdapter(yearGridAdapter);
         yearGridAdapter.notifyDataSetChanged();
@@ -109,9 +109,9 @@ public class YearView extends Fragment {
 
     public void updateYear(){
         yearCal.setTime(originalSelectedDate.getTime());
-        yearPersianCal.setTime(yearCal.getTime());
+        yearPersianCal.setMiladiDate(yearCal);
         yearPersianCal.setPersian(Calendar.MONTH, 0);
-        yearCal.setTime(yearPersianCal.getTime());
+        yearCal.setTime(yearPersianCal.getMiladiDate().getTime());
         monthViewList.clear();
         for (int i = 0; i < 12; i++) {
             yearMonth[i].updateMonth(yearCal);
@@ -121,7 +121,7 @@ public class YearView extends Fragment {
 
         setColumns();
 
-        yearHeader_tv.setText(String.valueOf(yearPersianCal.getPersianYear()));
+        yearHeader_tv.setText(String.valueOf(yearPersianCal.getiPersianYear()));
         yearGridAdapter.notifyDataSetChanged();
     }
 
