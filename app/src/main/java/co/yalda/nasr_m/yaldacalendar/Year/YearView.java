@@ -24,6 +24,7 @@ import co.yalda.nasr_m.yaldacalendar.R;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
 
 /**
  * Created by Nasr_M on 2/21/2015.
@@ -39,6 +40,7 @@ public class YearView extends Fragment {
     private Calendar yearCal = Calendar.getInstance();
     private PersianCalendar yearPersianCal;
     private int CURRENT_VIEW = 1;
+    private int selectedIndex = -1;
 
     public static YearView newInstance(Calendar yearCal) {
         YearView yearView = new YearView();
@@ -135,5 +137,11 @@ public class YearView extends Fragment {
             rootView.setVisibility(View.VISIBLE);
             CURRENT_VIEW = 1;
         }
+    }
+
+    public void setSelectedDate(){
+        if (selectedIndex >= 0)
+            yearMonth[selectedIndex].unSetSelectedDate();
+        yearMonth[originalSelectedPersianDate.getiPersianMonth()-1].setSelectedDate();
     }
 }

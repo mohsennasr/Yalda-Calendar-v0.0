@@ -19,6 +19,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
+import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.PersianDatePicker.PersianDatePicker;
 import co.yalda.nasr_m.yaldacalendar.R;
 
@@ -27,18 +31,19 @@ import co.yalda.nasr_m.yaldacalendar.R;
  */
 public class AddEvent extends Activity {
 
-    EditText eventTitle, eventDetail;
-    PersianDatePicker datePicker;
-    TimePicker startTime, endTime;
-    Switch holeDay;
-    LinearLayout datePickerHolder;
-    TextView start, end, hole;
-    Button ok, cancel;
-    Intent result = new Intent();
-    Context context;
+    private EditText eventTitle, eventDetail;
+    private PersianDatePicker datePicker;
+    private TimePicker startTime, endTime;
+    private Switch holeDay;
+    private LinearLayout datePickerHolder;
+    private TextView start, end, hole;
+    private Button ok, cancel;
+    private Intent result = new Intent();
+    private Context context;
+    private MainActivity.eventMode eventMode;
+
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL); //Set Direction Right-to-Left
@@ -105,10 +110,10 @@ public class AddEvent extends Activity {
                     Toast.makeText(getApplicationContext(), "Event End Time Should be Greater Than Start Time !!", Toast.LENGTH_LONG).show();
                     return;
                 }
-
+                result.putExtra("EventMode", eventMode.toString());
                 result.putExtra("Title", eventTitle.getText().toString());
                 result.putExtra("Detail", eventDetail.getText().toString());
-                result.putExtra("Date", datePicker.getDisplayDate().getTime());
+                result.putExtra("Date", datePicker.getDisplayPersianDate().getMiladiDate().getTimeInMillis());
                 result.putExtra("Start_Time_Hour", startTime.getCurrentHour());
                 result.putExtra("Start_Time_Minute", startTime.getCurrentMinute());
                 result.putExtra("End_Time_Hour", endTime.getCurrentHour());
@@ -125,6 +130,21 @@ public class AddEvent extends Activity {
                 onBackPressed();
             }
         });
+
+        Bundle extras = getIntent().getExtras();
+        eventMode = extras.getString("EventMode").equals(MainActivity.eventMode.NewEvent.toString()) ? MainActivity.eventMode.NewEvent :
+                MainActivity.eventMode.EditEvent;
+        if (eventMode == MainActivity.eventMode.EditEvent){
+            eventTitle.setText(extras.getString("Title"));
+            eventDetail.setText(extras.getString("Detail"));
+            startTime.setCurrentHour(Integer.valueOf(extras.getString("Start_Time").substring(0, 2)));
+            startTime.setCurrentMinute(Integer.valueOf(extras.getString("Start_Time").substring(3, 5)));
+            endTime.setCurrentHour(Integer.valueOf(extras.getString("End_Time").substring(0, 2)));
+            endTime.setCurrentMinute(Integer.valueOf(extras.getString("End_Time").substring(3, 5)));
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(extras.getLong("Date"));
+            datePicker.setDisplayPersianDate(new PersianCalendar(cal));
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

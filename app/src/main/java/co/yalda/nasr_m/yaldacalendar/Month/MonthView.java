@@ -28,6 +28,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Year;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
 
 /**
  * Created by Nasr_M on 2/21/2015.
@@ -50,6 +51,7 @@ public class MonthView extends Fragment {
     private String[] weekDaysFull = new String[]{"", "شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه"};
     private PersianCalendar monthPersianCal;
     private ArrayList<String> weekNumArrayList;
+    private int selectedDayIndex = -1;
 
     /*
     Fragment Classes have their own constructor method that we can't modify input parameter.
@@ -128,7 +130,11 @@ public class MonthView extends Fragment {
 
         int weekNum = monthPersianCal.getFirstWeekNumberOfMonth();
         for (int i = 0; i < 6; i++) {
-            weekNumArrayList.add(String.valueOf(weekNum));
+            if (i<=(monthPersianCal.numberOfWeeksInMonth())) {
+                weekNumArrayList.add(String.valueOf(weekNum));
+            }else {
+                weekNumArrayList.add("");
+            }
             if (weekNum >= 52 && monthPersianCal.getiPersianMonth() == 0)
                 weekNum = 1;
             else
@@ -177,12 +183,17 @@ public class MonthView extends Fragment {
             monthCal.add(Calendar.DATE, 1);
         }
         monthCal.setTime(month.getTime());
+        monthPersianCal.setMiladiDate(monthCal);
 
         weekNumArrayList.clear();
         int weekNum = monthPersianCal.getFirstWeekNumberOfMonth();
         for (int i = 0; i < 6; i++) {
-            weekNumArrayList.add(String.valueOf(weekNum));
-            if (weekNum >= 52 && monthPersianCal.getiPersianMonth() == 0)
+            if (i<=(monthPersianCal.numberOfWeeksInMonth())) {
+                weekNumArrayList.add(String.valueOf(weekNum));
+            }else{
+                weekNumArrayList.add("");
+            }
+            if (weekNum >= 52 && monthPersianCal.getiPersianMonth() == 1)
                 weekNum = 1;
             else
                 weekNum++;
@@ -197,6 +208,17 @@ public class MonthView extends Fragment {
         } else {
             monthHeader_tv.setText(monthPersianCal.getPersianMonthName());
         }
+    }
+
+    public void setSelectedDate(){
+        if (selectedDayIndex >= 0)
+            dayUC[selectedDayIndex].unSetSelectedDay();
+        selectedDayIndex = originalSelectedPersianDate.getiPersianDate() + originalSelectedPersianDate.persianPreMonthRemainingDay() - 1;
+        dayUC[selectedDayIndex].setSelectedDay();
+    }
+
+    public void unSetSelectedDate(){
+        dayUC[selectedDayIndex].unSetSelectedDay();
     }
 
     @Override

@@ -196,7 +196,7 @@ public class PersianCalendar extends Calendar{
                         if ((i / 12) >= 1) {
                             currentYear++;
                         }
-                        if ((i % 12) < 6) {
+                        if (((i % 12) < 6) && (i % 12) > 0 ) {
                             dayCount += 31;
                         } else if (((i % 12) < 11) || isLeap(currentYear)) {
                             dayCount += 30;
@@ -205,7 +205,7 @@ public class PersianCalendar extends Calendar{
                         }
                     }
                 }else{
-                    for (int i = 0; i < -amount; i--) {
+                    for (int i = 0; i < amount; i--) {
                         if ((Math.abs(i) / 12) >= 1) {
                             currentYear--;
                         }
@@ -225,6 +225,29 @@ public class PersianCalendar extends Calendar{
                 miladiDate.add(DATE, amount);
                 calculateDate();
                 break;
+        }
+    }
+
+    public int numberOfWeeksInMonth(){
+        int dayCount = persianPreMonthRemainingDay() + getMaxDayOfMonth();
+        return (int) Math.ceil(dayCount/7);
+    }
+
+    public int persianCompare(PersianCalendar pCal){
+        if (iPersianYear > pCal.iPersianYear){
+            return 1;
+        }else if (iPersianYear < pCal.iPersianYear){
+            return -1;
+        }else if (iPersianMonth > pCal.iPersianMonth){
+            return 1;
+        }else if (iPersianMonth < pCal.iPersianMonth){
+            return -1;
+        }else if (iPersianDate > pCal.iPersianDate){
+            return 1;
+        }else if (iPersianDate < pCal.iPersianDate){
+            return -1;
+        }else {
+            return 0;
         }
     }
 

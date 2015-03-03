@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 
@@ -71,7 +72,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private CustomDrawer drawerLayout;
     private ActionBar actionBar;
     private TabViewPagerAdapter tabPagerAdapter;
-    private String[] tabNames = new String[]{"First", "Second", "Third", "Fourth"};
+    private String[] tabNames = new String[]{"روزانه 1", "روزانه 2", "ماهیانه", "سالیانه"};
     private int currentTab = 0;
     private DayUC dayUCList, dayUCFull;
     private MonthView monthView;
@@ -83,11 +84,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private float[] startPoint, endPoint, distance;
     private boolean IS_IN_VIEWPAGER_AREA = false, SWIPE_ACTION = true, ACTION_FINISHED = false;
     private Point point = new Point();
+    private boolean UPDATE_DAY_LIST = false;
+    private boolean UPDATE_DAY_FULL = false;
+    private boolean UPDATE_MONTH = false;
+    private boolean UPDATE_YEAR = false;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL); //Set Direction Right-to-Left
 
@@ -254,12 +260,23 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 //TODO add note to DB and ListView
                 return true;
             case R.id.ab_today_item:                //today button clicked
+                PersianCalendar today = new PersianCalendar(Calendar.getInstance());
+                if (today.getMiladiDate().compareTo(originalSelectedDate) == 0)
+                    return true;
+
+                if (today.getiPersianYear() != originalSelectedPersianDate.getiPersianYear()) {
+                    onDateChange(dayViewMode.Year);
+                }else if (today.getiPersianMonth() != originalSelectedPersianDate.getiPersianMonth()){
+                    onDateChange(dayViewMode.Month);
+                }else {
+                    onDateChange(dayViewMode.DayFull);
+                }
                 originalSelectedDate = Calendar.getInstance();
                 originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
-                onDateChange(dayViewMode.Year);
                 return true;
             case R.id.ab_add_event_item:            //add event button clicked
                 Intent eventActivity = new Intent(this, AddEvent.class);
+                eventActivity.putExtra("EventMode", eventMode.NewEvent.toString());
                 startActivityForResult(eventActivity, 0);
                 return true;
             case R.id.ab_date_picker_item:          //date picker button clicked
@@ -300,6 +317,34 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        switch (tab.getPosition()){
+            case 0:
+                if (UPDATE_DAY_LIST) {
+                    dayUCList.updateDayList();
+                    UPDATE_DAY_LIST = false;
+                }
+                break;
+            case 1:
+                if (UPDATE_DAY_FULL) {
+                    dayUCFull.updateDayFull();
+                    UPDATE_DAY_FULL = false;
+                }
+                break;
+            case 2:
+                if (UPDATE_MONTH) {
+                    monthView.updateMonth(originalSelectedDate);
+                    UPDATE_MONTH = false;
+                }
+                monthView.setSelectedDate();
+                break;
+            case 3:
+                if (UPDATE_YEAR) {
+                    yearView.updateYear();
+                    UPDATE_YEAR = false;
+                }
+                yearView.setSelectedDate();
+                break;
+        }
         viewPager.setCurrentItem(tab.getPosition());              //set view pager content base on selected tab
     }
 
@@ -423,7 +468,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
                                 onDateChange(dayViewMode.Month);
                             }else {
-                                onDateChange(dayViewMode.Default);
+                                onDateChange(dayViewMode.DayList);
                             }
                             break;
                         case 1:         // DayFull View Mode
@@ -436,7 +481,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
                                 onDateChange(dayViewMode.Month);
                             }else {
-                                onDateChange(dayViewMode.Default);
+                                onDateChange(dayViewMode.DayFull);
                             }
                             break;
                         case 2:         // Month View Mode
@@ -468,7 +513,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
                                 onDateChange(dayViewMode.Month);
                             }else {
-                                onDateChange(dayViewMode.Default);
+                                onDateChange(dayViewMode.DayList);
                             }
                             break;
                         case 1:         // DayFull View Mode
@@ -481,7 +526,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
                                 onDateChange(dayViewMode.Month);
                             }else {
-                                onDateChange(dayViewMode.Default);
+                                onDateChange(dayViewMode.DayFull);
                             }
                             break;
                         case 2:         // Month View Mode
@@ -569,18 +614,74 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     //on swipe actions change hole date
     public void onDateChange(dayViewMode view){
-        dayUCFull.updateDayFull();
-        dayUCList.updateDayList();
-        switch (view){
+
+        switch (view) {
+            case DayList:
+                dayUCList.updateDayList();
+                UPDATE_DAY_FULL = true;
+                break;
+            case DayFull:
+                dayUCFull.updateDayFull();
+                UPDATE_DAY_LIST = true;
+                break;
             case Month:
-                monthView.updateMonth(originalSelectedDate);
+                switch (viewPager.getCurrentItem()){
+                    case 0:
+                        dayUCList.updateDayList();
+                        UPDATE_DAY_LIST = false;
+                        UPDATE_DAY_FULL = true;
+                        UPDATE_MONTH = true;
+                        break;
+                    case 1:
+                        dayUCFull.updateDayFull();
+                        UPDATE_DAY_FULL = false;
+                        UPDATE_DAY_LIST = true;
+                        UPDATE_MONTH = true;
+                        break;
+                    case 2:
+                        monthView.updateMonth(originalSelectedDate);
+                        UPDATE_MONTH = false;
+                        UPDATE_DAY_LIST = true;
+                        UPDATE_DAY_FULL = true;
+                        break;
+                    case 3:
+                        UPDATE_DAY_FULL = true;
+                        UPDATE_DAY_LIST = true;
+                        UPDATE_MONTH = true;
+                }
                 break;
             case Year:
-                monthView.updateMonth(originalSelectedDate);
-                yearView.updateYear();
+                switch (viewPager.getCurrentItem()){
+                    case 0:
+                        dayUCList.updateDayList();
+                        UPDATE_DAY_LIST = false;
+                        UPDATE_DAY_FULL = true;
+                        UPDATE_MONTH = true;
+                        UPDATE_YEAR = true;
+                        break;
+                    case 1:
+                        dayUCFull.updateDayFull();
+                        UPDATE_DAY_FULL = false;
+                        UPDATE_DAY_LIST = true;
+                        UPDATE_MONTH = true;
+                        UPDATE_YEAR = true;
+                        break;
+                    case 2:
+                        monthView.updateMonth(originalSelectedDate);
+                        UPDATE_MONTH = false;
+                        UPDATE_DAY_LIST = true;
+                        UPDATE_DAY_FULL = true;
+                        UPDATE_YEAR = true;
+                        break;
+                    case 3:
+                        yearView.updateYear();
+                        UPDATE_YEAR = false;
+                        UPDATE_DAY_FULL = true;
+                        UPDATE_DAY_LIST = true;
+                        UPDATE_MONTH = true;
+                }
                 break;
         }
-
     }
 
     //if there is ot enough room for menu items, make overflow menu
@@ -659,12 +760,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0) {
+//        if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 String eventTitle, eventDetail;
                 Long eventDate;
                 int startHour, startMin, endHour, endMin;
-
+                eventMode mode = data.getStringExtra("EventMode").equals(eventMode.NewEvent.toString()) ? eventMode.NewEvent :
+                        eventMode.EditEvent;
                 eventTitle = data.getStringExtra("Title");
                 eventDetail = data.getStringExtra("Detail");
                 eventDate = data.getLongExtra("Date", -1);
@@ -677,11 +779,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
                 events.setEvent(eventTitle, eventDetail, startHour + ":" + startMin, endHour + ":" + endMin);
 
-                dayUCList.addEvent(events);
+                if (mode == eventMode.NewEvent)
+                    dayUCList.addEvent(events);
+                else
+                    dayUCList.updateEvent(events);
 
                 //TODO set event
             }
-        }
+//        }
     }
 
     public static enum dayViewMode {
@@ -714,6 +819,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         ZoomOut
     }
 
+    public static enum  eventMode {
+        NewEvent,
+        EditEvent
+    }
+
     public class TabViewPagerAdapter extends FragmentPagerAdapter {
 
         public TabViewPagerAdapter(FragmentManager fm) {
@@ -724,12 +834,20 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
+                    if (UPDATE_DAY_LIST)
+                        dayUCList.updateDayList();
                     return dayUCList;
                 case 1:
+                    if (UPDATE_DAY_FULL)
+                        dayUCFull.updateDayFull();
                     return dayUCFull;
                 case 2:
+                    if (UPDATE_MONTH)
+                        monthView.updateMonth(originalSelectedDate);
                     return monthView;
                 case 3:
+                    if (UPDATE_YEAR)
+                        yearView.updateYear();
                     return yearView;
             }
             return null;

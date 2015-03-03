@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -14,6 +15,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,6 +33,7 @@ import co.yalda.nasr_m.yaldacalendar.Adapters.NoteListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.ArabicDateConverter;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
+import co.yalda.nasr_m.yaldacalendar.Handler.AddEvent;
 import co.yalda.nasr_m.yaldacalendar.Handler.Events;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
@@ -70,6 +74,7 @@ public class DayUC extends Fragment {
     private Typeface tahomaFont;
     private DayUC dayUCListHeader;                                  // DayUC Object for Showing in DayList View Mode (Header)
     private LayoutInflater mInfalater;
+    private int CURRENT_SELECTED_EVENT = -1;                    //selected event in dayList mode
 
     public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode) {
         DayUC dayUC = new DayUC();
@@ -196,14 +201,16 @@ public class DayUC extends Fragment {
      */
     public void initialMonth() {
 //        mainDate_TV.setClickable(isEnable);
+        persianCalendar.setMiladiDate(miladiCalendar);
         if (!isEnable)
             mainDate_TV.setBackgroundColor(Color.LTGRAY);
         else
             mainDate_TV.setBackgroundColor(Color.GREEN);
 
+        setSelectedDay();
+
         switch (MainActivity.mainCalendarType) {
             case Solar:
-                persianCalendar.setMiladiDate(miladiCalendar);
                 mainDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
                 break;
             case Gregorian:
@@ -219,7 +226,6 @@ public class DayUC extends Fragment {
             secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
-                    persianCalendar.setMiladiDate(miladiCalendar);
                     secondDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
@@ -236,7 +242,6 @@ public class DayUC extends Fragment {
             thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
-                    persianCalendar.setMiladiDate(miladiCalendar);
                     thirdDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
@@ -315,70 +320,7 @@ public class DayUC extends Fragment {
                 inputNote.show();
             }
         });
-
-//        final LinearLayout eventLayout = (LinearLayout) rootView.findViewById(R.id.day_list_event_layout);
-//
-//
-//        for (int i=0; i<8; i++){
-//            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            final View eventListItem = mInflater.inflate(R.layout.event_list_item, null);
-//            TextView eventTime = (TextView) eventListItem.findViewById(R.id.event_item_text);
-//            final ListView eventListView = (ListView) eventListItem.findViewById(R.id.event_item_event_list);
-//            eventTime.setText("1" + i + ":00 - 1" + (i+1) + ":00");
-//            ArrayList<Events> eventList = new ArrayList<>();
-//            for (int j=0; j<8; j++) {
-//                Events events = Events.newInstance(context, Calendar.getInstance());
-//                events.setEvent("یادآوری " + (j+1), "یادآوری", "1" + i + ":00", "1" + (i+1) + ":00");
-//                eventList.add(events);
-//            }
-//            EventListViewAdapter eventAdapter = new EventListViewAdapter(eventList);
-//            eventListView.setAdapter(eventAdapter);
-//            eventAdapter.notifyDataSetChanged();
-//            eventListItem.setVisibility(View.VISIBLE);
-//            eventLayout.addView(eventListItem);
-//            eventListView.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//                    eventLayout.getParent().requestDisallowInterceptTouchEvent(true);
-//                    return false;
-//                }
-//            });
-//        }
-//        dayEventLV = (ListView) rootView.findViewById(R.id.day_list_mode_event_list);
-//        //initiate event list array and list view
-//        eventTimeList = new ArrayList<>();
-//        eventDetailList = new HashMap<>();
-//
-//        dayListadapter = new DayListViewAdapter(eventTimeList, eventDetailList, context);
-//
-//        //set list view adapter
-//        dayEventLV.setAdapter(dayListadapter);
-//
-//        // TODO Event List should be derived from DB
-//
-//        List<Events> eventlist1 = new ArrayList<>();
-//        List<Events> eventlist2 = new ArrayList<>();
-//
-////        Events event2 = Events.newInstance(context, Calendar.getInstance());
-//
-//        eventTimeList.add("10:00" + " - " + "11:00");
-//        eventTimeList.add("16:00" + " - " + "17:00");
-//        for (int i = 0; i < 10; i++) {
-//            Events event1 = Events.newInstance(context, Calendar.getInstance());
-//            Events event2 = Events.newInstance(context, Calendar.getInstance());
-//            event1.setEvent("یادآوری " + i, "اولین یادآوری", "10:00", "11:00");
-//            eventlist1.add(event1);
-//            event2.setEvent("یادآوری " + i, "دومین یادآوری", "16:00", "17:00");
-//            eventlist2.add(event2);
-//        }
-////        event2.setEvent("یادآوری 2", "دومین یادآوری", "10:00", "11:00");
-////        eventlist1.add(event2);
-//
-//
-//        eventDetailList.put(eventTimeList.get(0), eventlist1);
-//        eventDetailList.put(eventTimeList.get(1), eventlist2);
-//
-//        dayListadapter.notifyDataSetChanged();
+        registerForContextMenu(dayEventLV);
 
     }
 
@@ -406,6 +348,7 @@ public class DayUC extends Fragment {
         holyDayNote.setTextColor(Color.BLACK);
 
         noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
+
         adapter = new NoteListViewAdapter(context, notes);
         noteList.setAdapter(adapter);
         noteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -635,14 +578,16 @@ public class DayUC extends Fragment {
 
     public void updateMonth(Calendar calendar){
         miladiCalendar.setTime(calendar.getTime());
+        persianCalendar.setMiladiDate(miladiCalendar);
         if (!isEnable)
             mainDate_TV.setBackgroundColor(Color.LTGRAY);
         else
             mainDate_TV.setBackgroundColor(Color.GREEN);
 
+        setSelectedDay();
+
         switch (MainActivity.mainCalendarType) {
             case Solar:
-                persianCalendar.setMiladiDate(miladiCalendar);
                 mainDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
                 break;
             case Gregorian:
@@ -658,7 +603,6 @@ public class DayUC extends Fragment {
             secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
-                    persianCalendar.setMiladiDate(miladiCalendar);
                     secondDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
@@ -675,7 +619,6 @@ public class DayUC extends Fragment {
             thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
-                    persianCalendar.setMiladiDate(miladiCalendar);
                     thirdDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
@@ -741,6 +684,15 @@ public class DayUC extends Fragment {
         dayListadapter.notifyDataSetChanged();
     }
 
+    public void updateEvent(Events events){
+        eventsArrayList.remove(CURRENT_SELECTED_EVENT);
+        eventsArrayList.add(CURRENT_SELECTED_EVENT, events);
+        dayListadapter = new DayListViewAdapter(eventsArrayList, context);
+        dayEventLV.setAdapter(dayListadapter);
+        dayListadapter.notifyDataSetChanged();
+        CURRENT_SELECTED_EVENT = -1;
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -749,7 +701,50 @@ public class DayUC extends Fragment {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
+//        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId()==R.id.day_list_mode_event_list) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            menu.setHeaderTitle("رویداد");
+            String[] menuItems = new String[]{"ویرایش", "حذف"};
+            for (int i = 0; i<menuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, menuItems[i]);
+            }
+        }
+    }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+//        return super.onContextItemSelected(item);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+
+        switch (item.getItemId()){
+            case 0:
+                Intent eventActivity = new Intent(context, AddEvent.class);
+                eventActivity.putExtra("EventMode", MainActivity.eventMode.EditEvent.toString());
+                eventActivity.putExtra("Title", eventsArrayList.get(info.position).getTitle());
+                eventActivity.putExtra("Detail", eventsArrayList.get(info.position).getDescription());
+                eventActivity.putExtra("Start_Time", eventsArrayList.get(info.position).getStartTime());
+                eventActivity.putExtra("End_Time", eventsArrayList.get(info.position).getEndTime());
+                eventActivity.putExtra("Date", eventsArrayList.get(info.position).getCal().getTimeInMillis());
+                CURRENT_SELECTED_EVENT = info.position;
+                startActivityForResult(eventActivity, 0);
+                break;
+            case 1:             //remove event
+                eventsArrayList.remove(info.position);
+                dayListadapter = new DayListViewAdapter(eventsArrayList, context);
+                dayEventLV.setAdapter(dayListadapter);
+                dayListadapter.notifyDataSetChanged();
+                break;
+        }
+        return true;
+    }
+
+    public void setSelectedDay(){
+        if (persianCalendar.persianCompare(originalSelectedPersianDate) == 0)
+            mainDate_TV.setBackgroundColor(Color.RED);
+    }
+
+    public void unSetSelectedDay(){
+        mainDate_TV.setBackgroundColor(Color.GREEN);
     }
 }

@@ -206,6 +206,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="right"
+        android:animateLayoutChanges="true"
         android:layout_above="@id/note"
         android:layout_below="@id/holiday_note_tv"/>
 

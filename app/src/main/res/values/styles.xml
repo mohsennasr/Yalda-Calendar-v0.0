@@ -5,6 +5,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <!-- Base application theme. -->
+    <style name="AppHoloTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:windowActionBar">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
     <color name="LightGreen">#00ff00</color>
 
     <color name="LightGray">#cccccc</color>

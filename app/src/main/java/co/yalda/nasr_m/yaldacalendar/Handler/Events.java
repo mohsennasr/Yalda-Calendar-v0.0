@@ -87,4 +87,8 @@ public class Events extends Fragment {
     public String getDescription() {
         return description;
     }
+
+    public Calendar getCal() {
+        return cal;
+    }
 }

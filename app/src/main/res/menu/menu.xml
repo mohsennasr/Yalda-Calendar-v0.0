@@ -13,7 +13,7 @@
         android:id="@+id/ab_date_picker_item"
         android:icon="@android:drawable/ic_menu_today"
         android:showAsAction="ifRoom|withText"
-        android:title="انتخاب تاریخ"
+        android:title="برو به تاریخ"
         android:visible="true"
         tools:ignore="AppCompatResource" />
 
