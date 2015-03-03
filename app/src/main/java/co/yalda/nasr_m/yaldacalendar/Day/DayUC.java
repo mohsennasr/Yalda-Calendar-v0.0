@@ -88,6 +88,7 @@ public class DayUC extends Fragment {
         // Create Layout Inflater
         dayUC.mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        dayUC.checkHoliday();
         dayUC.viewSelector();
 
         return dayUC;
@@ -206,6 +207,10 @@ public class DayUC extends Fragment {
             mainDate_TV.setBackgroundColor(Color.LTGRAY);
         else
             mainDate_TV.setBackgroundColor(Color.GREEN);
+
+        if (isHoliday){
+            mainDate_TV.setBackgroundColor(Color.RED);
+        }
 
         setSelectedDay();
 
@@ -549,7 +554,8 @@ public class DayUC extends Fragment {
     }
 
     private void checkHoliday() {
-        isHoliday = Arrays.asList(MainActivity.holidayList).contains(persianCalendar.getPersianDateIndex());
+        isHoliday = ((Arrays.asList(MainActivity.holidayList).contains(persianCalendar.getPersianDateIndex()))
+        || Arrays.asList(MainActivity.dayWeekHoliday).contains(String.valueOf(miladiCalendar.get(Calendar.DAY_OF_WEEK)))) && isEnable;
     }
 
     public void setEnable(boolean isEnable) {
@@ -583,6 +589,10 @@ public class DayUC extends Fragment {
             mainDate_TV.setBackgroundColor(Color.LTGRAY);
         else
             mainDate_TV.setBackgroundColor(Color.GREEN);
+
+        if (isHoliday){
+            mainDate_TV.setBackgroundColor(Color.RED);
+        }
 
         setSelectedDay();
 
@@ -741,10 +751,13 @@ public class DayUC extends Fragment {
 
     public void setSelectedDay(){
         if (persianCalendar.persianCompare(originalSelectedPersianDate) == 0)
-            mainDate_TV.setBackgroundColor(Color.RED);
+            mainDate_TV.setBackgroundColor(Color.BLUE);
     }
 
     public void unSetSelectedDay(){
-        mainDate_TV.setBackgroundColor(Color.GREEN);
+        if (isHoliday)
+            mainDate_TV.setBackgroundColor(Color.RED);
+        else
+            mainDate_TV.setBackgroundColor(Color.GREEN);
     }
 }

@@ -142,6 +142,7 @@ public class YearView extends Fragment {
     public void setSelectedDate(){
         if (selectedIndex >= 0)
             yearMonth[selectedIndex].unSetSelectedDate();
-        yearMonth[originalSelectedPersianDate.getiPersianMonth()-1].setSelectedDate();
+        selectedIndex = originalSelectedPersianDate.getiPersianMonth()-1;
+        yearMonth[selectedIndex].setSelectedDate();
     }
 }

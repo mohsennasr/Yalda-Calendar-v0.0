@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static calendarType thirdCalendarType = calendarType.Gregorian;
     public static Calendar originalSelectedDate = Calendar.getInstance();
     public static PersianCalendar originalSelectedPersianDate = new PersianCalendar(Calendar.getInstance());
-    public static List<Byte> dayWeekHoliday;
+    public static String[] dayWeekHoliday = new String[]{"5", "6"} ;
     public static List<OCCVAC> holiday;
     public static Context context;
     public static int[] viewSize;
