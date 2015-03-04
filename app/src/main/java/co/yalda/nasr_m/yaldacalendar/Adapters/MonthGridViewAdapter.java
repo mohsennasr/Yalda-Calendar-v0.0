@@ -68,6 +68,7 @@ public class MonthGridViewAdapter extends BaseAdapter {
             if (viewMode == dayViewMode.Month) {
                 convertView.setLayoutParams(new AbsListView.LayoutParams(40, (viewSize[1] - 150) / 6));
             }
+            convertView.setClickable(false);
             return convertView;
         }
         if (viewMode == dayViewMode.Month) {
@@ -75,6 +76,9 @@ public class MonthGridViewAdapter extends BaseAdapter {
                     (viewSize[0] - 80) / 7,
                     (viewSize[1] - 200) / 6));
         }
+
+        gridList.get((position / 8) * 7 + (position % 8) - 1).rootView.setClickable(false);
+
         return gridList.get((position / 8) * 7 + (position % 8) - 1).rootView;
     }
 }

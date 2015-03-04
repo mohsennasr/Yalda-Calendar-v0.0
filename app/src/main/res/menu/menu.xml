@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/selected_date"
+        android:title="تاریخ انتخابی"
+        android:showAsAction="always"
+        tools:ignore="AppCompatResource"
+        android:actionLayout="@layout/menu_date_view"
+        android:showDividers="beginning|end"
+        android:divider="?android:dividerVertical"
+        android:dividerPadding="8dp"/>
+
     <item
         android:id="@+id/ab_today_item"
         android:icon="@android:drawable/ic_menu_my_calendar"

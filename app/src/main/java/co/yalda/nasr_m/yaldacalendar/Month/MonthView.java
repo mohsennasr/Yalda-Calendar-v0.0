@@ -165,6 +165,20 @@ public class MonthView extends Fragment {
         weekDaysAdapter = new CalendarItemAdapter(weekDaysArrayList, viewMode);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
+
+        setSelectedDate();
+
+        monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                int startPosition = monthPersianCal.persianPreMonthRemainingDay()+1;
+//                int endPosition = monthPersianCal.persianPreMonthRemainingDay()
+//                if ((position % 8) == 0){
+//                    // week selected
+//                }else if ((position < monthPersianCal.persianPreMonthRemainingDay()) ||
+//                        (position > monthPersianCal.getMaxDayOfMonth() + monthPersianCal.persianPreMonthRemainingDay())
+            }
+        });
     }
 
     public void updateMonth(Calendar month){
@@ -208,6 +222,8 @@ public class MonthView extends Fragment {
         } else {
             monthHeader_tv.setText(monthPersianCal.getPersianMonthName());
         }
+
+        setSelectedDate();
     }
 
     public void setSelectedDate(){
@@ -218,7 +234,8 @@ public class MonthView extends Fragment {
     }
 
     public void unSetSelectedDate(){
-        dayUC[selectedDayIndex].unSetSelectedDay();
+        if (selectedDayIndex >= 0)
+            dayUC[selectedDayIndex].unSetSelectedDay();
     }
 
     @Override

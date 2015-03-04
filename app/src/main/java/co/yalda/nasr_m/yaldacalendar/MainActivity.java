@@ -27,9 +27,9 @@ import android.view.ViewConfiguration;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -89,6 +89,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private boolean UPDATE_DAY_FULL = false;
     private boolean UPDATE_MONTH = false;
     private boolean UPDATE_YEAR = false;
+    private TextView actionBarSelectedDate;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -217,6 +218,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //                menu.getItem(i).setVisible(false);
         } else {
             getMenuInflater().inflate(R.menu.menu, menu);
+
+            View v = menu.findItem(R.id.selected_date).getActionView();
+
+            actionBarSelectedDate = ( TextView ) v.findViewById(R.id.date_view_text);
+            actionBarSelectedDate.setText(new PersianCalendar(Calendar.getInstance()).getPersianFullDate());
         }
 
         return true;
@@ -230,8 +236,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         }
         //Handle action bar actions click
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
+//            case R.id.action_settings:
+//                return true;
             case R.id.ab_add_note_item:             //add note button clicked
                 LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 //create dialog layout
@@ -549,18 +555,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     break;
                 case Down2Up:                                               //Decrease Parent Date by 1
                     switch (viewPager.getCurrentItem()) {
-                        case 0:         // DayList view Mode
-//                            originalSelectedDate.add(Calendar.MONTH, 1);
-//                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, 1);
-//                            dayUCList.updateDayList();
-//                            break;
-                            return super.dispatchTouchEvent(event);
-                        case 1:         // DayFull View Mode
-//                            originalSelectedDate.add(Calendar.MONTH, 1);
-//                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, 1);
-//                            dayUCFull.updateDayFull();
-//                            break;
-                            return super.dispatchTouchEvent(event);
                         case 2:         // Month View Mode
                             originalSelectedDate.add(Calendar.YEAR, 1);
                             originalSelectedPersianDate.addPersian(Calendar.YEAR, 1);
@@ -570,18 +564,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     break;
                 case Up2Down:                                               //Increase Parent Date by 1
                     switch (viewPager.getCurrentItem()) {
-                        case 0:         // DayList view Mode
-//                            originalSelectedDate.add(Calendar.MONTH, -1);
-//                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, -1);
-//                            dayUCList.updateDayList();
-//                            break;
-                            return super.dispatchTouchEvent(event);
-                        case 1:         // DayFull View Mode
-//                            originalSelectedDate.add(Calendar.MONTH, -1);
-//                            originalSelectedPersianDate.addPersianDate(Calendar.MONTH, -1);
-//                            dayUCFull.updateDayFull();
-//                            break;
-                            return super.dispatchTouchEvent(event);
                         case 2:         // Month View Mode
                             originalSelectedDate.add(Calendar.YEAR, -1);
                             originalSelectedPersianDate.addPersian(Calendar.YEAR, -1);
@@ -615,7 +597,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     //on swipe actions change hole date
     public void onDateChange(dayViewMode view){
-
         switch (view) {
             case DayList:
                 dayUCList.updateDayList();

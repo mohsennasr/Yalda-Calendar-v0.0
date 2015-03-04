@@ -56,7 +56,7 @@ public class DayUC extends Fragment {
     public View rootView;                                           // Root View of Fragment
     public TextView mainDate_TV, secondDate_TV, thirdDate_TV;       // Date TextViews (Month & Year View Mode
     private boolean isHoliday;                                      // Is It Holiday
-    private boolean isEnable = true;                                // Should be Clickable
+    public boolean isEnable = true;                                // Should be Clickable
     private PersianCalendar persianCalendar;                        // Persian Calendar
     private Calendar miladiCalendar = Calendar.getInstance();       // Day Base Calendar
     private MainActivity.dayViewMode dayViewMode;                   // Day View Mode -> Year, Month, DayList, DayFull
@@ -203,13 +203,20 @@ public class DayUC extends Fragment {
     public void initialMonth() {
 //        mainDate_TV.setClickable(isEnable);
         persianCalendar.setMiladiDate(miladiCalendar);
-        if (!isEnable)
-            mainDate_TV.setBackgroundColor(Color.LTGRAY);
-        else
-            mainDate_TV.setBackgroundColor(Color.GREEN);
+        if (!isEnable) {
+            mainDate_TV.setTextColor(Color.LTGRAY);
+            secondDate_TV.setTextColor(Color.LTGRAY);
+            thirdDate_TV.setTextColor(Color.LTGRAY);
+        }else {
+            mainDate_TV.setTextColor(Color.BLACK);
+            secondDate_TV.setTextColor(Color.BLACK);
+            thirdDate_TV.setTextColor(Color.BLACK);
+        }
 
         if (isHoliday){
-            mainDate_TV.setBackgroundColor(Color.RED);
+            mainDate_TV.setTextColor(Color.RED);
+            secondDate_TV.setTextColor(Color.RED);
+            thirdDate_TV.setTextColor(Color.RED);
         }
 
         setSelectedDay();
@@ -228,7 +235,7 @@ public class DayUC extends Fragment {
         }
 
         if ((MainActivity.secondCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-            secondDate_TV.setClickable(isEnable);
+//            secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
                     secondDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
@@ -244,7 +251,7 @@ public class DayUC extends Fragment {
         }
 
         if ((MainActivity.thirdCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-            thirdDate_TV.setClickable(isEnable);
+//            thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
                     thirdDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
@@ -585,13 +592,21 @@ public class DayUC extends Fragment {
     public void updateMonth(Calendar calendar){
         miladiCalendar.setTime(calendar.getTime());
         persianCalendar.setMiladiDate(miladiCalendar);
-        if (!isEnable)
-            mainDate_TV.setBackgroundColor(Color.LTGRAY);
-        else
-            mainDate_TV.setBackgroundColor(Color.GREEN);
+        checkHoliday();
+        if (!isEnable) {
+            mainDate_TV.setTextColor(Color.LTGRAY);
+            secondDate_TV.setTextColor(Color.LTGRAY);
+            thirdDate_TV.setTextColor(Color.LTGRAY);
+        }else {
+            mainDate_TV.setTextColor(Color.BLACK);
+            secondDate_TV.setTextColor(Color.BLACK);
+            thirdDate_TV.setTextColor(Color.BLACK);
+        }
 
         if (isHoliday){
-            mainDate_TV.setBackgroundColor(Color.RED);
+            mainDate_TV.setTextColor(Color.RED);
+            secondDate_TV.setTextColor(Color.RED);
+            thirdDate_TV.setTextColor(Color.RED);
         }
 
         setSelectedDay();
@@ -610,7 +625,7 @@ public class DayUC extends Fragment {
         }
 
         if ((MainActivity.secondCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-            secondDate_TV.setClickable(isEnable);
+//            secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
                     secondDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
@@ -626,7 +641,7 @@ public class DayUC extends Fragment {
         }
 
         if ((MainActivity.thirdCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-            thirdDate_TV.setClickable(isEnable);
+//            thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
                     thirdDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
@@ -750,14 +765,16 @@ public class DayUC extends Fragment {
     }
 
     public void setSelectedDay(){
-        if (persianCalendar.persianCompare(originalSelectedPersianDate) == 0)
-            mainDate_TV.setBackgroundColor(Color.BLUE);
+        if (persianCalendar.persianCompare(originalSelectedPersianDate) == 0 && isEnable)
+            rootView.setBackgroundResource(R.drawable.border_rectangle);
+        if (persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) == 0 && isEnable)
+            rootView.setBackgroundResource(R.drawable.background_rectangle);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void unSetSelectedDay(){
-        if (isHoliday)
-            mainDate_TV.setBackgroundColor(Color.RED);
-        else
-            mainDate_TV.setBackgroundColor(Color.GREEN);
+        if ((persianCalendar.persianCompare(originalSelectedPersianDate) != 0)
+                && persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) != 0)
+            rootView.setBackground(null);
     }
 }

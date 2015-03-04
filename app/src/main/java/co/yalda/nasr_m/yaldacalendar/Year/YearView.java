@@ -100,6 +100,8 @@ public class YearView extends Fragment {
         YearListGridAdapter yearListGridAdapter = new YearListGridAdapter(yearList);
         yearListGrid.setAdapter(yearListGridAdapter);
         yearListGridAdapter.notifyDataSetChanged();
+
+        setSelectedDate();
     }
 
     public void setColumns() {
@@ -125,6 +127,8 @@ public class YearView extends Fragment {
 
         yearHeader_tv.setText(String.valueOf(yearPersianCal.getiPersianYear()));
         yearGridAdapter.notifyDataSetChanged();
+
+        setSelectedDate();
     }
 
     public void yearSwitchView(){

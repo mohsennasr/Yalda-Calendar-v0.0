@@ -193,32 +193,32 @@ public class PersianCalendar extends Calendar{
                 int dayCount = 0, currentYear = iPersianYear;
                 if (amount > 0) {
                     for (int i = iPersianMonth; i < amount + iPersianMonth; i++) {
-                        if ((i / 12) >= 1) {
-                            currentYear++;
-                        }
-                        if (((i % 12) < 6) && (i % 12) > 0 ) {
+                        if (((i % 12) <= 6) && (i % 12) != 0 ) {
                             dayCount += 31;
-                        } else if (((i % 12) < 11) || isLeap(currentYear)) {
+                        } else if (((i % 12) > 6) || isLeap(currentYear)) {
                             dayCount += 30;
                         } else {
                             dayCount += 29;
                         }
+                        if ((i / 12) >= 1) {
+                            currentYear++;
+                        }
                     }
                 }else{
-                    for (int i = 0; i < amount; i--) {
+                    for (int i = iPersianMonth; i > iPersianMonth + amount; i--) {
                         if ((Math.abs(i) / 12) >= 1) {
                             currentYear--;
                         }
-                        if ((Math.abs(i) % 12) < 7 && (Math.abs(i) % 12) > 0) {
+                        if ((Math.abs(i) % 12) <= 7 && (Math.abs(i) % 12) > 1) {
                             dayCount += 31;
-                        } else if (((Math.abs(i) % 12) > 7) || isLeap(currentYear)) {
+                        } else if (((Math.abs(i) % 12) > 7) || ((Math.abs(i) % 12) == 0 ) || isLeap(currentYear)) {
                             dayCount += 30;
                         } else {
                             dayCount += 29;
                         }
                     }
                 }
-                miladiDate.add(DATE, amount>0 ? dayCount : - dayCount);
+                miladiDate.add(DATE, amount > 0 ? dayCount : - dayCount);
                 calculateDate();
                 break;
             case DATE:
