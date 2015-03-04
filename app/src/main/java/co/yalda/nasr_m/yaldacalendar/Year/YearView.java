@@ -18,11 +18,14 @@ import java.util.Calendar;
 import co.yalda.nasr_m.yaldacalendar.Adapters.YearGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.YearListGridAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
 import co.yalda.nasr_m.yaldacalendar.R;
 
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_MONTH_INDEX;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
 
@@ -92,7 +95,8 @@ public class YearView extends Fragment {
 
         setColumns();
 
-        yearHeader_tv.setText(String.valueOf(yearPersianCal.getiPersianYear()));
+        yearHeader_tv.setTypeface(homaFont);
+        yearHeader_tv.setText(PersianUtil.toString(yearPersianCal.getiPersianYear()));
         yearGridAdapter = new YearGridViewAdapter(monthViewList);
         yearGridView.setAdapter(yearGridAdapter);
         yearGridAdapter.notifyDataSetChanged();
@@ -102,6 +106,13 @@ public class YearView extends Fragment {
         yearListGridAdapter.notifyDataSetChanged();
 
         setSelectedDate();
+
+        yearGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(context, "Year click...", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void setColumns() {
@@ -118,7 +129,7 @@ public class YearView extends Fragment {
         yearCal.setTime(yearPersianCal.getMiladiDate().getTime());
         monthViewList.clear();
         for (int i = 0; i < 12; i++) {
-            yearMonth[i].updateMonth(yearCal);
+            yearMonth[i].initialMonth(yearCal);
             yearCal.add(Calendar.MONTH, 1);
             monthViewList.add(yearMonth[i]);
         }
@@ -144,9 +155,9 @@ public class YearView extends Fragment {
     }
 
     public void setSelectedDate(){
-        if (selectedIndex >= 0)
-            yearMonth[selectedIndex].unSetSelectedDate();
-        selectedIndex = originalSelectedPersianDate.getiPersianMonth()-1;
-        yearMonth[selectedIndex].setSelectedDate();
+        if (SELECTED_MONTH_INDEX >= 0)
+            yearMonth[SELECTED_MONTH_INDEX].unSetSelectedDate();
+        SELECTED_MONTH_INDEX = originalSelectedPersianDate.getiPersianMonth()-1;
+        yearMonth[SELECTED_MONTH_INDEX].setSelectedDate();
     }
 }

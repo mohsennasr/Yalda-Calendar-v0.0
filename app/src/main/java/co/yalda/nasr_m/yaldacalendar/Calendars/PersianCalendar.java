@@ -3,6 +3,8 @@ package co.yalda.nasr_m.yaldacalendar.Calendars;
 import java.util.Calendar;
 import java.util.Date;
 
+import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
+
 /**
  * Created by Nasr_M on 2/17/2015.
  */
@@ -164,7 +166,7 @@ public class PersianCalendar extends Calendar{
     }
 
     public String getPersianFullDate() {
-        return (persianDayName + " " + iPersianDate + " " + persianMonthName + " " + iPersianYear);
+        return (persianDayName + " " + PersianUtil.toString(iPersianDate) + " " + persianMonthName + " " + PersianUtil.toString(iPersianYear));
     }
 
     public String getPersianDateIndex() {
@@ -230,7 +232,7 @@ public class PersianCalendar extends Calendar{
 
     public int numberOfWeeksInMonth(){
         int dayCount = persianPreMonthRemainingDay() + getMaxDayOfMonth();
-        return (int) Math.ceil(dayCount/7);
+        return (int) Math.ceil(dayCount / 7.);
     }
 
     public int persianCompare(PersianCalendar pCal){

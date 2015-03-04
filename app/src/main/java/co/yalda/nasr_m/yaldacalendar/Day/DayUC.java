@@ -45,6 +45,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayHeader;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayList;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Year;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
 
@@ -71,7 +72,6 @@ public class DayUC extends Fragment {
     private DayListViewAdapter dayListadapter;                    // Event List View Adapter for DayList View Mode
     private ListView dayEventLV;                                    // Events List View
     private ListView noteList;
-    private Typeface tahomaFont;
     private DayUC dayUCListHeader;                                  // DayUC Object for Showing in DayList View Mode (Header)
     private LayoutInflater mInfalater;
     private int CURRENT_SELECTED_EVENT = -1;                    //selected event in dayList mode
@@ -185,8 +185,7 @@ public class DayUC extends Fragment {
             case Solar:
                 persianCalendar = originalSelectedPersianDate;
                 mainDate_TV.setText(persianCalendar.getPersianFullDate());
-                tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
-                mainDate_TV.setTypeface(tahomaFont);
+                mainDate_TV.setTypeface(homaFont);
                 break;
             case Gregorian:
                 mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -203,27 +202,34 @@ public class DayUC extends Fragment {
     public void initialMonth() {
 //        mainDate_TV.setClickable(isEnable);
         persianCalendar.setMiladiDate(miladiCalendar);
+        mainDate_TV.setTypeface(homaFont);
         if (!isEnable) {
             mainDate_TV.setTextColor(Color.LTGRAY);
-            secondDate_TV.setTextColor(Color.LTGRAY);
-            thirdDate_TV.setTextColor(Color.LTGRAY);
+            if (dayViewMode == Month) {
+                secondDate_TV.setTextColor(Color.LTGRAY);
+                thirdDate_TV.setTextColor(Color.LTGRAY);
+            }
         }else {
             mainDate_TV.setTextColor(Color.BLACK);
-            secondDate_TV.setTextColor(Color.BLACK);
-            thirdDate_TV.setTextColor(Color.BLACK);
+            if (dayViewMode == Month) {
+                secondDate_TV.setTextColor(Color.BLACK);
+                thirdDate_TV.setTextColor(Color.BLACK);
+            }
         }
 
         if (isHoliday){
             mainDate_TV.setTextColor(Color.RED);
-            secondDate_TV.setTextColor(Color.RED);
-            thirdDate_TV.setTextColor(Color.RED);
+            if (dayViewMode == Month) {
+                secondDate_TV.setTextColor(Color.RED);
+                thirdDate_TV.setTextColor(Color.RED);
+            }
         }
 
         setSelectedDay();
 
         switch (MainActivity.mainCalendarType) {
             case Solar:
-                mainDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
+                mainDate_TV.setText(PersianUtil.toString(persianCalendar.getiPersianDate()));
                 break;
             case Gregorian:
                 mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -238,7 +244,7 @@ public class DayUC extends Fragment {
 //            secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
-                    secondDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
+                    secondDate_TV.setText(PersianUtil.toString(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
                     secondDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -254,7 +260,7 @@ public class DayUC extends Fragment {
 //            thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
-                    thirdDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
+                    thirdDate_TV.setText(PersianUtil.toString(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
                     thirdDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
@@ -592,69 +598,9 @@ public class DayUC extends Fragment {
     public void updateMonth(Calendar calendar){
         miladiCalendar.setTime(calendar.getTime());
         persianCalendar.setMiladiDate(miladiCalendar);
+        unSetSelectedDay();
         checkHoliday();
-        if (!isEnable) {
-            mainDate_TV.setTextColor(Color.LTGRAY);
-            secondDate_TV.setTextColor(Color.LTGRAY);
-            thirdDate_TV.setTextColor(Color.LTGRAY);
-        }else {
-            mainDate_TV.setTextColor(Color.BLACK);
-            secondDate_TV.setTextColor(Color.BLACK);
-            thirdDate_TV.setTextColor(Color.BLACK);
-        }
-
-        if (isHoliday){
-            mainDate_TV.setTextColor(Color.RED);
-            secondDate_TV.setTextColor(Color.RED);
-            thirdDate_TV.setTextColor(Color.RED);
-        }
-
-        setSelectedDay();
-
-        switch (MainActivity.mainCalendarType) {
-            case Solar:
-                mainDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
-                break;
-            case Gregorian:
-                mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
-                break;
-            case Hejri:
-//                arabicCalendar = new ArabicCalendar(miladiCalendar);
-//                mainDate_TV.setText(String.valueOf(arabicCalendar.get(Calendar.DATE)));
-                break;
-        }
-
-        if ((MainActivity.secondCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-//            secondDate_TV.setClickable(isEnable);
-            switch (MainActivity.secondCalendarType) {
-                case Solar:
-                    secondDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
-                    break;
-                case Gregorian:
-                    secondDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
-                    break;
-                case Hejri:
-//                arabicCalendar = new ArabicCalendar(miladiCalendar);
-//                secondDate_TV.setText(String.valueOf(arabicCalendar.get(Calendar.DATE)));
-                    break;
-            }
-        }
-
-        if ((MainActivity.thirdCalendarType != null) && (dayViewMode != MainActivity.dayViewMode.Year)) {
-//            thirdDate_TV.setClickable(isEnable);
-            switch (MainActivity.thirdCalendarType) {
-                case Solar:
-                    thirdDate_TV.setText(String.valueOf(persianCalendar.getiPersianDate()));
-                    break;
-                case Gregorian:
-                    thirdDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
-                    break;
-                case Hejri:
-//                    arabicCalendar = new ArabicCalendar(miladiCalendar);
-//                thirdDate_TV.setText(String.valueOf(arabicCalendar.get(Calendar.DATE)));
-                    break;
-            }
-        }
+        initialMonth();
     }
 
     public void updateDayList(){
@@ -773,8 +719,15 @@ public class DayUC extends Fragment {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void unSetSelectedDay(){
-        if ((persianCalendar.persianCompare(originalSelectedPersianDate) != 0)
-                && persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) != 0)
+        if (persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) != 0)
             rootView.setBackground(null);
+    }
+
+    public PersianCalendar getPersianCalendar() {
+        return persianCalendar;
+    }
+
+    public Calendar getMiladiCalendar() {
+        return miladiCalendar;
     }
 }

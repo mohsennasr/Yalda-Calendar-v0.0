@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CustomActionBarTabText" parent="android:Widget.Holo.Light.ActionBar.TabText">
+        <item name="android:textColor">#ffffff</item>
+    </style>
+</resources>

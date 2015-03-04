@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:layout_weight="2"
         android:gravity="center"
-        android:background="@color/LightGray">
+        android:background="@color/accent_material_light">
 
         <TextView
             android:id="@+id/event_start_time"

@@ -55,4 +55,9 @@ public class YearGridViewAdapter extends BaseAdapter {
         gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(width, height));
         return gridList.get(position).rootView;
     }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return true;
+    }
 }

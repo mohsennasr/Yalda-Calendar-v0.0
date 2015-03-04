@@ -8,12 +8,28 @@
     <!-- Base application theme. -->
     <style name="AppHoloTheme" parent="@android:style/Theme.Holo.Light">
         <item name="android:windowActionBar">false</item>
+        <item name="android:actionBarStyle">@style/CustomActionBar</item>
+        <item name="android:actionBarTabStyle">@style/CustomActionBarTab</item>
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="CustomActionBar" parent="android:Widget.Holo.ActionBar">
+        <item name="android:background">@color/Blue</item>
+        <item name="android:textSize">24dp</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:actionMenuTextAppearance">@style/CustomActionBarTabText</item>
+    </style>
+
+    <style name="CustomActionBarTab" parent="android:Widget.Holo.Light.Tab">
+        <item name="android:background">@color/DarkBlue</item>
     </style>
 
     <color name="LightGreen">#00ff00</color>
 
     <color name="LightGray">#cccccc</color>
+
+    <color name="Blue">#0055ff</color>
+    <color name="DarkBlue">#6565ff</color>
 
     <style name="BoldText">
         <item name="android:textStyle">bold</item>

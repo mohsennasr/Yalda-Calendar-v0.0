@@ -14,6 +14,7 @@ import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 
 /**
  * Created by Nasr_M on 2/23/2015.
@@ -60,6 +61,7 @@ public class CalendarItemAdapter extends BaseAdapter {
                 itemText.setTextSize(12);
                 itemText.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 22));
             }
+            itemText.setTypeface(homaFont);
         }
 
         return convertView;

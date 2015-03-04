@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,14 +19,21 @@ import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.CalendarItemAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.SimpleWeekGridAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_DAY_INDEX;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_MONTH_INDEX;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Year;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
 
 /**
@@ -43,15 +49,19 @@ public class MonthView extends Fragment {
     private TextView monthHeader_tv;        //month name TextView
     private GridView monthGridView;         //month days gridView
     private GridView weekDaysGrid;         //month days gridView
+    private GridView weekNumberGrid;        //week numbers
     private MonthGridViewAdapter gridViewAdapter;   //month grid adapter
+    private SimpleWeekGridAdapter weekNumberGridAdapter;
     private CalendarItemAdapter weekDaysAdapter, weekNumAdapter;
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
     private dayViewMode viewMode;
-    private String[] weekDays = new String[]{"", "ش", "ی", "د", "س", "چ", "پ", "ج"};
-    private String[] weekDaysFull = new String[]{"", "شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه"};
+    private String[] weekDays = new String[]{"ش", "ی", "د", "س", "چ", "پ", "ج"};
+    private String[] weekDaysFull = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه"};
     private PersianCalendar monthPersianCal;
     private ArrayList<String> weekNumArrayList;
     private int selectedDayIndex = -1;
+    private int remainDay=0, maxDayMonth=0;
+    private ArrayList<String> weekDaysArrayList;
 
     /*
     Fragment Classes have their own constructor method that we can't modify input parameter.
@@ -63,7 +73,7 @@ public class MonthView extends Fragment {
         monthView.monthCal.setTime(monthCal.getTime());
         monthView.viewMode = dayViewMode;
         monthView.firstInitialization();
-        monthView.initialMonth();
+        monthView.initialMonth(monthCal);
         return monthView;
     }
 
@@ -81,7 +91,7 @@ public class MonthView extends Fragment {
             }
         if (rootView == null) {
             firstInitialization();
-            initialMonth();
+            initialMonth(monthCal);
         }
     }
 
@@ -98,112 +108,39 @@ public class MonthView extends Fragment {
         monthHeader_tv = (TextView) rootView.findViewById(R.id.month_view_header);
         monthGridView = (GridView) rootView.findViewById(R.id.month_view_day_grid);
         weekDaysGrid = (GridView) rootView.findViewById(R.id.month_week_day_name_grid);
-        monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(context, "Grid Item " + position + " Selected", Toast.LENGTH_LONG).show();
-            }
-        });
+        weekNumberGrid = (GridView) rootView.findViewById(R.id.week_number_grid);
 
         if (dayUCList == null)
             dayUCList = new ArrayList<>();
     }
 
     //initial attributes
-    private void initialMonth() {
+    public void initialMonth(Calendar month) {
+        monthCal.setTime(month.getTime());
         monthCal.setFirstDayOfWeek(Calendar.SATURDAY);
         monthPersianCal = new PersianCalendar(monthCal);
-        int maxDayMonth = monthPersianCal.getMaxDayOfMonth();
+        maxDayMonth = monthPersianCal.getMaxDayOfMonth();
         monthPersianCal.setPersian(Calendar.DATE, 1);
         monthCal.setTime(monthPersianCal.getMiladiDate().getTime());
-        int remainDay = monthPersianCal.persianPreMonthRemainingDay();
+        remainDay = monthPersianCal.persianPreMonthRemainingDay();
         monthCal.add(Calendar.DATE, -remainDay);
-        dayUC = new DayUC[42];
-        for (int i = 0; i < 42; i++) {
-            dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i >= (maxDayMonth + remainDay))
-                    , viewMode);
-            dayUCList.add(dayUC[i]);
-            monthCal.add(Calendar.DATE, 1);
-        }
-
-        weekNumArrayList = new ArrayList<>();
-
-        int weekNum = monthPersianCal.getFirstWeekNumberOfMonth();
-        for (int i = 0; i < 6; i++) {
-            if (i<=(monthPersianCal.numberOfWeeksInMonth())) {
-                weekNumArrayList.add(String.valueOf(weekNum));
-            }else {
-                weekNumArrayList.add("");
-            }
-            if (weekNum >= 52 && monthPersianCal.getiPersianMonth() == 0)
-                weekNum = 1;
-            else
-                weekNum++;
-        }
-
-        gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList, viewMode);
-        monthGridView.setAdapter(gridViewAdapter);
-//        monthGridView.setMotionEventSplittingEnabled(false);
-        gridViewAdapter.notifyDataSetChanged();
 
         //Week Day Name Grid View
-        ArrayList<String> weekDaysArrayList = new ArrayList<>();
+        weekDaysArrayList = new ArrayList<>();
 
-        if (viewMode == Month) {
-            weekDaysArrayList.addAll(Arrays.asList(weekDaysFull));
-            monthHeader_tv.setText(monthPersianCal.getPersianMonthName() + " " + String.valueOf(monthPersianCal.getiPersianYear()));
-            monthHeader_tv.setTextSize(34);
-            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 60));
-        } else {
-            weekDaysArrayList.addAll(Arrays.asList(weekDays));
-            monthHeader_tv.setText(monthPersianCal.getPersianMonthName());
-            monthHeader_tv.setTextSize(20);
-            monthHeader_tv.setTextColor(Color.BLACK);
-            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 32));
-        }
-
-        weekDaysAdapter = new CalendarItemAdapter(weekDaysArrayList, viewMode);
-        weekDaysGrid.setAdapter(weekDaysAdapter);
-        weekDaysAdapter.notifyDataSetChanged();
-
-        setSelectedDate();
-
-        monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                int startPosition = monthPersianCal.persianPreMonthRemainingDay()+1;
-//                int endPosition = monthPersianCal.persianPreMonthRemainingDay()
-//                if ((position % 8) == 0){
-//                    // week selected
-//                }else if ((position < monthPersianCal.persianPreMonthRemainingDay()) ||
-//                        (position > monthPersianCal.getMaxDayOfMonth() + monthPersianCal.persianPreMonthRemainingDay())
-            }
-        });
-    }
-
-    public void updateMonth(Calendar month){
-        monthCal.setTime(month.getTime());
-        monthPersianCal.setMiladiDate(monthCal);
-        int maxDayMonth = monthPersianCal.getMaxDayOfMonth();
-        monthPersianCal.setPersian(Calendar.DATE, 1);
-        monthCal.setTime(monthPersianCal.getMiladiDate().getTime());
-        int remainDay = monthPersianCal.persianPreMonthRemainingDay();
-        monthCal.add(Calendar.DATE, -remainDay);
-        dayUCList.clear();
-        for (int i = 0; i < 42; i++) {
-            dayUC[i].setEnable(!(i < remainDay | i >= (maxDayMonth + remainDay)));
-            dayUC[i].updateMonth(monthCal);
-            dayUCList.add(dayUC[i]);
-            monthCal.add(Calendar.DATE, 1);
+        if (dayUC == null) {
+            newMonth();
+        }else {
+            updateeMonth();
         }
         monthCal.setTime(month.getTime());
         monthPersianCal.setMiladiDate(monthCal);
 
-        weekNumArrayList.clear();
         int weekNum = monthPersianCal.getFirstWeekNumberOfMonth();
+        int weekNumber = monthPersianCal.numberOfWeeksInMonth();
         for (int i = 0; i < 6; i++) {
-            if (i<=(monthPersianCal.numberOfWeeksInMonth())) {
-                weekNumArrayList.add(String.valueOf(weekNum));
+            if (i < weekNumber) {
+                weekNumArrayList.add(PersianUtil.toString(weekNum));
             }else{
                 weekNumArrayList.add("");
             }
@@ -213,29 +150,87 @@ public class MonthView extends Fragment {
                 weekNum++;
         }
 
-        gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList, viewMode);
+        weekNumberGridAdapter = new SimpleWeekGridAdapter(weekNumArrayList, viewMode);
+//        gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList, viewMode);
+        gridViewAdapter = new MonthGridViewAdapter(dayUCList, viewMode);
         monthGridView.setAdapter(gridViewAdapter);
+        weekNumberGrid.setAdapter(weekNumberGridAdapter);
+        weekNumberGridAdapter.notifyDataSetChanged();
+//        monthGridView.setMotionEventSplittingEnabled(false);
         gridViewAdapter.notifyDataSetChanged();
 
+        weekDaysAdapter = new CalendarItemAdapter(weekDaysArrayList, viewMode);
+        weekDaysGrid.setAdapter(weekDaysAdapter);
+        weekDaysAdapter.notifyDataSetChanged();
+
         if (viewMode == Month) {
-            monthHeader_tv.setText(monthPersianCal.getPersianMonthName() + " " + String.valueOf(monthPersianCal.getiPersianYear()));
+            weekDaysArrayList.addAll(Arrays.asList(weekDaysFull));
+            monthHeader_tv.setText(monthPersianCal.getPersianMonthName() + " " + PersianUtil.toString(monthPersianCal.getiPersianYear()));
+            monthHeader_tv.setTextSize(28);
+            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 60));
         } else {
+            weekDaysArrayList.addAll(Arrays.asList(weekDays));
             monthHeader_tv.setText(monthPersianCal.getPersianMonthName());
+            monthHeader_tv.setTextSize(16);
+            monthHeader_tv.setTextColor(Color.BLACK);
+            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 38));
         }
 
+        monthHeader_tv.setTypeface(homaFont);
+
         setSelectedDate();
+
+        monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (MainActivity.SELECTED_DAY_INDEX > 0)
+                    dayUC[SELECTED_DAY_INDEX].unSetSelectedDay();
+                if (SELECTED_MONTH_INDEX != (monthPersianCal.getiPersianMonth()-1))
+                    MainActivity.UPDATE_YEAR = true;
+                SELECTED_DAY_INDEX = position;
+                originalSelectedDate.setTime(dayUC[position].getMiladiCalendar().getTime());
+                originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
+                dayUC[position].setSelectedDay();
+            }
+        });
+
+    }
+
+    private void newMonth(){
+        dayUC = new DayUC[42];
+        for (int i = 0; i < 42; i++) {
+            dayUC[i] = DayUC.newInstance(monthCal, !(i < remainDay | i >= (maxDayMonth + remainDay))
+                    , viewMode);
+            dayUCList.add(dayUC[i]);
+            monthCal.add(Calendar.DATE, 1);
+        }
+
+        weekNumArrayList = new ArrayList<>();
+    }
+
+    private void updateeMonth(){
+        dayUCList.clear();
+        for (int i = 0; i < 42; i++) {
+            dayUC[i].setEnable(!(i < remainDay | i >= (maxDayMonth + remainDay)));
+            dayUC[i].updateMonth(monthCal);
+            dayUCList.add(dayUC[i]);
+            monthCal.add(Calendar.DATE, 1);
+        }
+        weekNumArrayList.clear();
     }
 
     public void setSelectedDate(){
-        if (selectedDayIndex >= 0)
-            dayUC[selectedDayIndex].unSetSelectedDay();
-        selectedDayIndex = originalSelectedPersianDate.getiPersianDate() + originalSelectedPersianDate.persianPreMonthRemainingDay() - 1;
-        dayUC[selectedDayIndex].setSelectedDay();
+        if (SELECTED_MONTH_INDEX == (monthPersianCal.getiPersianMonth()-1)) {
+            if (SELECTED_DAY_INDEX >= 0)
+                dayUC[SELECTED_DAY_INDEX].unSetSelectedDay();
+            SELECTED_DAY_INDEX = originalSelectedPersianDate.getiPersianDate() + originalSelectedPersianDate.persianPreMonthRemainingDay() - 1;
+            dayUC[SELECTED_DAY_INDEX].setSelectedDay();
+        }
     }
 
     public void unSetSelectedDate(){
-        if (selectedDayIndex >= 0)
-            dayUC[selectedDayIndex].unSetSelectedDay();
+        if (SELECTED_DAY_INDEX >= 0)
+            dayUC[SELECTED_DAY_INDEX].unSetSelectedDay();
     }
 
     @Override

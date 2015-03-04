@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -28,6 +29,7 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -45,6 +47,7 @@ import co.yalda.nasr_m.yaldacalendar.PersianDatePicker.PersianDatePicker;
 import co.yalda.nasr_m.yaldacalendar.Utilities.ExpandableListPreparation;
 import co.yalda.nasr_m.yaldacalendar.Year.YearView;
 
+import static android.graphics.Typeface.createFromAsset;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.Down2Up;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.Left2Right;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.Right2Left;
@@ -55,7 +58,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.ZoomOut;
 /**
  * Created by Nasr_M on 2/28/2015.
  */
-public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
+public class MainActivity extends FragmentActivity implements ActionBar.TabListener{
 
     public static String[] holidayList = new String[]{"01/01", "01/02", "01/03", "01/04"};
     public static calendarType mainCalendarType = calendarType.Solar;
@@ -69,6 +72,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static int[] viewSize;
     public static touchEvent touchAction;
     public static ProgressDialog progressDialog;
+    public static Typeface tahomaFont, homaFont;
+    public static int SELECTED_MONTH_INDEX = -1;
+    public static int SELECTED_DAY_INDEX = -1;
+    public static YearView staticYear;
+    public static MonthView staticMonth;
     private CustomViewPager viewPager;
     private CustomDrawer drawerLayout;
     private ActionBar actionBar;
@@ -85,11 +93,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private float[] startPoint, endPoint, distance;
     private boolean IS_IN_VIEWPAGER_AREA = false, SWIPE_ACTION = true, ACTION_FINISHED = false;
     private Point point = new Point();
-    private boolean UPDATE_DAY_LIST = false;
-    private boolean UPDATE_DAY_FULL = false;
-    private boolean UPDATE_MONTH = false;
-    private boolean UPDATE_YEAR = false;
+    public static boolean UPDATE_DAY_LIST = false;
+    public static boolean UPDATE_DAY_FULL = false;
+    public static boolean UPDATE_MONTH = false;
+    public static boolean UPDATE_YEAR = false;
     private TextView actionBarSelectedDate;
+    private boolean BACK_PRESSED = false;
+    private long PRESSED_TIME = 0;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -123,6 +133,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
             viewSize[1] -= actionBarHeight;
         }
+
+//        tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
+        homaFont = createFromAsset(context.getAssets(), "homa.ttf");
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -270,16 +283,17 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 PersianCalendar today = new PersianCalendar(Calendar.getInstance());
                 if (today.getMiladiDate().compareTo(originalSelectedDate) == 0)
                     return true;
-
+                dayViewMode view;
                 if (today.getiPersianYear() != originalSelectedPersianDate.getiPersianYear()) {
-                    onDateChange(dayViewMode.Year);
+                    view = dayViewMode.Year;
                 }else if (today.getiPersianMonth() != originalSelectedPersianDate.getiPersianMonth()){
-                    onDateChange(dayViewMode.Month);
+                    view = dayViewMode.Month;
                 }else {
-                    onDateChange(dayViewMode.DayFull);
+                    view = viewPager.getCurrentItem() == 0 ? dayViewMode.DayList : dayViewMode.DayFull;
                 }
                 originalSelectedDate = Calendar.getInstance();
                 originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
+                onDateChange(view);
                 return true;
             case R.id.ab_add_event_item:            //add event button clicked
                 Intent eventActivity = new Intent(this, AddEvent.class);
@@ -339,7 +353,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 break;
             case 2:
                 if (UPDATE_MONTH) {
-                    monthView.updateMonth(originalSelectedDate);
+                    monthView.initialMonth(originalSelectedDate);
                     UPDATE_MONTH = false;
                 }
                 monthView.setSelectedDate();
@@ -597,6 +611,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     //on swipe actions change hole date
     public void onDateChange(dayViewMode view){
+        SELECTED_MONTH_INDEX = originalSelectedPersianDate.getiPersianMonth() -1;
+        SELECTED_DAY_INDEX = originalSelectedPersianDate.getiPersianDate() + originalSelectedPersianDate.persianPreMonthRemainingDay();
         switch (view) {
             case DayList:
                 dayUCList.updateDayList();
@@ -621,7 +637,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         UPDATE_MONTH = true;
                         break;
                     case 2:
-                        monthView.updateMonth(originalSelectedDate);
+                        monthView.initialMonth(originalSelectedDate);
                         UPDATE_MONTH = false;
                         UPDATE_DAY_LIST = true;
                         UPDATE_DAY_FULL = true;
@@ -649,7 +665,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         UPDATE_YEAR = true;
                         break;
                     case 2:
-                        monthView.updateMonth(originalSelectedDate);
+                        monthView.initialMonth(originalSelectedDate);
                         UPDATE_MONTH = false;
                         UPDATE_DAY_LIST = true;
                         UPDATE_DAY_FULL = true;
@@ -702,10 +718,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onBackPressed() {
-        if (drawerOpen)
+        if (drawerOpen) {
             drawerLayout.closeDrawers();
-//        else {
-            super.onBackPressed();
+        }else if (BACK_PRESSED && (Math.abs(PRESSED_TIME - Calendar.getInstance().getTimeInMillis()) < 1000)){
+            finish();
+        }else{
+            Toast.makeText(context, "لطفا برای خروج کلید بازگشت را مجددا فشار دهید", Toast.LENGTH_SHORT).show();
+            BACK_PRESSED = true;
+            PRESSED_TIME = Calendar.getInstance().getTimeInMillis();
+        }
+//            super.onBackPressed();
 //            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //            //create dialog layout
 //            final TextView input = new TextView(context);
@@ -732,6 +754,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //            //show dialog
 //            inputNote.show();
 //        }
+
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -825,7 +848,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     return dayUCFull;
                 case 2:
                     if (UPDATE_MONTH)
-                        monthView.updateMonth(originalSelectedDate);
+                        monthView.initialMonth(originalSelectedDate);
                     return monthView;
                 case 3:
                     if (UPDATE_YEAR)
