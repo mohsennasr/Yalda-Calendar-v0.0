@@ -6,47 +6,70 @@
     android:orientation="vertical"
     android:showDividers="beginning|middle|end">
 
-    <TextView
-        android:id="@+id/month_view_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textStyle="bold" />
-
     <LinearLayout
+        android:id="@+id/month_complete"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <TextView
-            android:layout_width="40dp"
-            android:layout_height="wrap_content" />
-
-        <GridView
-            android:id="@+id/month_week_day_name_grid"
+            android:id="@+id/month_view_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:numColumns="7" />
+            android:gravity="center"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content" />
+
+            <GridView
+                android:id="@+id/month_week_day_name_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numColumns="7" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <GridView
+                android:id="@+id/week_number_grid"
+                android:layout_width="40dp"
+                android:layout_height="fill_parent"
+                android:numColumns="1"/>
+
+            <GridView
+                android:id="@+id/month_view_day_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:numColumns="7"
+                android:stretchMode="columnWidth" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/month_list_view"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
         <GridView
-            android:id="@+id/week_number_grid"
-            android:layout_width="40dp"
-            android:layout_height="fill_parent"
-            android:numColumns="1"/>
-
-        <GridView
-            android:id="@+id/month_view_day_grid"
+            android:id="@+id/month_list_grid"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:numColumns="7"
-            android:stretchMode="columnWidth" />
+            android:layout_height="match_parent"
+            android:stretchMode="columnWidth"
+            android:numColumns="3"/>
 
     </LinearLayout>
 

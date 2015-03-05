@@ -224,6 +224,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         yearView = YearView.newInstance(Calendar.getInstance());
 
         getOverflowMenu();
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("لطفاً منتظر بمانید...");
+        progressDialog.setCancelable(false);
     }
 
     @Override
@@ -367,7 +371,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 break;
             case 3:
                 if (UPDATE_YEAR) {
-                    yearView.updateYear();
+                    yearView.initialYear();
                     UPDATE_YEAR = false;
                 }
                 yearView.setSelectedDate();
@@ -392,7 +396,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //        super.dispatchTouchEvent(event);
         if (distance[0] != 0 && event.getAction() == MotionEvent.ACTION_UP)
             ACTION_FINISHED = true;
-        if ((event.getPointerCount() >= 2) && (distance[0] != 0)) {     // multiTouch gesture
+        if ((event.getPointerCount() >= 2)) {     // multiTouch gesture
             SWIPE_ACTION = false;
             if (progressDialog != null) {
                 progressDialog.dismiss();
@@ -473,10 +477,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             && IS_IN_VIEWPAGER_AREA
                             && SWIPE_ACTION
                             /*&& !yearCal.YEAR_LIST*/) {
-                        progressDialog = new ProgressDialog(this);
-                        progressDialog.setTitle("لطفاً منتظر بمانید...");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
+
                     }
                     break;
             }
@@ -594,15 +595,21 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     break;
                 case ZoomIn:
                     switch (viewPager.getCurrentItem()){
+                        case 2:
+                            monthView.monthSwitchView(1);
+                            break;
                         case 3:
-                            yearView.yearSwitchView();
+                            yearView.yearSwitchView(1);
                             break;
                     }
                     break;
                 case ZoomOut:
                     switch (viewPager.getCurrentItem()){
+                        case 2:
+                            monthView.monthSwitchView(2);
+                            break;
                         case 3:
-                            yearView.yearSwitchView();
+                            yearView.yearSwitchView(2);
                             break;
                     }
                     break;
@@ -679,11 +686,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         UPDATE_YEAR = true;
                         break;
                     case 3:
-                        yearView.updateYear();
+                        progressDialog.show();
+                        yearView.initialYear();
                         UPDATE_YEAR = false;
                         UPDATE_DAY_FULL = true;
                         UPDATE_DAY_LIST = true;
                         UPDATE_MONTH = true;
+//                        progressDialog.dismiss();
                 }
                 break;
         }
@@ -734,34 +743,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             BACK_PRESSED = true;
             PRESSED_TIME = Calendar.getInstance().getTimeInMillis();
         }
-//            super.onBackPressed();
-//            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            //create dialog layout
-//            final TextView input = new TextView(context);
-//            input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-//            final String[] value = {new String()};
-//            input.setText("آیا می خواهید خارج شوید؟");
-//
-//            //create dialog
-//            AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
-//            inputNote.setTitle("خروج");
-//            inputNote.setView(input);
-//
-//            //set dialog buttons
-//            inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int whichButton) {
-//                    finish();
-//                }
-//            });
-//            inputNote.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int whichButton) {
-//                }
-//            });
-//
-//            //show dialog
-//            inputNote.show();
-//        }
-
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -859,7 +840,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     return monthView;
                 case 3:
                     if (UPDATE_YEAR)
-                        yearView.updateYear();
+                        yearView.initialYear();
                     return yearView;
             }
             return null;

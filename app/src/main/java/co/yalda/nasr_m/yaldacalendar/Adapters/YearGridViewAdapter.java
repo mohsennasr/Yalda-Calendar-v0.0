@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
 
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.progressDialog;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewSize;
 
 /**
@@ -53,6 +54,9 @@ public class YearGridViewAdapter extends BaseAdapter {
         }
 
         gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(width, height));
+        if (position == 11 && progressDialog != null)
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
         return gridList.get(position).rootView;
     }
 

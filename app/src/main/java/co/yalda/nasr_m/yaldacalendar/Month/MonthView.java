@@ -19,6 +19,7 @@ import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.CalendarItemAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.MonthListGridAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.SimpleWeekGridAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.ArabicCalendar;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
@@ -29,6 +30,8 @@ import co.yalda.nasr_m.yaldacalendar.R;
 
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_DAY_INDEX;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_MONTH_INDEX;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_DAY_FULL;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_DAY_LIST;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
@@ -64,6 +67,10 @@ public class MonthView extends Fragment {
     private int selectedDayIndex = -1;
     private int remainDay=0, maxDayMonth=0;
     private ArrayList<String> weekDaysArrayList;
+    private LinearLayout monthComplete, monthList;
+    private GridView monthListGridView;
+    private MonthListGridAdapter monthListGridAdapter;
+    private int CURRENT_VIEW = 1;
 
     /*
     Fragment Classes have their own constructor method that we can't modify input parameter.
@@ -107,6 +114,9 @@ public class MonthView extends Fragment {
         rootView = mInfalater.inflate(R.layout.month_view, null);
 //        rootView.setClickable(true);
 
+        monthComplete = (LinearLayout) rootView.findViewById(R.id.month_complete);
+        monthList = (LinearLayout) rootView.findViewById(R.id.month_list_view);
+        monthListGridView = (GridView) rootView.findViewById(R.id.month_list_grid);
         monthHeader_tv = (TextView) rootView.findViewById(R.id.month_view_header);
         monthGridView = (GridView) rootView.findViewById(R.id.month_view_day_grid);
         weekDaysGrid = (GridView) rootView.findViewById(R.id.month_week_day_name_grid);
@@ -152,6 +162,13 @@ public class MonthView extends Fragment {
                 weekNum++;
         }
 
+        final ArrayList<String> monthArrayList = new ArrayList<>();
+        monthArrayList.addAll(Arrays.asList(PersianCalendar.persianMonthNames));
+        monthListGridAdapter = new MonthListGridAdapter(monthArrayList, monthPersianCal.getiPersianMonth()-1);
+        monthListGridView.setAdapter(monthListGridAdapter);
+        monthListGridAdapter.notifyDataSetChanged();
+
+
         weekNumberGridAdapter = new SimpleWeekGridAdapter(weekNumArrayList, viewMode);
 //        gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList, viewMode);
         gridViewAdapter = new MonthGridViewAdapter(dayUCList, viewMode);
@@ -193,6 +210,20 @@ public class MonthView extends Fragment {
                 originalSelectedDate.setTime(dayUC[position].getMiladiCalendar().getTime());
                 originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
                 dayUC[position].setSelectedDay();
+            }
+        });
+
+        monthListGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position != (monthPersianCal.getiPersianMonth()-1)) {
+                    originalSelectedPersianDate.setPersian(Calendar.MONTH, position);
+                    originalSelectedDate.setTime(originalSelectedPersianDate.getMiladiDate().getTime());
+                    initialMonth(originalSelectedDate);
+                    UPDATE_DAY_FULL = true;
+                    UPDATE_DAY_LIST = true;
+                }
+                monthSwitchView(1);
             }
         });
 
@@ -239,5 +270,17 @@ public class MonthView extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("ViewMode", viewMode.toString());
         super.onSaveInstanceState(outState);
+    }
+
+    public void monthSwitchView(int view){
+        if (CURRENT_VIEW == 1 && view == 2){
+            monthComplete.setVisibility(View.GONE);
+            monthList.setVisibility(View.VISIBLE);
+            CURRENT_VIEW = 2;
+        }else if (CURRENT_VIEW == 2 && view == 1){
+            monthList.setVisibility(View.GONE);
+            monthComplete.setVisibility(View.VISIBLE);
+            CURRENT_VIEW = 1;
+        }
     }
 }
