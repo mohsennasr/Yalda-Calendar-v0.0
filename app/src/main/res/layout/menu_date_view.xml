@@ -6,7 +6,7 @@
     android:showDividers="middle"
     android:divider="?android:dividerVertical"
     android:dividerPadding="8dp"
-    android:layout_marginLeft="2dp"
+    android:layout_marginLeft="20dp"
     android:layout_marginRight="2dp">
 
     <TextView

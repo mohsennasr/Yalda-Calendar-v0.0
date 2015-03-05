@@ -1,5 +1,6 @@
 package co.yalda.nasr_m.yaldacalendar.Year;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -52,19 +53,30 @@ public class YearView extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (rootView == null){
+            LayoutInflater mInfalater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            rootView = mInfalater.inflate(R.layout.year_view, null);
+            secondView = mInfalater.inflate(R.layout.year_second_view, null);
+            secondView.setVisibility(View.GONE);
+            yearListGrid = (GridView) secondView.findViewById(R.id.year_list_grid);
+            yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
+            yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
+        }
+        if (monthViewList == null)
+            monthViewList = new ArrayList<>();
+        initialYear();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.year_view, container, false);
-        secondView = inflater.inflate(R.layout.year_second_view, container, false);
-        secondView.setVisibility(View.GONE);
-        yearListGrid = (GridView) secondView.findViewById(R.id.year_list_grid);
-        yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
-        yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
-        yearGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(context, "Grid Item " + position + " Selected", Toast.LENGTH_LONG).show();
-            }
-        });
+//        rootView = inflater.inflate(R.layout.year_view, container, false);
+//        secondView = inflater.inflate(R.layout.year_second_view, container, false);
+//        secondView.setVisibility(View.GONE);
+//        yearListGrid = (GridView) secondView.findViewById(R.id.year_list_grid);
+//        yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
+//        yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
 
         return CURRENT_VIEW == 1 ? rootView : secondView;
     }
@@ -72,9 +84,6 @@ public class YearView extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (monthViewList == null)
-            monthViewList = new ArrayList<>();
-        initialYear();
     }
 
     //initial attributes
@@ -96,7 +105,7 @@ public class YearView extends Fragment {
         setColumns();
 
         yearHeader_tv.setTypeface(homaFont);
-        yearHeader_tv.setText(PersianUtil.toString(yearPersianCal.getiPersianYear()));
+        yearHeader_tv.setText(PersianUtil.toPersian(yearPersianCal.getiPersianYear()));
         yearGridAdapter = new YearGridViewAdapter(monthViewList);
         yearGridView.setAdapter(yearGridAdapter);
         yearGridAdapter.notifyDataSetChanged();

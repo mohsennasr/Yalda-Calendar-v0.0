@@ -8,6 +8,7 @@
         android:id="@+id/day_uc_main_date"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textSize="12sp"
         android:gravity="center"/>
 
 </LinearLayout>

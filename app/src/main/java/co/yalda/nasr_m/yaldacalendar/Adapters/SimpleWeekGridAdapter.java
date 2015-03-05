@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewSize;
 
 /**
@@ -52,9 +53,10 @@ public class SimpleWeekGridAdapter extends BaseAdapter {
 
         TextView weekItem = (TextView) convertView.findViewById(R.id.simple_week_number_text);
         weekItem.setText(gridList.get(position));
+        weekItem.setTypeface(homaFont);
 
         if (viewMode == MainActivity.dayViewMode.Month) {
-            convertView.setLayoutParams(new AbsListView.LayoutParams(40, (viewSize[1] - 200) / 6));
+            convertView.setLayoutParams(new AbsListView.LayoutParams(40, (viewSize[1] - 260) / 6));
         }
 
         return convertView;

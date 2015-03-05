@@ -52,7 +52,11 @@ public class PersianUtil {
     /**
      * Convert an int into arabic string.
      */
-    public static String toString(int num) {
+    public static String toPersian(int num) {
         return convertDigits(Integer.toString(num));
+    }
+
+    public static String toArabic(int num) {
+        return convertDigitstoArabic(Integer.toString(num));
     }
 }

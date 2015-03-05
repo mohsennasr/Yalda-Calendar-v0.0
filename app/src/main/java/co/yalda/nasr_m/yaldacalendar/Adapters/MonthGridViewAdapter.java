@@ -50,35 +50,11 @@ public class MonthGridViewAdapter extends BaseAdapter {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-//        if (convertView == null) {
-//            LayoutInflater minflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            convertView = minflater.inflate(R.layout.simple_list_item, null);
-//        }
-
-//        if (position % 8 == 0) {
-//            TextView item = (TextView) convertView.findViewById(R.id.simple_text);
-//            item.setText(weekGridList.get(position / 8));
-//            item.setTextColor(Color.BLACK);
-//            item.setTextAppearance(context, R.style.BoldText);
-//            if (viewMode == dayViewMode.Month) {
-//                convertView.setLayoutParams(new AbsListView.LayoutParams(40, (viewSize[1] - 150) / 6));
-//            }
-//            convertView.setClickable(false);
-//            return convertView;
-//        }
         if (viewMode == dayViewMode.Month) {
-//            gridList.get((position / 8) * 7 + position % 8 - 1).rootView.setLayoutParams(new AbsListView.LayoutParams(
-//                    (viewSize[0] - 80) / 7,
-//                    (viewSize[1] - 200) / 6));
             gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(
                     (viewSize[0] - 40) / 7,
                     (viewSize[1] - 260) / 6));
         }
-
-//        gridList.get((position / 8) * 7 + (position % 8) - 1).rootView.setClickable(false);
-//        gridList.get(position).rootView.setClickable(false);
-
-//        return gridList.get((position / 8) * 7 + (position % 8) - 1).rootView;
         return gridList.get(position).rootView;
     }
 

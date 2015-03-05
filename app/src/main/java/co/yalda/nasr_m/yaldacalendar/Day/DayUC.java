@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,15 +29,15 @@ import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.DayListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.NoteListViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.Calendars.ArabicCalendar;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
-import co.yalda.nasr_m.yaldacalendar.Converters.ArabicDateConverter;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Handler.AddEvent;
 import co.yalda.nasr_m.yaldacalendar.Handler.Events;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
-import static android.graphics.Typeface.createFromAsset;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.arabicFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayFull;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayHeader;
@@ -48,6 +47,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Year;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.timesFont;
 
 /**
  * Created by Nasr_M on 2/17/2015.
@@ -60,6 +60,7 @@ public class DayUC extends Fragment {
     public boolean isEnable = true;                                // Should be Clickable
     private PersianCalendar persianCalendar;                        // Persian Calendar
     private Calendar miladiCalendar = Calendar.getInstance();       // Day Base Calendar
+    private ArabicCalendar arabicCalendar;
     private MainActivity.dayViewMode dayViewMode;                   // Day View Mode -> Year, Month, DayList, DayFull
     private TextView dayName, dayDate, dayliNote1, dayliNote2, monthName, miladiFullDate, jalaliFulldate,       // Day Full View Mode TextViews
             arabicFullDate, miladiDate, jalaliDate, arabicdate, holyDayNote;
@@ -81,7 +82,7 @@ public class DayUC extends Fragment {
         dayUC.miladiCalendar.setTime(miladiDate.getTime());
         dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);              // Set First Day of Week Based on Primary Calendar
         dayUC.persianCalendar = new PersianCalendar(dayUC.miladiCalendar);      // Initial Persian Calendar
-        // TODO Third Calendar (Arabic) Shoul be Added
+        dayUC.arabicCalendar = new ArabicCalendar(dayUC.miladiCalendar);
         dayUC.isEnable = isEnable;                                              // Set Day Clickable
         dayUC.dayViewMode = dayViewMode;                                        // Set Day View Mode
 
@@ -183,15 +184,17 @@ public class DayUC extends Fragment {
         mainDate_TV.setClickable(isEnable);
         switch (MainActivity.mainCalendarType) {
             case Solar:
-                persianCalendar = originalSelectedPersianDate;
-                mainDate_TV.setText(persianCalendar.getPersianFullDate());
+                persianCalendar.setMiladiDate(miladiCalendar);
                 mainDate_TV.setTypeface(homaFont);
+                mainDate_TV.setText(persianCalendar.getPersianFullDate());
                 break;
             case Gregorian:
                 mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
                 break;
             case Hejri:
-                // TODO Arabic Calendar Should Be Added
+                arabicCalendar.setBaseMiladiCalendar(miladiCalendar);
+                mainDate_TV.setTypeface(homaFont);
+                mainDate_TV.setText(arabicCalendar.getArabicFullDate());
                 break;
         }
     }
@@ -202,6 +205,7 @@ public class DayUC extends Fragment {
     public void initialMonth() {
 //        mainDate_TV.setClickable(isEnable);
         persianCalendar.setMiladiDate(miladiCalendar);
+        arabicCalendar.setBaseMiladiCalendar(miladiCalendar);
         mainDate_TV.setTypeface(homaFont);
         if (!isEnable) {
             mainDate_TV.setTextColor(Color.LTGRAY);
@@ -229,14 +233,14 @@ public class DayUC extends Fragment {
 
         switch (MainActivity.mainCalendarType) {
             case Solar:
-                mainDate_TV.setText(PersianUtil.toString(persianCalendar.getiPersianDate()));
+                mainDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
                 break;
             case Gregorian:
                 mainDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
                 break;
             case Hejri:
-//                arabicCalendar = new ArabicCalendar(miladiCalendar);
-//                mainDate_TV.setText(String.valueOf(arabicCalendar.get(Calendar.DATE)));
+                mainDate_TV.setTypeface(homaFont);
+                mainDate_TV.setText(PersianUtil.toArabic(arabicCalendar.getArabicDate()));
                 break;
         }
 
@@ -244,14 +248,14 @@ public class DayUC extends Fragment {
 //            secondDate_TV.setClickable(isEnable);
             switch (MainActivity.secondCalendarType) {
                 case Solar:
-                    secondDate_TV.setText(PersianUtil.toString(persianCalendar.getiPersianDate()));
+                    secondDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
                     secondDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
                     break;
                 case Hejri:
-//                arabicCalendar = new ArabicCalendar(miladiCalendar);
-//                secondDate_TV.setText(String.valueOf(arabicCalendar.get(Calendar.DATE)));
+                    secondDate_TV.setTypeface(homaFont);
+                    secondDate_TV.setText(PersianUtil.toArabic(arabicCalendar.getArabicDate()));
                     break;
             }
         }
@@ -260,14 +264,14 @@ public class DayUC extends Fragment {
 //            thirdDate_TV.setClickable(isEnable);
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
-                    thirdDate_TV.setText(PersianUtil.toString(persianCalendar.getiPersianDate()));
+                    thirdDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
                     break;
                 case Gregorian:
                     thirdDate_TV.setText(String.valueOf(miladiCalendar.get(Calendar.DATE)));
                     break;
                 case Hejri:
-//                    arabicCalendar = new ArabicCalendar(miladiCalendar);
-//                thirdDate_TV.setText(String.valueOf(arabicCalendar.get(Calendar.DATE)));
+                    thirdDate_TV.setTypeface(homaFont);
+                    thirdDate_TV.setText(PersianUtil.toArabic(arabicCalendar.getArabicDate()));
                     break;
             }
         }
@@ -355,14 +359,9 @@ public class DayUC extends Fragment {
 //            e.printStackTrace();
 //        }
 
-        //set typefaces for text view fonts
-        Typeface iranNastaliq = createFromAsset(MainActivity.context.getAssets(), "iran_nastaliq.ttf");
-        Typeface homa = createFromAsset(MainActivity.context.getAssets(), "homa.ttf");
-        Typeface arabic = createFromAsset(MainActivity.context.getAssets(), "arabic.ttf");
-        Typeface times = createFromAsset(MainActivity.context.getAssets(), "times.ttf");
 
         holyDayNote = (TextView) rootView.findViewById(R.id.holiday_note_tv);
-        holyDayNote.setTypeface(homa);
+        holyDayNote.setTypeface(homaFont);
         holyDayNote.setTextColor(Color.BLACK);
 
         noteList = (ListView) rootView.findViewById(R.id.note_list_lv);
@@ -440,37 +439,37 @@ public class DayUC extends Fragment {
         });
 
         dayDate = (TextView) rootView.findViewById(R.id.date_tv);
-        dayDate.setTypeface(homa);
+        dayDate.setTypeface(homaFont);
         dayDate.setTextColor(Color.BLACK);
         dayliNote1 = (TextView) rootView.findViewById(R.id.dayli_note_1_tv);
-        dayliNote1.setTypeface(homa);
+        dayliNote1.setTypeface(homaFont);
         dayliNote1.setTextColor(Color.BLACK);
         dayliNote2 = (TextView) rootView.findViewById(R.id.dayli_note_2_tv);
-        dayliNote2.setTypeface(homa);
+        dayliNote2.setTypeface(homaFont);
         dayliNote2.setTextColor(Color.BLACK);
         dayName = (TextView) rootView.findViewById(R.id.day_name_tv);
-        dayName.setTypeface(homa);
+        dayName.setTypeface(homaFont);
         dayName.setTextColor(Color.BLACK);
         monthName = (TextView) rootView.findViewById(R.id.month_name_tv);
-        monthName.setTypeface(homa);
+        monthName.setTypeface(homaFont);
         monthName.setTextColor(Color.BLACK);
         jalaliFulldate = (TextView) rootView.findViewById(R.id.jalali_date_full_tv);
-        jalaliFulldate.setTypeface(homa);
+        jalaliFulldate.setTypeface(homaFont);
         jalaliDate = (TextView) rootView.findViewById(R.id.jalali_date_tv);
-        jalaliDate.setTypeface(homa);
+        jalaliDate.setTypeface(homaFont);
         jalaliFulldate.setTextColor(Color.WHITE);
         jalaliDate.setTextColor(Color.WHITE);
         arabicFullDate = (TextView) rootView.findViewById(R.id.arabic_date_full_tv);
-        arabicFullDate.setTypeface(arabic);
+        arabicFullDate.setTypeface(arabicFont);
         arabicFullDate.setTextColor(Color.WHITE);
         arabicdate = (TextView) rootView.findViewById(R.id.arabic_date_tv);
-        arabicdate.setTypeface(arabic);
+        arabicdate.setTypeface(arabicFont);
         arabicdate.setTextColor(Color.WHITE);
         miladiFullDate = (TextView) rootView.findViewById(R.id.miladi_date_full_tv);
-        miladiFullDate.setTypeface(times);
+        miladiFullDate.setTypeface(timesFont);
         miladiFullDate.setTextColor(Color.WHITE);
         miladiDate = (TextView) rootView.findViewById(R.id.miladi_date_tv);
-        miladiDate.setTypeface(times);
+        miladiDate.setTypeface(timesFont);
         miladiDate.setTextColor(Color.WHITE);
     }
 
@@ -521,10 +520,11 @@ public class DayUC extends Fragment {
                 , originalSelectedDate.get(Calendar.MONTH)
                 , originalSelectedDate.get(Calendar.DATE));
         temporary.add(Calendar.DATE, -1);
-        String[] ADate = ArabicDateConverter.writeIslamicDate(temporary);
+        String[] ADate = new String[4];
 
         //convert digits to persian digit
-        persianCalendar = originalSelectedPersianDate;
+//        persianCalendar.setMiladiDate(originalSelectedDate);
+//        arabicCalendar.setBaseMiladiCalendar(originalSelectedDate);
 //        PersianCalendar pcal = new PersianCalendar(originalSelectedDate);
         String[] PDate = new String[5];
         PDate[0] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianYear()));
@@ -534,12 +534,14 @@ public class DayUC extends Fragment {
         PDate[4] = persianCalendar.getPersianDayName();
 
         //convert digits to arabic digits
-        ADate[0] = PersianUtil.convertDigitstoArabic(ADate[0]);
-        ADate[1] = PersianUtil.convertDigitstoArabic(ADate[1]);
-        ADate[2] = PersianUtil.convertDigitstoArabic(ADate[2]);
+        ADate[0] = PersianUtil.toArabic(arabicCalendar.getArabicYear());
+        ADate[1] = PersianUtil.toArabic(arabicCalendar.getArabicMonth());
+        ADate[2] = PersianUtil.toArabic(arabicCalendar.getArabicDate());
+        ADate[3] = arabicCalendar.getArabicMonthName();
 
         //set text color to RED for holidays
-        if (PDate[4] == "جمعه" || !holyDayNote.getText().toString().isEmpty()) {
+//        if (PDate[4] == "جمعه" || !holyDayNote.getText().toPersian().isEmpty()) {
+        if (isHoliday){
             monthName.setTextColor(Color.RED);
             dayName.setTextColor(Color.RED);
             dayDate.setTextColor(Color.RED);
@@ -577,9 +579,11 @@ public class DayUC extends Fragment {
 
     public void updateDayHeader(){
         miladiCalendar.setTime(originalSelectedDate.getTime());
-        persianCalendar.set(originalSelectedPersianDate.getiPersianYear(),
-                originalSelectedPersianDate.getiPersianMonth(),
-                originalSelectedPersianDate.getiPersianDate());
+//        persianCalendar.set(originalSelectedPersianDate.getiPersianYear(),
+//                originalSelectedPersianDate.getiPersianMonth(),
+//                originalSelectedPersianDate.getiPersianDate());
+        persianCalendar.setMiladiDate(originalSelectedDate);
+        arabicCalendar.setBaseMiladiCalendar(originalSelectedDate);
         switch (MainActivity.mainCalendarType) {
             case Solar:
                 mainDate_TV.setText(persianCalendar.getPersianFullDate());
@@ -590,7 +594,7 @@ public class DayUC extends Fragment {
                 + originalSelectedDate.get(Calendar.DATE)));
                 break;
             case Hejri:
-                // TODO Arabic Calendar Should Be Added
+                mainDate_TV.setText(arabicCalendar.getArabicFullDate());
                 break;
         }
     }
@@ -598,6 +602,7 @@ public class DayUC extends Fragment {
     public void updateMonth(Calendar calendar){
         miladiCalendar.setTime(calendar.getTime());
         persianCalendar.setMiladiDate(miladiCalendar);
+        arabicCalendar.setBaseMiladiCalendar(miladiCalendar);
         unSetSelectedDay();
         checkHoliday();
         initialMonth();
@@ -635,9 +640,11 @@ public class DayUC extends Fragment {
 
     public void updateDayFull(){
         miladiCalendar.setTime(originalSelectedDate.getTime());
-        persianCalendar.set(originalSelectedPersianDate.getiPersianYear(),
-                originalSelectedPersianDate.getiPersianMonth(),
-                originalSelectedPersianDate.getiPersianDate());
+//        persianCalendar.set(originalSelectedPersianDate.getiPersianYear(),
+//                originalSelectedPersianDate.getiPersianMonth(),
+//                originalSelectedPersianDate.getiPersianDate());
+        persianCalendar.setMiladiDate(miladiCalendar);
+        arabicCalendar.setBaseMiladiCalendar(miladiCalendar);
         dayFullPutData();
     }
 

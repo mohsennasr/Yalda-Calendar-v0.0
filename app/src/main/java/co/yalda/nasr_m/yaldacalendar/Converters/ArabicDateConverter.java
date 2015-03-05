@@ -108,7 +108,7 @@ public class ArabicDateConverter {
         return myRes;
     }
 
-    public static String[] writeIslamicDate(Calendar Date) {
+    public static Integer[] writeIslamicDate(Calendar Date) {
         String[] wdNames = {"Ahad", "Ithnin", "Thulatha", "Arbaa", "Khams",
                 "Jumuah", "Sabt"};
         String[] iMonthNames = {"محرم", "صفر", "ربیع الاول",
@@ -117,7 +117,7 @@ public class ArabicDateConverter {
         // This Value is used to give the correct day +- 1 day
         boolean dayTest = true;
         Integer[] iDate = kuwaiticalendar(dayTest, Date);
-        String[] res = {iDate[7].toString(), iDate[6].toString(), iDate[5].toString(), iMonthNames[iDate[6]]};
+        Integer[] res = {iDate[7], iDate[6], iDate[5], iDate[4]};
 
         return res;
     }

@@ -20,6 +20,7 @@ import java.util.Calendar;
 import co.yalda.nasr_m.yaldacalendar.Adapters.CalendarItemAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.SimpleWeekGridAdapter;
+import co.yalda.nasr_m.yaldacalendar.Calendars.ArabicCalendar;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
@@ -58,6 +59,7 @@ public class MonthView extends Fragment {
     private String[] weekDays = new String[]{"ش", "ی", "د", "س", "چ", "پ", "ج"};
     private String[] weekDaysFull = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه"};
     private PersianCalendar monthPersianCal;
+    private ArabicCalendar monthArabicCal;
     private ArrayList<String> weekNumArrayList;
     private int selectedDayIndex = -1;
     private int remainDay=0, maxDayMonth=0;
@@ -103,7 +105,7 @@ public class MonthView extends Fragment {
     private void firstInitialization() {
         LayoutInflater mInfalater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         rootView = mInfalater.inflate(R.layout.month_view, null);
-        rootView.setClickable(true);
+//        rootView.setClickable(true);
 
         monthHeader_tv = (TextView) rootView.findViewById(R.id.month_view_header);
         monthGridView = (GridView) rootView.findViewById(R.id.month_view_day_grid);
@@ -140,7 +142,7 @@ public class MonthView extends Fragment {
         int weekNumber = monthPersianCal.numberOfWeeksInMonth();
         for (int i = 0; i < 6; i++) {
             if (i < weekNumber) {
-                weekNumArrayList.add(PersianUtil.toString(weekNum));
+                weekNumArrayList.add(PersianUtil.toPersian(weekNum));
             }else{
                 weekNumArrayList.add("");
             }
@@ -165,7 +167,7 @@ public class MonthView extends Fragment {
 
         if (viewMode == Month) {
             weekDaysArrayList.addAll(Arrays.asList(weekDaysFull));
-            monthHeader_tv.setText(monthPersianCal.getPersianMonthName() + " " + PersianUtil.toString(monthPersianCal.getiPersianYear()));
+            monthHeader_tv.setText(monthPersianCal.getPersianMonthName() + " " + PersianUtil.toPersian(monthPersianCal.getiPersianYear()));
             monthHeader_tv.setTextSize(28);
             monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 60));
         } else {
@@ -173,7 +175,7 @@ public class MonthView extends Fragment {
             monthHeader_tv.setText(monthPersianCal.getPersianMonthName());
             monthHeader_tv.setTextSize(16);
             monthHeader_tv.setTextColor(Color.BLACK);
-            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 38));
+            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 34));
         }
 
         monthHeader_tv.setTypeface(homaFont);

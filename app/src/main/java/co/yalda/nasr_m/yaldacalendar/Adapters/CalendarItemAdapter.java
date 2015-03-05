@@ -56,10 +56,10 @@ public class CalendarItemAdapter extends BaseAdapter {
             itemText.setTextAppearance(context, R.style.BoldText);
             if (view == MainActivity.dayViewMode.Month) {
                 itemText.setTextSize(24);
-                itemText.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 45));
+                itemText.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 60));
             } else {
                 itemText.setTextSize(12);
-                itemText.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 22));
+                itemText.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 30));
             }
             itemText.setTypeface(homaFont);
         }

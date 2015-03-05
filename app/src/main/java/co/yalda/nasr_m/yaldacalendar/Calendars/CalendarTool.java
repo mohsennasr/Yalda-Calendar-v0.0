@@ -29,7 +29,7 @@ import java.util.GregorianCalendar;
  * String getGregorianDate();
  * String getJulianDate();
  * String getWeekDayStr();
- * String toString();
+ * String toPersian();
  * int getDayOfWeek();
  * void nextDay();
  * void nextDay(int days);
@@ -197,8 +197,8 @@ public class CalendarTool {
     }
 
     /**
-     * toString:
-     * Overrides the default toString() method to return all dates.
+     * toPersian:
+     * Overrides the default toPersian() method to return all dates.
      * @return String
      */
     public String toString()

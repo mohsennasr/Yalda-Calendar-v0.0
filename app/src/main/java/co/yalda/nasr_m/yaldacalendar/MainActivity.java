@@ -63,7 +63,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static String[] holidayList = new String[]{"01/01", "01/02", "01/03", "01/04"};
     public static calendarType mainCalendarType = calendarType.Solar;
     public static calendarType secondCalendarType = calendarType.Gregorian;
-    public static calendarType thirdCalendarType = calendarType.Gregorian;
+    public static calendarType thirdCalendarType = calendarType.Hejri;
     public static Calendar originalSelectedDate = Calendar.getInstance();
     public static PersianCalendar originalSelectedPersianDate = new PersianCalendar(Calendar.getInstance());
     public static String[] dayWeekHoliday = new String[]{"5", "6"} ;
@@ -72,11 +72,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static int[] viewSize;
     public static touchEvent touchAction;
     public static ProgressDialog progressDialog;
-    public static Typeface tahomaFont, homaFont;
+    public static Typeface tahomaFont, homaFont, iranNastaliqFont, arabicFont, timesFont;
     public static int SELECTED_MONTH_INDEX = -1;
     public static int SELECTED_DAY_INDEX = -1;
-    public static YearView staticYear;
-    public static MonthView staticMonth;
     private CustomViewPager viewPager;
     private CustomDrawer drawerLayout;
     private ActionBar actionBar;
@@ -100,6 +98,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private TextView actionBarSelectedDate;
     private boolean BACK_PRESSED = false;
     private long PRESSED_TIME = 0;
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -134,8 +138,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             viewSize[1] -= actionBarHeight;
         }
 
-//        tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
+        tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
         homaFont = createFromAsset(context.getAssets(), "homa.ttf");
+        iranNastaliqFont = createFromAsset(MainActivity.context.getAssets(), "iran_nastaliq.ttf");
+        arabicFont = createFromAsset(MainActivity.context.getAssets(), "arabic.ttf");
+        timesFont = createFromAsset(MainActivity.context.getAssets(), "times.ttf");
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
