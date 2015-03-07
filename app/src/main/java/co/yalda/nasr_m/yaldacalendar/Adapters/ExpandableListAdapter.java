@@ -15,10 +15,14 @@ import co.yalda.nasr_m.yaldacalendar.MainActivity;
 /**
  * Created by Nasr_M on 2/16/2015.
  */
+
+/*
+expandable list view adapter for drawer panel expandable list
+ */
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private List<String> parentList;
-    private HashMap<String, List<String>> childList;
+    private List<String> parentList;                    //parent items list
+    private HashMap<String, List<String>> childList;    //childes item list
 
     public ExpandableListAdapter(List<String> parentList, HashMap<String, List<String>> childList) {
         this.parentList = parentList;
@@ -61,6 +65,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
+    /*
+    return parent items view
+     */
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
         if (convertView == null) {
@@ -69,7 +76,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(android.R.layout.simple_expandable_list_item_2, null);
             TextView lblListHeader = (TextView) convertView
                     .findViewById(android.R.id.text2);
-//            lblListHeader.setTypeface(null, Typeface.BOLD);
             lblListHeader.setText(headerTitle);
         }
 
@@ -77,6 +83,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
+    /*
+    return child items view
+     */
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         final String childText = (String) getChild(groupPosition, childPosition);
 

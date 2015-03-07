@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="month_header_tv_text_size_month_view">28</integer>
+    <integer name="month_header_tv_height_size_month_view">60</integer>
+    <integer name="month_header_tv_text_size_year_view">16</integer>
+    <integer name="month_header_tv_height_size_year_view">34</integer>
+    <integer name="month_list_grid_adapter_header_height">200</integer>
+    <integer name="month_grid_view_adapter_margin_width">40</integer>
+    <integer name="month_grid_view_adapter_header_height">260</integer>
+    <integer name="month_week_days_adapter_text_size_month_view">24</integer>
+    <integer name="month_week_days_adapter_text_size_year_view">12</integer>
+    <integer name="month_week_days_adapter_height_month_view">60</integer>
+    <integer name="month_week_days_adapter_height_size_year_view">30</integer>
+
+</resources>

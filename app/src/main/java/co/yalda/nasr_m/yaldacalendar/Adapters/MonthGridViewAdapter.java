@@ -17,28 +17,26 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewSize;
 /**
  * Created by Nasr_M on 2/21/2015.
  */
+/*
+grid view adapter for showing month days grid
+ */
 public class MonthGridViewAdapter extends BaseAdapter {
 
     private ArrayList<DayUC> gridList;           //list of grid DayUC objects
-//    private ArrayList<String> weekGridList;      //list of week Numbers objects
     private dayViewMode viewMode;                //month ViewMode
 
-    public MonthGridViewAdapter(ArrayList<DayUC> gridList, /*ArrayList<String> weekGridList,*/ dayViewMode viewMode) {
+    public MonthGridViewAdapter(ArrayList<DayUC> gridList, dayViewMode viewMode) {
         this.gridList = gridList;
-//        this.weekGridList = weekGridList;
         this.viewMode = viewMode;
     }
 
     @Override
     public int getCount() {
-        return gridList.size()/* + weekGridList.size()*/;
+        return gridList.size();
     }
 
     @Override
     public Object getItem(int position) {
-//        if (position % 8 == 0)
-//            return weekGridList.get(position / 8);
-//        return gridList.get((position / 8) * 7 + position % 8 - 1);
         return gridList.get(position);
     }
 
@@ -49,9 +47,12 @@ public class MonthGridViewAdapter extends BaseAdapter {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
+    /*
+    return dayUC view for showing in grid view
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
         if (viewMode == dayViewMode.Month) {
-            gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(
+            gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(       //resize day view to fit hole screen
                     (viewSize[0] - 40) / 7,
                     (viewSize[1] - 260) / 6));
         }

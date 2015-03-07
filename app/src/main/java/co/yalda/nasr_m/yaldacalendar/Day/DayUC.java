@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import co.yalda.nasr_m.yaldacalendar.Adapters.DayListViewAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.EventsListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.NoteListViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.ArabicCalendar;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
@@ -58,9 +58,9 @@ public class DayUC extends Fragment {
     public TextView mainDate_TV, secondDate_TV, thirdDate_TV;       // Date TextViews (Month & Year View Mode
     private boolean isHoliday;                                      // Is It Holiday
     public boolean isEnable = true;                                // Should be Clickable
-    private PersianCalendar persianCalendar;                        // Persian Calendar
+    private PersianCalendar persianCalendar = new PersianCalendar(Calendar.getInstance());                        // Persian Calendar
     private Calendar miladiCalendar = Calendar.getInstance();       // Day Base Calendar
-    private ArabicCalendar arabicCalendar;
+    private ArabicCalendar arabicCalendar = new ArabicCalendar(Calendar.getInstance());
     private MainActivity.dayViewMode dayViewMode;                   // Day View Mode -> Year, Month, DayList, DayFull
     private TextView dayName, dayDate, dayliNote1, dayliNote2, monthName, miladiFullDate, jalaliFulldate,       // Day Full View Mode TextViews
             arabicFullDate, miladiDate, jalaliDate, arabicdate, holyDayNote;
@@ -70,7 +70,7 @@ public class DayUC extends Fragment {
     private NoteListViewAdapter adapter;                                // List View Adapter for Note ListView in DayFull Mode
     private ArrayList<String> notes = new ArrayList<String>();      // Notes Array List for DayFull View Mode
     private ArrayList<Events> eventsArrayList;
-    private DayListViewAdapter dayListadapter;                    // Event List View Adapter for DayList View Mode
+    private EventsListViewAdapter dayListadapter;                    // Event List View Adapter for DayList View Mode
     private ListView dayEventLV;                                    // Events List View
     private ListView noteList;
     private DayUC dayUCListHeader;                                  // DayUC Object for Showing in DayList View Mode (Header)
@@ -120,15 +120,16 @@ public class DayUC extends Fragment {
             }
 
         // In Activity Restart (for rotation) Initialization rootView == Null, so Initial it
-        if (rootView == null) {
-            mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            viewSelector();
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // If in DayList View Mode, Attach DayList Fragment to rootView
+        if (rootView == null) {
+            mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            viewSelector();
+        }
         if (dayViewMode == DayList)
             ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUCListHeader).commit();
         return rootView;        // Return RootView of Fragment
@@ -169,10 +170,12 @@ public class DayUC extends Fragment {
             // Day List View Mode
             case DayList:
                 rootView = mInfalater.inflate(R.layout.day_uc_list_mode_view, null);
+                miladiCalendar.setTime(originalSelectedDate.getTime());
+                dayUCListHeader = DayUC.newInstance(miladiCalendar, false, DayHeader);
                 initialDayList();
                 break;
         }
-        rootView.setClickable(!isEnable);
+//        rootView.setClickable(!isEnable);
     }
 
     /*
@@ -290,8 +293,6 @@ public class DayUC extends Fragment {
     Initial DayList Mode
      */
     private void initialDayList() {
-        miladiCalendar.setTime(originalSelectedDate.getTime());
-        dayUCListHeader = DayUC.newInstance(miladiCalendar, false, DayHeader);
 
         //TODO get event list from DB
 
@@ -299,7 +300,7 @@ public class DayUC extends Fragment {
         Events events = Events.newInstance(context, Calendar.getInstance());
         events.setEvent("asdf0", "asdfasdfasdfasdfa sdf ", "10:25", "16:56");
         eventsArrayList.add(events);
-        dayListadapter = new DayListViewAdapter(eventsArrayList, context);
+        dayListadapter = new EventsListViewAdapter(eventsArrayList, context);
 
         dayEventLV = (ListView) rootView.findViewById(R.id.day_list_mode_event_list);
         dayEventLV.setAdapter(dayListadapter);
@@ -375,7 +376,6 @@ public class DayUC extends Fragment {
                 final TextView input = new TextView(context);
                 input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
                 final String[] value = {new String()};
-                final boolean[] mo2 = {false};
                 value[0] = notes.get(position);
                 input.setText(value[0]);
 
@@ -515,11 +515,9 @@ public class DayUC extends Fragment {
 //        }
 
         //get arabic date
-        Calendar temporary = Calendar.getInstance();
-        temporary.set(originalSelectedDate.get(Calendar.YEAR)
-                , originalSelectedDate.get(Calendar.MONTH)
-                , originalSelectedDate.get(Calendar.DATE));
-        temporary.add(Calendar.DATE, -1);
+//        Calendar temporary = Calendar.getInstance();
+//        temporary.setTime(originalSelectedDate.getTime());
+//        temporary.add(Calendar.DATE, -1);
         String[] ADate = new String[4];
 
         //convert digits to persian digit
@@ -566,6 +564,7 @@ public class DayUC extends Fragment {
 
         arabicFullDate.setText(ADate[3] + " " + ADate[0]);
         arabicdate.setText(ADate[2]);
+        monthName.setTypeface(homaFont);
     }
 
     private void checkHoliday() {
@@ -579,9 +578,6 @@ public class DayUC extends Fragment {
 
     public void updateDayHeader(){
         miladiCalendar.setTime(originalSelectedDate.getTime());
-//        persianCalendar.set(originalSelectedPersianDate.getiPersianYear(),
-//                originalSelectedPersianDate.getiPersianMonth(),
-//                originalSelectedPersianDate.getiPersianDate());
         persianCalendar.setMiladiDate(originalSelectedDate);
         arabicCalendar.setBaseMiladiCalendar(originalSelectedDate);
         switch (MainActivity.mainCalendarType) {
@@ -601,48 +597,21 @@ public class DayUC extends Fragment {
 
     public void updateMonth(Calendar calendar){
         miladiCalendar.setTime(calendar.getTime());
-        persianCalendar.setMiladiDate(miladiCalendar);
-        arabicCalendar.setBaseMiladiCalendar(miladiCalendar);
         unSetSelectedDay();
         checkHoliday();
         initialMonth();
     }
 
     public void updateDayList(){
-//        miladiCalendar.setTime(originalSelectedDate.getTime());
-//        eventTimeList.clear();
-//        dayUCListHeader.updateDayHeader();
-//        List<Events> eventlist1 = new ArrayList<>();
-//        List<Events> eventlist2 = new ArrayList<>();
-//
-//        //TODO get events from DB
-//
-//        eventTimeList.add("10:00" + " - " + "11:00");
-//        eventTimeList.add("16:00" + " - " + "17:00");
-//        for (int i = 0; i < 10; i++) {
-//            Events event1 = Events.newInstance(context, Calendar.getInstance());
-//            Events event2 = Events.newInstance(context, Calendar.getInstance());
-//            event1.setEvent("یادآوری " + i, "اولین یادآوری", "10:00", "11:00");
-//            eventlist1.add(event1);
-//            event2.setEvent("یادآوری " + i, "دومین یادآوری", "16:00", "17:00");
-//            eventlist2.add(event2);
-//        }
-//
-//        eventDetailList.put(eventTimeList.get(0), eventlist1);
-//        eventDetailList.put(eventTimeList.get(1), eventlist2);
-//
-//        dayListadapter.notifyDataSetChanged();
         miladiCalendar.setTime(originalSelectedDate.getTime());
-        dayUCListHeader = DayUC.newInstance(miladiCalendar, false, DayHeader);
+//        dayUCListHeader = DayUC.newInstance(miladiCalendar, false, DayHeader);
         ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.day_list_mode_frame, dayUCListHeader).commit();
+        dayUCListHeader.updateDayHeader();
         initialDayList();
     }
 
     public void updateDayFull(){
         miladiCalendar.setTime(originalSelectedDate.getTime());
-//        persianCalendar.set(originalSelectedPersianDate.getiPersianYear(),
-//                originalSelectedPersianDate.getiPersianMonth(),
-//                originalSelectedPersianDate.getiPersianDate());
         persianCalendar.setMiladiDate(miladiCalendar);
         arabicCalendar.setBaseMiladiCalendar(miladiCalendar);
         dayFullPutData();
@@ -657,29 +626,36 @@ public class DayUC extends Fragment {
 
     public void addEvent(Events events){
         eventsArrayList.add(events);
-        dayListadapter = new DayListViewAdapter(eventsArrayList, context);
+        dayListadapter = new EventsListViewAdapter(eventsArrayList, context);
         dayEventLV.setAdapter(dayListadapter);
         dayListadapter.notifyDataSetChanged();
     }
 
     public void updateEvent(Events events){
-        eventsArrayList.remove(CURRENT_SELECTED_EVENT);
-        eventsArrayList.add(CURRENT_SELECTED_EVENT, events);
-        dayListadapter = new DayListViewAdapter(eventsArrayList, context);
-        dayEventLV.setAdapter(dayListadapter);
-        dayListadapter.notifyDataSetChanged();
-        CURRENT_SELECTED_EVENT = -1;
+        if (CURRENT_SELECTED_EVENT >=0) {
+            eventsArrayList.remove(CURRENT_SELECTED_EVENT);
+            eventsArrayList.add(CURRENT_SELECTED_EVENT, events);
+            dayListadapter = new EventsListViewAdapter(eventsArrayList, context);
+            dayEventLV.setAdapter(dayListadapter);
+            dayListadapter.notifyDataSetChanged();
+            CURRENT_SELECTED_EVENT = -1;
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("ViewMode", dayViewMode.toString());
+        Bundle bundle = new Bundle();
+        bundle.putLong("MiladiDate", miladiCalendar.getTimeInMillis());
+        bundle.putString("ViewMode", dayViewMode.toString());
+        bundle.putBoolean("IsHoliday", isHoliday);
+        bundle.putBoolean("IsEnable", isEnable);
+        outState.putBundle("GeneralValues", bundle);
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-//        super.onCreateContextMenu(menu, v, menuInfo);
         if (v.getId()==R.id.day_list_mode_event_list) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
             menu.setHeaderTitle("رویداد");
@@ -692,24 +668,25 @@ public class DayUC extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-//        return super.onContextItemSelected(item);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-
         switch (item.getItemId()){
-            case 0:
+            case 0:             //Edit Event
                 Intent eventActivity = new Intent(context, AddEvent.class);
                 eventActivity.putExtra("EventMode", MainActivity.eventMode.EditEvent.toString());
                 eventActivity.putExtra("Title", eventsArrayList.get(info.position).getTitle());
                 eventActivity.putExtra("Detail", eventsArrayList.get(info.position).getDescription());
-                eventActivity.putExtra("Start_Time", eventsArrayList.get(info.position).getStartTime());
-                eventActivity.putExtra("End_Time", eventsArrayList.get(info.position).getEndTime());
+                eventActivity.putExtra("isHoleDay", eventsArrayList.get(info.position).isHoleDay());
+                if (!eventsArrayList.get(info.position).isHoleDay()) {
+                    eventActivity.putExtra("Start_Time", eventsArrayList.get(info.position).getStartTime());
+                    eventActivity.putExtra("End_Time", eventsArrayList.get(info.position).getEndTime());
+                }
                 eventActivity.putExtra("Date", eventsArrayList.get(info.position).getCal().getTimeInMillis());
                 CURRENT_SELECTED_EVENT = info.position;
                 startActivityForResult(eventActivity, 0);
                 break;
             case 1:             //remove event
                 eventsArrayList.remove(info.position);
-                dayListadapter = new DayListViewAdapter(eventsArrayList, context);
+                dayListadapter = new EventsListViewAdapter(eventsArrayList, context);
                 dayEventLV.setAdapter(dayListadapter);
                 dayListadapter.notifyDataSetChanged();
                 break;

@@ -17,6 +17,7 @@
             android:layout_width="200dp"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:textSize="34sp"
             android:singleLine="true"
             android:textStyle="bold" />
 
@@ -39,6 +40,7 @@
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="0dp"
                 android:gravity="center"
+                android:textSize="24sp"
                 android:singleLine="true"
                 android:textStyle="bold" />
 
@@ -154,6 +156,7 @@
             android:layout_width="200dp"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:textSize="34sp"
             android:singleLine="true"
             android:textStyle="bold" />
 

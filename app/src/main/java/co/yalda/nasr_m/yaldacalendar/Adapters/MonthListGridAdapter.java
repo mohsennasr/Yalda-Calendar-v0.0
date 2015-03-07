@@ -17,6 +17,9 @@ import co.yalda.nasr_m.yaldacalendar.R;
 /**
  * Created by Nasr_M on 3/1/2015.
  */
+/*
+monthListGridAdapter is for showing month selection grid in month second view
+ */
 public class MonthListGridAdapter extends BaseAdapter{
 
     ArrayList<String> monthList;
@@ -43,6 +46,9 @@ public class MonthListGridAdapter extends BaseAdapter{
     }
 
     @Override
+    /*
+    create items for showing in grid
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null){
             LayoutInflater mInflater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -54,13 +60,16 @@ public class MonthListGridAdapter extends BaseAdapter{
         item.setTextSize(32);
         item.setTypeface(MainActivity.homaFont);
 
+        /*
+        resize items base on screen orientation and screen size to fill screen
+         */
         convertView.setLayoutParams(new AbsListView.LayoutParams(MainActivity.viewSize[0] /
                 (MainActivity.context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 4),
                 (MainActivity.viewSize[1] - 200) /
                 (MainActivity.context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 4 : 3))
         );
 
-        if (position == currentPosition)
+        if (position == currentPosition)                    //make selected cell if it's showing current month
             convertView.setBackgroundResource(R.drawable.background_rectangle);
 
         return convertView;

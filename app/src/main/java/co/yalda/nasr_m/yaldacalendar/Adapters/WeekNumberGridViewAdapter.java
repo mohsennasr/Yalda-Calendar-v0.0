@@ -19,12 +19,12 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewSize;
 /**
  * Created by Nasr_M on 2/25/2015.
  */
-public class SimpleWeekGridAdapter extends BaseAdapter {
+public class WeekNumberGridViewAdapter extends BaseAdapter {
 
     private ArrayList<String> gridList;
     private MainActivity.dayViewMode viewMode;
 
-    public SimpleWeekGridAdapter(ArrayList<String> gridList, MainActivity.dayViewMode viewMode) {
+    public WeekNumberGridViewAdapter(ArrayList<String> gridList, MainActivity.dayViewMode viewMode) {
         this.gridList = gridList;
         this.viewMode = viewMode;
     }

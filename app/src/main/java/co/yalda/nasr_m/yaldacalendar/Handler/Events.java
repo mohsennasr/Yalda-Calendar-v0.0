@@ -23,9 +23,10 @@ public class Events extends Fragment {
     private Context context;
     private Calendar cal = Calendar.getInstance();                   //event object date
     private String startTime, endTime;
+    private boolean isHoleDay = false;
     private String title, description;
     private boolean hasReminder;
-    private TextView title_tv, description_tv;
+    private TextView title_tv, description_tv, holeDay_tv, startTime_tv, endTime_tv, event_time_tv;
 
     public static Events newInstance(Context context, Calendar cal) {
         Events events = new Events();
@@ -54,6 +55,10 @@ public class Events extends Fragment {
         title_tv.setTextColor(Color.BLACK);
         description_tv = (TextView) rootView.findViewById(R.id.event_description);
         description_tv.setTextColor(Color.BLACK);
+        holeDay_tv = (TextView) rootView.findViewById(R.id.event_hole_day);
+        startTime_tv = (TextView) rootView.findViewById(R.id.event_start_time);
+        endTime_tv = (TextView) rootView.findViewById(R.id.event_end_time);
+        event_time_tv = (TextView) rootView.findViewById(R.id.event_time);
 
         if (title != null)
             setData();
@@ -62,6 +67,20 @@ public class Events extends Fragment {
     private void setData() {
         title_tv.setText(title);
         description_tv.setText(description);
+        if (isHoleDay){
+            event_time_tv.setText("تمام روز");
+            event_time_tv.setTextAppearance(context, R.style.BoldText);
+//            holeDay_tv.setVisibility(View.VISIBLE);
+            startTime_tv.setVisibility(View.INVISIBLE);
+            endTime_tv.setVisibility(View.INVISIBLE);
+        }else {
+            startTime_tv.setVisibility(View.VISIBLE);
+            startTime_tv.setText(startTime);
+            endTime_tv.setVisibility(View.VISIBLE);
+            endTime_tv.setText(endTime);
+//            holeDay_tv.setVisibility(View.INVISIBLE);
+            event_time_tv.setText("-");
+        }
     }
 
     public void setEvent(String title, String description, String startTime, String endTime) {
@@ -69,6 +88,14 @@ public class Events extends Fragment {
         this.description = description;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.isHoleDay = false;
+        initializer();
+    }
+
+    public void setEvent(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.isHoleDay = true;
         initializer();
     }
 
@@ -90,5 +117,9 @@ public class Events extends Fragment {
 
     public Calendar getCal() {
         return cal;
+    }
+
+    public boolean isHoleDay() {
+        return isHoleDay;
     }
 }

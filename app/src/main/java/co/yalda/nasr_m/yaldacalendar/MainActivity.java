@@ -37,6 +37,7 @@ import java.util.List;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.ExpandableListAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
+import co.yalda.nasr_m.yaldacalendar.Day.DaySwitch;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 import co.yalda.nasr_m.yaldacalendar.Handler.AddEvent;
 import co.yalda.nasr_m.yaldacalendar.Handler.CustomDrawer;
@@ -58,7 +59,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.ZoomOut;
 /**
  * Created by Nasr_M on 2/28/2015.
  */
-public class MainActivity extends FragmentActivity implements ActionBar.TabListener{
+public class MainActivity extends FragmentActivity implements ActionBar.TabListener, View.OnClickListener{
 
     public static String[] holidayList = new String[]{"01/01", "01/02", "01/03", "01/04"};
     public static calendarType mainCalendarType = calendarType.Solar;
@@ -75,6 +76,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static Typeface tahomaFont, homaFont, iranNastaliqFont, arabicFont, timesFont;
     public static int SELECTED_MONTH_INDEX = -1;
     public static int SELECTED_DAY_INDEX = -1;
+    public static boolean SELECTED_DAY_CHANGED = false;
     private CustomViewPager viewPager;
     private CustomDrawer drawerLayout;
     private ActionBar actionBar;
@@ -89,7 +91,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private ExpandableListView expListView;
     private ExpandableListAdapter expAdapter;
     private float[] startPoint, endPoint, distance;
-    private boolean IS_IN_VIEWPAGER_AREA = false, SWIPE_ACTION = true, ACTION_FINISHED = false;
+    private boolean IS_IN_VIEWPAGER_AREA = false, SWIPE_ACTION = true, ACTION_FINISHED = false, GESTURE_ACTION = false;
     private Point point = new Point();
     public static boolean UPDATE_DAY_LIST = false;
     public static boolean UPDATE_DAY_FULL = false;
@@ -98,7 +100,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private TextView actionBarSelectedDate;
     private boolean BACK_PRESSED = false;
     private long PRESSED_TIME = 0;
-
+    private DaySwitch daySwitch = new DaySwitch();
 
     @Override
     protected void onStart() {
@@ -197,7 +199,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         viewPager = (CustomViewPager) findViewById(R.id.view_pager);
 
         //declare page offset limit in view pager
-        viewPager.setOffscreenPageLimit(4);
+        viewPager.setOffscreenPageLimit(3);
 
         //assign action bar
         actionBar = getActionBar();
@@ -351,30 +353,32 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
         switch (tab.getPosition()){
             case 0:
-                if (UPDATE_DAY_LIST) {
+                if (UPDATE_DAY_LIST && dayUCList != null) {
                     dayUCList.updateDayList();
                     UPDATE_DAY_LIST = false;
                 }
                 break;
             case 1:
-                if (UPDATE_DAY_FULL) {
+                if (UPDATE_DAY_FULL && dayUCFull != null) {
                     dayUCFull.updateDayFull();
                     UPDATE_DAY_FULL = false;
                 }
                 break;
             case 2:
-                if (UPDATE_MONTH) {
+                if (UPDATE_MONTH && monthView != null) {
                     monthView.initialMonth(originalSelectedDate);
                     UPDATE_MONTH = false;
                 }
-                monthView.setSelectedDate();
+                if (monthView != null)
+                    monthView.setSelectedDate();
                 break;
             case 3:
-                if (UPDATE_YEAR) {
+                if (UPDATE_YEAR && yearView != null) {
                     yearView.initialYear();
                     UPDATE_YEAR = false;
                 }
-                yearView.setSelectedDate();
+                if (yearView != null)
+                    yearView.setSelectedDate();
                 break;
         }
         viewPager.setCurrentItem(tab.getPosition());              //set view pager content base on selected tab
@@ -398,6 +402,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             ACTION_FINISHED = true;
         if ((event.getPointerCount() >= 2)) {     // multiTouch gesture
             SWIPE_ACTION = false;
+            GESTURE_ACTION = true;
             if (progressDialog != null) {
                 progressDialog.dismiss();
                 progressDialog = null;
@@ -445,29 +450,33 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 case MotionEvent.ACTION_UP:
                     if (!IS_IN_VIEWPAGER_AREA)
                         return super.dispatchTouchEvent(event);
-                    endPoint[0] = event.getX();
-                    endPoint[1] = event.getY();
-                    float dx, dy;
-                    dx = Math.abs(endPoint[0] - startPoint[0]);
-                    dy = Math.abs(endPoint[1] - startPoint[1]);
-                    if (dx > 10 || dy > 10) {
-                        if ((dx >= dy) && (startPoint[0] >= endPoint[0])) {         // Right-to-Left Swipe
-                            touchAction = Right2Left;
-                        } else if ((dx > dy) && (startPoint[0] < endPoint[0])) {    // Left-to-Right Swipe
-                            touchAction = Left2Right;
-                        } else if ((dx < dy) && (startPoint[1] >= endPoint[1])) {   // Down-to-Up Swipe
-                            touchAction = Down2Up;
-                            if (progressDialog != null)
-                                progressDialog.dismiss();
-                        } else if ((dx < dy) && (startPoint[1] < endPoint[1])) {    // Up-to-Down Swipe
-                            touchAction = Up2Down;
-                            if (progressDialog != null)
-                                progressDialog.dismiss();
+                    if (!GESTURE_ACTION) {
+                        endPoint[0] = event.getX();
+                        endPoint[1] = event.getY();
+                        float dx, dy;
+                        dx = Math.abs(endPoint[0] - startPoint[0]);
+                        dy = Math.abs(endPoint[1] - startPoint[1]);
+                        if (dx > 10 || dy > 10) {
+                            if ((dx >= dy) && (startPoint[0] >= endPoint[0])) {         // Right-to-Left Swipe
+                                touchAction = Right2Left;
+                            } else if ((dx > dy) && (startPoint[0] < endPoint[0])) {    // Left-to-Right Swipe
+                                touchAction = Left2Right;
+                            } else if ((dx < dy) && (startPoint[1] >= endPoint[1])) {   // Down-to-Up Swipe
+                                touchAction = Down2Up;
+                                if (progressDialog != null)
+                                    progressDialog.dismiss();
+                            } else if ((dx < dy) && (startPoint[1] < endPoint[1])) {    // Up-to-Down Swipe
+                                touchAction = Up2Down;
+                                if (progressDialog != null)
+                                    progressDialog.dismiss();
+                            }
+                        } else {
+                            return super.dispatchTouchEvent(event);
                         }
-                    }else{
-                        return super.dispatchTouchEvent(event);
+                        ACTION_FINISHED = true;
+                    }else {
+                        GESTURE_ACTION = false;
                     }
-                    ACTION_FINISHED = true;
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if (viewPager.getCurrentItem() == 6
@@ -595,6 +604,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     break;
                 case ZoomIn:
                     switch (viewPager.getCurrentItem()){
+//                        case 0:
+//                            daySwitch.switchView(1);
                         case 2:
                             monthView.monthSwitchView(1);
                             break;
@@ -605,6 +616,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     break;
                 case ZoomOut:
                     switch (viewPager.getCurrentItem()){
+//                        case 0:
+//                            daySwitch.switchView(2);
                         case 2:
                             monthView.monthSwitchView(2);
                             break;
@@ -618,7 +631,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             startPoint = new float[4];
             endPoint = new float[4];
             distance = new float[2];
-            return true;
+//            return true;
         }
         return super.dispatchTouchEvent(event);
     }
@@ -630,33 +643,41 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         switch (view) {
             case DayList:
                 dayUCList.updateDayList();
+                SELECTED_DAY_CHANGED = true;
                 UPDATE_DAY_FULL = true;
+                UPDATE_DAY_LIST = false;
                 break;
             case DayFull:
                 dayUCFull.updateDayFull();
+                SELECTED_DAY_CHANGED = true;
                 UPDATE_DAY_LIST = true;
+                UPDATE_DAY_FULL = false;
                 break;
             case Month:
                 switch (viewPager.getCurrentItem()){
                     case 0:
                         dayUCList.updateDayList();
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_LIST = false;
                         UPDATE_DAY_FULL = true;
                         UPDATE_MONTH = true;
                         break;
                     case 1:
                         dayUCFull.updateDayFull();
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_FULL = false;
                         UPDATE_DAY_LIST = true;
                         UPDATE_MONTH = true;
                         break;
                     case 2:
                         monthView.initialMonth(originalSelectedDate);
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_MONTH = false;
                         UPDATE_DAY_LIST = true;
                         UPDATE_DAY_FULL = true;
                         break;
                     case 3:
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_FULL = true;
                         UPDATE_DAY_LIST = true;
                         UPDATE_MONTH = true;
@@ -666,6 +687,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 switch (viewPager.getCurrentItem()){
                     case 0:
                         dayUCList.updateDayList();
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_LIST = false;
                         UPDATE_DAY_FULL = true;
                         UPDATE_MONTH = true;
@@ -673,6 +695,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         break;
                     case 1:
                         dayUCFull.updateDayFull();
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_FULL = false;
                         UPDATE_DAY_LIST = true;
                         UPDATE_MONTH = true;
@@ -680,14 +703,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         break;
                     case 2:
                         monthView.initialMonth(originalSelectedDate);
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_MONTH = false;
                         UPDATE_DAY_LIST = true;
                         UPDATE_DAY_FULL = true;
                         UPDATE_YEAR = true;
                         break;
                     case 3:
-                        progressDialog.show();
+//                        progressDialog.show();
                         yearView.initialYear();
+                        SELECTED_DAY_CHANGED = true;
                         UPDATE_YEAR = false;
                         UPDATE_DAY_FULL = true;
                         UPDATE_DAY_LIST = true;
@@ -756,6 +781,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //        if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 String eventTitle, eventDetail;
+                boolean isHoleDay;
                 Long eventDate;
                 int startHour, startMin, endHour, endMin;
                 eventMode mode = data.getStringExtra("EventMode").equals(eventMode.NewEvent.toString()) ? eventMode.NewEvent :
@@ -763,14 +789,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 eventTitle = data.getStringExtra("Title");
                 eventDetail = data.getStringExtra("Detail");
                 eventDate = data.getLongExtra("Date", -1);
-                startHour = data.getIntExtra("Start_Time_Hour", -1);
-                startMin = data.getIntExtra("Start_Time_Minute", -1);
-                endHour = data.getIntExtra("End_Time_Hour", -1);
-                endMin = data.getIntExtra("End_Time_Minute", -1);
-
+                isHoleDay = data.getBooleanExtra("isHoleDay", false);
                 Events events = Events.newInstance(context,originalSelectedDate);
-
-                events.setEvent(eventTitle, eventDetail, startHour + ":" + startMin, endHour + ":" + endMin);
+                if (!isHoleDay) {
+                    startHour = data.getIntExtra("Start_Time_Hour", -1);
+                    startMin = data.getIntExtra("Start_Time_Minute", -1);
+                    endHour = data.getIntExtra("End_Time_Hour", -1);
+                    endMin = data.getIntExtra("End_Time_Minute", -1);
+                    events.setEvent(eventTitle, eventDetail, startHour + ":" + startMin, endHour + ":" + endMin);
+                }else
+                    events.setEvent(eventTitle, eventDetail);
 
                 if (mode == eventMode.NewEvent)
                     dayUCList.addEvent(events);
@@ -780,6 +808,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 //TODO set event
             }
 //        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(context, "Click...", Toast.LENGTH_SHORT).show();
     }
 
     public static enum dayViewMode {
@@ -830,6 +863,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     if (UPDATE_DAY_LIST)
                         dayUCList.updateDayList();
                     return dayUCList;
+//                    return daySwitch;
                 case 1:
                     if (UPDATE_DAY_FULL)
                         dayUCFull.updateDayFull();

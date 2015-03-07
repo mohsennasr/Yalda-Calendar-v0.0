@@ -19,12 +19,15 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 /**
  * Created by Nasr_M on 2/23/2015.
  */
-public class CalendarItemAdapter extends BaseAdapter {
+/*
+grid view adapter for week days name in month view
+ */
+public class WeekDaysAdapter extends BaseAdapter {
 
     private ArrayList<String> list;
     private MainActivity.dayViewMode view;
 
-    public CalendarItemAdapter(ArrayList<String> list, MainActivity.dayViewMode view) {
+    public WeekDaysAdapter(ArrayList<String> list, MainActivity.dayViewMode view) {
         this.list = list;
         this.view = view;
     }

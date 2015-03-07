@@ -37,7 +37,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersian
 /**
  * Created by Nasr_M on 2/21/2015.
  */
-public class YearView extends Fragment {
+public class YearView extends Fragment implements GridView.OnItemClickListener, View.OnClickListener{
 
     private View rootView;
     private MonthView[] yearMonth;
@@ -56,12 +56,40 @@ public class YearView extends Fragment {
     public static YearView newInstance(Calendar yearCal) {
         YearView yearView = new YearView();
         yearView.yearCal.setTime(yearCal.getTime());
+        yearView.firstInit();
         return yearView;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (rootView == null)
+            firstInit();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
+//        rootView = inflater.inflate(R.layout.year_view, container, false);
+//        secondView = inflater.inflate(R.layout.year_second_view, container, false);
+//        secondView.setVisibility(View.GONE);
+//        yearListGrid = (GridView) secondView.findViewById(R.id.year_list_grid);
+//        yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
+//        yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
+
+        if (rootView == null)
+            firstInit();
+
+        return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    private void firstInit(){
+        if (monthViewList == null)
+            monthViewList = new ArrayList<>();
         if (rootView == null){
             LayoutInflater mInfalater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             rootView = mInfalater.inflate(R.layout.year_view, null);
@@ -74,26 +102,8 @@ public class YearView extends Fragment {
             yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
             yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
         }
-        if (monthViewList == null)
-            monthViewList = new ArrayList<>();
+
         initialYear();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        rootView = inflater.inflate(R.layout.year_view, container, false);
-//        secondView = inflater.inflate(R.layout.year_second_view, container, false);
-//        secondView.setVisibility(View.GONE);
-//        yearListGrid = (GridView) secondView.findViewById(R.id.year_list_grid);
-//        yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
-//        yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
-
-        return rootView;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     //initial attributes
@@ -150,13 +160,15 @@ public class YearView extends Fragment {
         yearGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(context, "Year click...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Year Item 2 click...", Toast.LENGTH_SHORT).show();
             }
         });
+
+
     }
 
     public void setColumns() {
-        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
             yearGridView.setNumColumns(3);
         else
             yearGridView.setNumColumns(4);
@@ -172,6 +184,7 @@ public class YearView extends Fragment {
         Integer yearNum = yearCal.get(Calendar.YEAR) - 4;
         for (int i = 0; i < 12; i++) {
             yearMonth[i].initialMonth(yearCal);
+            yearMonth[i].monthGridView.setOnItemClickListener(this);
             yearCal.add(Calendar.MONTH, 1);
             monthViewList.add(yearMonth[i]);
         }
@@ -204,4 +217,13 @@ public class YearView extends Fragment {
     }
 
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(context, "Year Item click...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(context, "Year click...", Toast.LENGTH_SHORT).show();
+    }
 }

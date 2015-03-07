@@ -15,6 +15,9 @@ import co.yalda.nasr_m.yaldacalendar.R;
 /**
  * Created by Nasr_M on 2/17/2015.
  */
+/*
+list view adapter for showing notes list in dayFull view mode
+ */
 public class NoteListViewAdapter extends BaseAdapter {
 
     private ArrayList<String> list;

@@ -178,10 +178,14 @@ public class PersianCalendar extends Calendar{
     }
 
     public void setPersian(int year, int month, int day) {
-        miladiDate.add(YEAR, year - iPersianYear);
-        miladiDate.add(YEAR, month - iPersianMonth + 1);
-        miladiDate.add(YEAR, day - iPersianDate);
-        calculateDate();
+        addPersian(YEAR, year - iPersianYear);
+        addPersian(MONTH, month - iPersianMonth);
+        addPersian(DATE, day - iPersianDate);
+
+//        miladiDate.add(YEAR, year - iPersianYear);
+//        miladiDate.add(MONTH, month - iPersianMonth + 1);
+//        miladiDate.add(DATE, day - iPersianDate);
+//        calculateDate();
     }
 
     public void addPersian(int field, int amount){

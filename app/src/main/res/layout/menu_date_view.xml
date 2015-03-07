@@ -4,9 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:showDividers="middle"
+    android:layoutDirection="rtl"
     android:divider="?android:dividerVertical"
     android:dividerPadding="8dp"
-    android:layout_marginLeft="20dp"
+    android:layout_marginLeft="2dp"
     android:layout_marginRight="2dp">
 
     <TextView
@@ -14,13 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:textStyle="bold"/>
-
-    <TextView
-        android:id="@+id/empty"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:textSize="18dp"
         android:textStyle="bold"/>
 
 </LinearLayout>

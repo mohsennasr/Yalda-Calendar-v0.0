@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/yalda"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppHoloTheme">
@@ -21,7 +21,9 @@
         </activity>
         <activity
             android:name=".Handler.AddEvent"
-            android:label="ثبت رویداد"></activity>
+            android:label="ثبت رویداد">
+
+            </activity>
     </application>
 
 </manifest>

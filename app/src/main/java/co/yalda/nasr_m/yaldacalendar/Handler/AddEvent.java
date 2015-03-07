@@ -41,6 +41,7 @@ public class AddEvent extends Activity {
     private Intent result = new Intent();
     private Context context;
     private MainActivity.eventMode eventMode;
+    private boolean isHoleDay = false;
 
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -80,13 +81,14 @@ public class AddEvent extends Activity {
                     start.setVisibility(View.GONE);
                     endTime.setVisibility(View.GONE);
                     end.setVisibility(View.GONE);
+                    isHoleDay = true;
                 } else {
                     startTime.setVisibility(View.VISIBLE);
                     start.setVisibility(View.VISIBLE);
                     endTime.setVisibility(View.VISIBLE);
                     end.setVisibility(View.VISIBLE);
+                    isHoleDay = false;
                 }
-
             }
         });
 
@@ -114,10 +116,17 @@ public class AddEvent extends Activity {
                 result.putExtra("Title", eventTitle.getText().toString());
                 result.putExtra("Detail", eventDetail.getText().toString());
                 result.putExtra("Date", datePicker.getDisplayPersianDate().getMiladiDate().getTimeInMillis());
-                result.putExtra("Start_Time_Hour", startTime.getCurrentHour());
-                result.putExtra("Start_Time_Minute", startTime.getCurrentMinute());
-                result.putExtra("End_Time_Hour", endTime.getCurrentHour());
-                result.putExtra("End_Time_Minute", endTime.getCurrentMinute());
+                result.putExtra("isHoleDay", isHoleDay);
+                if (!isHoleDay){
+                    result.putExtra("Start_Time_Hour", startTime.getCurrentHour() < 10 ? "0" + startTime.getCurrentHour().toString()
+                            : startTime.getCurrentHour());
+                    result.putExtra("Start_Time_Minute", startTime.getCurrentMinute() < 10 ? "0" + startTime.getCurrentMinute().toString()
+                            : startTime.getCurrentMinute().toString());
+                    result.putExtra("End_Time_Hour", endTime.getCurrentHour() < 10 ? "0" + endTime.getCurrentHour().toString()
+                            : endTime.getCurrentHour().toString());
+                    result.putExtra("End_Time_Minute", endTime.getCurrentMinute() < 10 ? "0" + endTime.getCurrentMinute().toString()
+                            : endTime.getCurrentMinute().toString());
+                }
 
                 setResult(RESULT_OK, result);
                 finish();
@@ -137,10 +146,16 @@ public class AddEvent extends Activity {
         if (eventMode == MainActivity.eventMode.EditEvent){
             eventTitle.setText(extras.getString("Title"));
             eventDetail.setText(extras.getString("Detail"));
-            startTime.setCurrentHour(Integer.valueOf(extras.getString("Start_Time").substring(0, 2)));
-            startTime.setCurrentMinute(Integer.valueOf(extras.getString("Start_Time").substring(3, 5)));
-            endTime.setCurrentHour(Integer.valueOf(extras.getString("End_Time").substring(0, 2)));
-            endTime.setCurrentMinute(Integer.valueOf(extras.getString("End_Time").substring(3, 5)));
+            isHoleDay = extras.getBoolean("isHoleDay");
+            if (!isHoleDay) {
+                startTime.setCurrentHour(Integer.valueOf(extras.getString("Start_Time").substring(0, 2)));
+                startTime.setCurrentMinute(Integer.valueOf(extras.getString("Start_Time").substring(3, 5)));
+                endTime.setCurrentHour(Integer.valueOf(extras.getString("End_Time").substring(0, 2)));
+                endTime.setCurrentMinute(Integer.valueOf(extras.getString("End_Time").substring(3, 5)));
+            }else {
+                isHoleDay = true;
+                holeDay.setChecked(true);
+            }
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(extras.getLong("Date"));
             datePicker.setDisplayPersianDate(new PersianCalendar(cal));

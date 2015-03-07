@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import co.yalda.nasr_m.yaldacalendar.Adapters.CalendarItemAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.WeekDaysAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthListGridAdapter;
-import co.yalda.nasr_m.yaldacalendar.Adapters.SimpleWeekGridAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.WeekNumberGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.ArabicCalendar;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
@@ -51,12 +51,12 @@ public class MonthView extends Fragment {
 
     //Month View attributes
     private TextView monthHeader_tv;        //month name TextView
-    private GridView monthGridView;         //month days gridView
+    public GridView monthGridView;         //month days gridView
     private GridView weekDaysGrid;         //month days gridView
     private GridView weekNumberGrid;        //week numbers
     private MonthGridViewAdapter gridViewAdapter;   //month grid adapter
-    private SimpleWeekGridAdapter weekNumberGridAdapter;
-    private CalendarItemAdapter weekDaysAdapter, weekNumAdapter;
+    private WeekNumberGridViewAdapter weekNumberGridAdapter;
+    private WeekDaysAdapter weekDaysAdapter;
     private ArrayList<DayUC> dayUCList;     //DayUC Array list
     private dayViewMode viewMode;
     private String[] weekDays = new String[]{"ش", "ی", "د", "س", "چ", "پ", "ج"};
@@ -64,7 +64,6 @@ public class MonthView extends Fragment {
     private PersianCalendar monthPersianCal;
     private ArabicCalendar monthArabicCal;
     private ArrayList<String> weekNumArrayList;
-    private int selectedDayIndex = -1;
     private int remainDay=0, maxDayMonth=0;
     private ArrayList<String> weekDaysArrayList;
     private LinearLayout monthComplete, monthList;
@@ -98,14 +97,15 @@ public class MonthView extends Fragment {
                     viewMode = Year;
                     break;
             }
-        if (rootView == null) {
-            firstInitialization();
-            initialMonth(monthCal);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (rootView == null) {
+            firstInitialization();
+            initialMonth(monthCal);
+        }
         return rootView;
     }
 
@@ -169,7 +169,7 @@ public class MonthView extends Fragment {
         monthListGridAdapter.notifyDataSetChanged();
 
 
-        weekNumberGridAdapter = new SimpleWeekGridAdapter(weekNumArrayList, viewMode);
+        weekNumberGridAdapter = new WeekNumberGridViewAdapter(weekNumArrayList, viewMode);
 //        gridViewAdapter = new MonthGridViewAdapter(dayUCList, weekNumArrayList, viewMode);
         gridViewAdapter = new MonthGridViewAdapter(dayUCList, viewMode);
         monthGridView.setAdapter(gridViewAdapter);
@@ -178,9 +178,11 @@ public class MonthView extends Fragment {
 //        monthGridView.setMotionEventSplittingEnabled(false);
         gridViewAdapter.notifyDataSetChanged();
 
-        weekDaysAdapter = new CalendarItemAdapter(weekDaysArrayList, viewMode);
+        weekDaysAdapter = new WeekDaysAdapter(weekDaysArrayList, viewMode);
         weekDaysGrid.setAdapter(weekDaysAdapter);
         weekDaysAdapter.notifyDataSetChanged();
+
+        monthHeader_tv.setTypeface(homaFont);
 
         if (viewMode == Month) {
             weekDaysArrayList.addAll(Arrays.asList(weekDaysFull));
@@ -199,19 +201,23 @@ public class MonthView extends Fragment {
 
         setSelectedDate();
 
-        monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (MainActivity.SELECTED_DAY_INDEX > 0)
-                    dayUC[SELECTED_DAY_INDEX].unSetSelectedDay();
-                if (SELECTED_MONTH_INDEX != (monthPersianCal.getiPersianMonth()-1))
-                    MainActivity.UPDATE_YEAR = true;
-                SELECTED_DAY_INDEX = position;
-                originalSelectedDate.setTime(dayUC[position].getMiladiCalendar().getTime());
-                originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
-                dayUC[position].setSelectedDay();
-            }
-        });
+        if (viewMode == Month) {
+            monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (MainActivity.SELECTED_DAY_INDEX > 0)
+                        dayUC[SELECTED_DAY_INDEX].unSetSelectedDay();
+//                    if (SELECTED_MONTH_INDEX != (monthPersianCal.getiPersianMonth() - 1))
+//                        MainActivity.UPDATE_YEAR = true;
+                    SELECTED_DAY_INDEX = position;
+                    originalSelectedDate.setTime(dayUC[position].getMiladiCalendar().getTime());
+                    originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
+                    dayUC[position].setSelectedDay();
+                    UPDATE_DAY_LIST = true;
+                    UPDATE_DAY_FULL = true;
+                }
+            });
+        }
 
         monthListGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -220,6 +226,7 @@ public class MonthView extends Fragment {
                     originalSelectedPersianDate.setPersian(Calendar.MONTH, position);
                     originalSelectedDate.setTime(originalSelectedPersianDate.getMiladiDate().getTime());
                     initialMonth(originalSelectedDate);
+                    setSelectedDate();
                     UPDATE_DAY_FULL = true;
                     UPDATE_DAY_LIST = true;
                 }
@@ -282,5 +289,9 @@ public class MonthView extends Fragment {
             monthComplete.setVisibility(View.VISIBLE);
             CURRENT_VIEW = 1;
         }
+    }
+
+    public GridView getMonthGridView() {
+        return monthGridView;
     }
 }
