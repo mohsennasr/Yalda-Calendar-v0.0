@@ -5,6 +5,7 @@ import java.util.Date;
 
 import co.yalda.nasr_m.yaldacalendar.Converters.MiladiToSolarConverter;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
+import co.yalda.nasr_m.yaldacalendar.MainActivity;
 
 /**
  * Created by Nasr_M on 2/17/2015.
@@ -17,6 +18,8 @@ public class PersianCalendar extends Calendar{
     public static String[] persianMonthNames = new String[]{"فروردین", "اردیبهشت", "خرداد"
             , "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
     private String[] persianWeekDayNames = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه"};
+    String[] miladiMonthName = {"January", "February", "March", "April", "May", "June", "July",                   // Miladi Month Names
+                "August", "September", "October", "November", "December"};
     private int[] monthDays = new int[]{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
 
     public PersianCalendar(Calendar cal) {
@@ -257,6 +260,34 @@ public class PersianCalendar extends Calendar{
             return 0;
         }
     }
+
+    public String getDateString(MainActivity.calendarType calType, boolean full){
+        switch (calType){
+            case Solar:
+                if (full){
+                    return getPersianFullDate();
+                }else {
+                    return PersianUtil.toPersian(iPersianDate) + " " + persianMonthName + " " + PersianUtil.toPersian(iPersianYear);
+                }
+            case Gregorian:
+                if (full){
+                    return miladiDate.get(DAY_OF_WEEK) + " " + miladiDate.get(DATE) + " " +
+                    miladiMonthName[miladiDate.get(MONTH)] + " " + miladiDate.get(YEAR);
+                }else {
+                    return miladiDate.get(DATE) + " " + miladiMonthName[miladiDate.get(MONTH)] + " " + miladiDate.get(YEAR);
+                }
+            case Hejri:
+                ArabicCalendar arabCal = new ArabicCalendar(miladiDate);
+                if (full){
+                    return arabCal.getArabicFullDate();
+                }else {
+                    return PersianUtil.toArabic(arabCal.getArabicDate()) + " " + arabCal.getArabicMonthName()
+                            + " " + PersianUtil.toArabic(arabCal.getArabicYear());
+                }
+        }
+        return null;
+    }
+
 
     @Override
     public void add(int field, int value) {

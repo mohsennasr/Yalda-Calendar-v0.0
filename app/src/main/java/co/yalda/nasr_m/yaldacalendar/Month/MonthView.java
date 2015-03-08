@@ -17,15 +17,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import co.yalda.nasr_m.yaldacalendar.Adapters.WeekDaysAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.MonthListGridAdapter;
+import co.yalda.nasr_m.yaldacalendar.Adapters.WeekDaysAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.WeekNumberGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Calendars.ArabicCalendar;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
-import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_DAY_INDEX;
@@ -200,23 +199,23 @@ public class MonthView extends Fragment {
 
         setSelectedDate();
 
-        if (viewMode == Month) {
-            monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (MainActivity.SELECTED_DAY_INDEX > 0)
-                        dayUC[SELECTED_DAY_INDEX].unSetSelectedDay();
-//                    if (SELECTED_MONTH_INDEX != (monthPersianCal.getiPersianMonth() - 1))
-//                        MainActivity.UPDATE_YEAR = true;
-                    SELECTED_DAY_INDEX = position;
-                    originalSelectedDate.setTime(dayUC[position].getMiladiCalendar().getTime());
-                    originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
-                    dayUC[position].setSelectedDay();
-                    UPDATE_DAY_LIST = true;
-                    UPDATE_DAY_FULL = true;
-                }
-            });
-        }
+//        if (viewMode == Month) {
+//            monthGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                @Override
+//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                    if (MainActivity.SELECTED_DAY_INDEX > 0)
+//                        dayUC[SELECTED_DAY_INDEX].unSetSelectedDay();
+////                    if (SELECTED_MONTH_INDEX != (monthPersianCal.getiPersianMonth() - 1))
+////                        MainActivity.UPDATE_YEAR = true;
+//                    SELECTED_DAY_INDEX = position;
+//                    originalSelectedDate.setTime(dayUC[position].getMiladiCalendar().getTime());
+//                    originalSelectedPersianDate.setMiladiDate(originalSelectedDate);
+//                    dayUC[position].setSelectedDay();
+//                    UPDATE_DAY_LIST = true;
+//                    UPDATE_DAY_FULL = true;
+//                }
+//            });
+//        }
 
         monthListGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
