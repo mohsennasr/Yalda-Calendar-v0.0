@@ -55,6 +55,10 @@ public class MonthGridViewAdapter extends BaseAdapter {
             gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(       //resize day view to fit hole screen
                     (viewSize[0] - 40) / 7,
                     (viewSize[1] - 260) / 6));
+        }else {
+            gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(       //resize day view to fit hole screen
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
         }
         return gridList.get(position).rootView;
     }

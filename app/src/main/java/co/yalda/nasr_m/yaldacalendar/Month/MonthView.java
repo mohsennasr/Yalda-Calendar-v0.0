@@ -97,7 +97,6 @@ public class MonthView extends Fragment {
                     viewMode = Year;
                     break;
             }
-
     }
 
     @Override
@@ -192,9 +191,9 @@ public class MonthView extends Fragment {
         } else {
             weekDaysArrayList.addAll(Arrays.asList(weekDays));
             monthHeader_tv.setText(monthPersianCal.getPersianMonthName());
-            monthHeader_tv.setTextSize(16);
+            monthHeader_tv.setTextSize(14);
             monthHeader_tv.setTextColor(Color.BLACK);
-            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 34));
+            monthHeader_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 30));
         }
 
         monthHeader_tv.setTypeface(homaFont);
@@ -251,8 +250,8 @@ public class MonthView extends Fragment {
     private void updateeMonth(){
         dayUCList.clear();
         for (int i = 0; i < 42; i++) {
-            dayUC[i].setEnable(!(i < remainDay | i >= (maxDayMonth + remainDay)));
-            dayUC[i].updateMonth(monthCal);
+//            dayUC[i].setEnable(!(i < remainDay | i >= (maxDayMonth + remainDay)));
+            dayUC[i].updateMonth(monthCal, !(i < remainDay | i >= (maxDayMonth + remainDay)));
             dayUCList.add(dayUC[i]);
             monthCal.add(Calendar.DATE, 1);
         }

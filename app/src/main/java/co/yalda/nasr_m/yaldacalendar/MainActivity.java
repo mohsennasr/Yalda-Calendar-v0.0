@@ -19,14 +19,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.Window;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,12 +75,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static int SELECTED_MONTH_INDEX = -1;
     public static int SELECTED_DAY_INDEX = -1;
     public static boolean SELECTED_DAY_CHANGED = false;
+    public static boolean UPDATE_DAY_LIST = false;
+    public static boolean UPDATE_DAY_FULL = false;
+    public static boolean UPDATE_MONTH = false;
+    public static boolean UPDATE_YEAR = false;
     private CustomViewPager viewPager;
     private CustomDrawer drawerLayout;
     private ActionBar actionBar;
     private TabViewPagerAdapter tabPagerAdapter;
     private String[] tabNames = new String[]{"روزانه 1", "روزانه 2", "ماهیانه", "سالیانه"};
-    private int currentTab = 0;
     private DayUC dayUCList, dayUCFull;
     private MonthView monthView;
     private YearView yearView;
@@ -93,19 +94,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private float[] startPoint, endPoint, distance;
     private boolean IS_IN_VIEWPAGER_AREA = false, SWIPE_ACTION = true, ACTION_FINISHED = false, GESTURE_ACTION = false;
     private Point point = new Point();
-    public static boolean UPDATE_DAY_LIST = false;
-    public static boolean UPDATE_DAY_FULL = false;
-    public static boolean UPDATE_MONTH = false;
-    public static boolean UPDATE_YEAR = false;
     private TextView actionBarSelectedDate;
     private boolean BACK_PRESSED = false;
     private long PRESSED_TIME = 0;
     private DaySwitch daySwitch = new DaySwitch();
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+    private int RIGHT_TO_LEFT_VALUE = -1;
+    private int LEFT_TO_RIGHT_VALUE = 1;
+    private int UP_TO_DOWN_VALUE = -1;
+    private int DOWN_TO_UP_VALUE = 1;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -116,39 +112,20 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL); //Set Direction Right-to-Left
 
         context = this;
-        startPoint = new float[4];
-        endPoint = new float[4];
-        distance = new float[2];
 
         init();
 
         if (savedInstanceState != null) {
-            currentTab = savedInstanceState.getInt("Current_Selected_Tab");
+            actionBar.setSelectedNavigationItem(savedInstanceState.getInt("Current_Selected_Tab"));
             tabPagerAdapter.notifyDataSetChanged();
-            actionBar.setSelectedNavigationItem(currentTab);
         }
-
-        Point dim = new Point();
-        getWindowManager().getDefaultDisplay().getSize(dim);
-        viewSize = new int[2];
-        viewSize[0] = dim.x;
-        viewSize[1] = dim.y - getActionBar().getHeight();
-
-        TypedValue tv = new TypedValue();
-        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-            viewSize[1] -= actionBarHeight;
-        }
-
-        tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
-        homaFont = createFromAsset(context.getAssets(), "homa.ttf");
-        iranNastaliqFont = createFromAsset(MainActivity.context.getAssets(), "iran_nastaliq.ttf");
-        arabicFont = createFromAsset(MainActivity.context.getAssets(), "arabic.ttf");
-        timesFont = createFromAsset(MainActivity.context.getAssets(), "times.ttf");
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public void init() {
+        startPoint = new float[4];
+        endPoint = new float[4];
+        distance = new float[2];
 /*
  *      setting up notification panel
  */
@@ -163,10 +140,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         //Assign Drawer to Layout
         drawerLayout = (CustomDrawer) findViewById(R.id.drawer_layout);
-
-        //cofig actionBar to display home button
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
 
         //initial drawer toggle and set open/close title
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
@@ -191,7 +164,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         drawerLayout.setDrawerListener(drawerToggle);
 
-        drawerLayout.requestDisallowInterceptTouchEvent(false);
+//        drawerLayout.requestDisallowInterceptTouchEvent(false);
 /*
  *      setting up tabs
  */
@@ -212,12 +185,25 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         //set action bar configurations
         actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         //add tabs to action bar
         for (String tab_name : tabNames) {
             actionBar.addTab(actionBar.newTab().setText(tab_name)
                     .setTabListener(this));
+        }
+
+        Point dim = new Point();
+        getWindowManager().getDefaultDisplay().getSize(dim);
+        viewSize = new int[2];
+        viewSize[0] = dim.x;
+        viewSize[1] = dim.y - actionBar.getHeight();
+
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+            viewSize[1] -= actionBarHeight;
         }
 
         dayUCList = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayList);
@@ -230,31 +216,32 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("لطفاً منتظر بمانید...");
         progressDialog.setCancelable(false);
+
+        tahomaFont = createFromAsset(context.getAssets(), "tahoma.ttf");
+        homaFont = createFromAsset(context.getAssets(), "homa.ttf");
+        iranNastaliqFont = createFromAsset(context.getAssets(), "iran_nastaliq.ttf");
+        arabicFont = createFromAsset(context.getAssets(), "arabic.ttf");
+        timesFont = createFromAsset(context.getAssets(), "times.ttf");
     }
 
     @Override
+    //Create Option menu items
     public boolean onCreateOptionsMenu(Menu menu) {
         //add items to the action bar if it is present.
-
-
         //if drawer is open hide all menu items
         if (drawerOpen) {
             getMenuInflater().inflate(R.menu.global, menu);
-//            for (int i = 0; i < menu.size(); i++)
-//                menu.getItem(i).setVisible(false);
         } else {
             getMenuInflater().inflate(R.menu.menu, menu);
-
             View v = menu.findItem(R.id.selected_date).getActionView();
-
             actionBarSelectedDate = ( TextView ) v.findViewById(R.id.date_view_text);
             actionBarSelectedDate.setText(new PersianCalendar(Calendar.getInstance()).getPersianFullDate());
         }
-
         return true;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    // action bar item listener
     public boolean onOptionsItemSelected(MenuItem item) {
         // toggle nav drawer on selecting action bar app icon/title
         if (drawerToggle.onOptionsItemSelected(item)) {
@@ -265,32 +252,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //            case R.id.action_settings:
 //                return true;
             case R.id.ab_add_note_item:             //add note button clicked
-                LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                //create dialog layout
-                final EditText input = new EditText(context);
-                input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-                final String[] value = {new String()};
-
-                //create dialog
-                AlertDialog.Builder inputNote = new AlertDialog.Builder(context);
-                inputNote.setTitle("اضافه کردن یادداشت");
-                inputNote.setView(input);
-
-                //set dialog buttons
-                inputNote.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        value[0] = input.getText().toString();
-                        dayUCFull.addNote(value[0]);
-                    }
-                });
-                inputNote.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                });
-
-                //show dialog
-                inputNote.show();
-                //TODO add note to DB and ListView
+                dayUCFull.addNote();
                 return true;
             case R.id.ab_today_item:                //today button clicked
                 PersianCalendar today = new PersianCalendar(Calendar.getInstance());
@@ -330,9 +292,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     public void onClick(DialogInterface dialog, int which) {
                         calendar.setTime(persianDatePicker.getDisplayDate());
                         persianCalendar.setMiladiDate(calendar);
+                        dayViewMode view;
+                        if (persianCalendar.getiPersianYear() != originalSelectedPersianDate.getiPersianYear())
+                            view = dayViewMode.Year;
+                        else if (persianCalendar.getiPersianMonth() != originalSelectedPersianDate.getiPersianMonth())
+                            view = dayViewMode.Month;
+                        else
+                            view = viewPager.getCurrentItem() == 0 ? dayViewMode.DayList : dayViewMode.DayFull;
                         originalSelectedDate.setTime(calendar.getTime());
-                        originalSelectedPersianDate.setMiladiDate(persianCalendar.getMiladiDate());
-                        onDateChange(dayViewMode.Year);
+                        originalSelectedPersianDate.setMiladiDate(calendar);
+                        onDateChange(view);
                     }
                 });
                 datePicker.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -340,7 +309,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 });
-
                 //show dialog
                 datePicker.show();
                 return true;
@@ -350,6 +318,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
     @Override
+    // tab selection listener for change views based on tab selected
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
         switch (tab.getPosition()){
             case 0:
@@ -396,10 +365,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
+    //capture all touch events and detect motions
     public boolean dispatchTouchEvent(MotionEvent event) {
 //        super.dispatchTouchEvent(event);
-        if (distance[0] != 0 && event.getAction() == MotionEvent.ACTION_UP)
-            ACTION_FINISHED = true;
+//        if (distance[0] != 0 && event.getAction() == MotionEvent.ACTION_UP)
+//            ACTION_FINISHED = true;
         if ((event.getPointerCount() >= 2)) {     // multiTouch gesture
             SWIPE_ACTION = false;
             GESTURE_ACTION = true;
@@ -439,7 +409,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     getWindowManager().getDefaultDisplay().getSize(point);
-                    if ((event.getX() > point.x - 40) || (event.getY() <= getActionBar().getHeight()) || drawerOpen) {  //check for drawer touch
+                    if ((event.getX() > point.x - 40) || (event.getY() <= actionBar.getHeight()) || drawerOpen) {  //check for drawer touch
                         IS_IN_VIEWPAGER_AREA = false;
                         return super.dispatchTouchEvent(event);
                     } else
@@ -450,48 +420,43 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 case MotionEvent.ACTION_UP:
                     if (!IS_IN_VIEWPAGER_AREA)
                         return super.dispatchTouchEvent(event);
-                    if (!GESTURE_ACTION) {
-                        endPoint[0] = event.getX();
-                        endPoint[1] = event.getY();
-                        float dx, dy;
-                        dx = Math.abs(endPoint[0] - startPoint[0]);
-                        dy = Math.abs(endPoint[1] - startPoint[1]);
-                        if (dx > 10 || dy > 10) {
-                            if ((dx >= dy) && (startPoint[0] >= endPoint[0])) {         // Right-to-Left Swipe
-                                touchAction = Right2Left;
-                            } else if ((dx > dy) && (startPoint[0] < endPoint[0])) {    // Left-to-Right Swipe
-                                touchAction = Left2Right;
-                            } else if ((dx < dy) && (startPoint[1] >= endPoint[1])) {   // Down-to-Up Swipe
-                                touchAction = Down2Up;
-                                if (progressDialog != null)
-                                    progressDialog.dismiss();
-                            } else if ((dx < dy) && (startPoint[1] < endPoint[1])) {    // Up-to-Down Swipe
-                                touchAction = Up2Down;
-                                if (progressDialog != null)
-                                    progressDialog.dismiss();
-                            }
-                        } else {
-                            return super.dispatchTouchEvent(event);
+                    endPoint[0] = event.getX();
+                    endPoint[1] = event.getY();
+                    float dx, dy;
+                    dx = Math.abs(endPoint[0] - startPoint[0]);
+                    dy = Math.abs(endPoint[1] - startPoint[1]);
+                    if (dx > 10 || dy > 10) {
+                        if ((dx >= dy) && (startPoint[0] >= endPoint[0])) {         // Right-to-Left Swipe
+                            touchAction = Right2Left;
+                        } else if ((dx > dy) && (startPoint[0] < endPoint[0])) {    // Left-to-Right Swipe
+                            touchAction = Left2Right;
+                        } else if ((dx < dy) && (startPoint[1] >= endPoint[1])) {   // Down-to-Up Swipe
+                            touchAction = Down2Up;
+//                                if (progressDialog != null)
+//                                    progressDialog.dismiss();
+                        } else if ((dx < dy) && (startPoint[1] < endPoint[1])) {    // Up-to-Down Swipe
+                            touchAction = Up2Down;
+//                                if (progressDialog != null)
+//                                    progressDialog.dismiss();
                         }
-                        ACTION_FINISHED = true;
-                    }else {
-                        GESTURE_ACTION = false;
+                    } else {
+                        return super.dispatchTouchEvent(event);
                     }
+                    ACTION_FINISHED = true;
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    if (viewPager.getCurrentItem() == 6
-                            && Math.abs(event.getX() - startPoint[0]) > 10
-                            && Math.abs(event.getY() - startPoint[1]) < Math.abs(event.getY() - startPoint[0])
-                            && progressDialog == null
-                            && IS_IN_VIEWPAGER_AREA
-                            && SWIPE_ACTION
-                            /*&& !yearCal.YEAR_LIST*/) {
-
-                    }
+//                    if (viewPager.getCurrentItem() == 6
+//                            && Math.abs(event.getX() - startPoint[0]) > 10
+//                            && Math.abs(event.getY() - startPoint[1]) < Math.abs(event.getY() - startPoint[0])
+//                            && progressDialog == null
+//                            && IS_IN_VIEWPAGER_AREA
+//                            && SWIPE_ACTION
+//                            /*&& !yearCal.YEAR_LIST*/) {
+//
+//                    }
                     break;
             }
         if (ACTION_FINISHED) {
-            SWIPE_ACTION = true;
             int month = 0, year = 0;
             switch (touchAction) {
                 case Right2Left:                                            //Increase Date by 1
@@ -499,8 +464,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         case 0:         // DayList view Mode
                             month = originalSelectedPersianDate.getiPersianMonth();
                             year = originalSelectedPersianDate.getiPersianYear();
-                            originalSelectedDate.add(Calendar.DATE, 1);
-                            originalSelectedPersianDate.addPersian(Calendar.DATE, 1);
+                            originalSelectedDate.add(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
                             if (originalSelectedPersianDate.getiPersianYear() != year){
                                 onDateChange(dayViewMode.Year);
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
@@ -512,8 +477,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         case 1:         // DayFull View Mode
                             month = originalSelectedPersianDate.getiPersianMonth();
                             year = originalSelectedPersianDate.getiPersianYear();
-                            originalSelectedDate.add(Calendar.DATE, 1);
-                            originalSelectedPersianDate.addPersian(Calendar.DATE, 1);
+                            originalSelectedDate.add(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
                             if (originalSelectedPersianDate.getiPersianYear() != year){
                                 onDateChange(dayViewMode.Year);
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
@@ -524,8 +489,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             break;
                         case 2:         // Month View Mode
                             year = originalSelectedPersianDate.getiPersianYear();
-                            originalSelectedDate.add(Calendar.MONTH, 1);
-                            originalSelectedPersianDate.addPersian(Calendar.MONTH, 1);
+                            originalSelectedDate.add(Calendar.MONTH, RIGHT_TO_LEFT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.MONTH, RIGHT_TO_LEFT_VALUE);
                             if (originalSelectedPersianDate.getiPersianYear() != year){
                                 onDateChange(dayViewMode.Year);
                             }else {
@@ -533,8 +498,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             }
                             break;
                         case 3:         // Year View Mode
-                            originalSelectedDate.add(Calendar.YEAR, 1);
-                            originalSelectedPersianDate.addPersian(Calendar.YEAR, 1);
+                            originalSelectedDate.add(Calendar.YEAR, RIGHT_TO_LEFT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, RIGHT_TO_LEFT_VALUE);
                             onDateChange(dayViewMode.Year);
                             break;
                     }
@@ -544,8 +509,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         case 0:         // DayList view Mode
                             month = originalSelectedPersianDate.getiPersianMonth();
                             year = originalSelectedPersianDate.getiPersianYear();
-                            originalSelectedDate.add(Calendar.DATE, -1);
-                            originalSelectedPersianDate.addPersian(Calendar.DATE, -1);
+                            originalSelectedDate.add(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
                             if (originalSelectedPersianDate.getiPersianYear() != year){
                                 onDateChange(dayViewMode.Year);
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
@@ -557,8 +522,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         case 1:         // DayFull View Mode
                             month = originalSelectedPersianDate.getiPersianMonth();
                             year = originalSelectedPersianDate.getiPersianYear();
-                            originalSelectedDate.add(Calendar.DATE, -1);
-                            originalSelectedPersianDate.addPersian(Calendar.DATE, -1);
+                            originalSelectedDate.add(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
                             if (originalSelectedPersianDate.getiPersianYear() != year){
                                 onDateChange(dayViewMode.Year);
                             }else if (originalSelectedPersianDate.getiPersianMonth() != month){
@@ -569,8 +534,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             break;
                         case 2:         // Month View Mode
                             year = originalSelectedPersianDate.getiPersianYear();
-                            originalSelectedDate.add(Calendar.MONTH, -1);
-                            originalSelectedPersianDate.addPersian(Calendar.MONTH, -1);
+                            originalSelectedDate.add(Calendar.MONTH, LEFT_TO_RIGHT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.MONTH, LEFT_TO_RIGHT_VALUE);
                             if (originalSelectedPersianDate.getiPersianYear() != year){
                                 onDateChange(dayViewMode.Year);
                             }else {
@@ -578,26 +543,26 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             }
                             break;
                         case 3:         // Year View Mode
-                            originalSelectedDate.add(Calendar.YEAR, -1);
-                            originalSelectedPersianDate.addPersian(Calendar.YEAR, -1);
+                            originalSelectedDate.add(Calendar.YEAR, LEFT_TO_RIGHT_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, LEFT_TO_RIGHT_VALUE);
                             onDateChange(dayViewMode.Year);
                             break;
                     }
                     break;
-                case Down2Up:                                               //Decrease Parent Date by 1
+                case Down2Up:                                               //Increase Parent Date by 1
                     switch (viewPager.getCurrentItem()) {
                         case 2:         // Month View Mode
-                            originalSelectedDate.add(Calendar.YEAR, 1);
-                            originalSelectedPersianDate.addPersian(Calendar.YEAR, 1);
+                            originalSelectedDate.add(Calendar.YEAR, DOWN_TO_UP_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, DOWN_TO_UP_VALUE);
                             onDateChange(dayViewMode.Year);
                             break;
                     }
                     break;
-                case Up2Down:                                               //Increase Parent Date by 1
+                case Up2Down:                                               //Decrease Parent Date by 1
                     switch (viewPager.getCurrentItem()) {
                         case 2:         // Month View Mode
-                            originalSelectedDate.add(Calendar.YEAR, -1);
-                            originalSelectedPersianDate.addPersian(Calendar.YEAR, -1);
+                            originalSelectedDate.add(Calendar.YEAR, UP_TO_DOWN_VALUE);
+                            originalSelectedPersianDate.addPersian(Calendar.YEAR, UP_TO_DOWN_VALUE);
                             onDateChange(dayViewMode.Year);
                             break;
                     }
@@ -627,16 +592,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     }
                     break;
             }
+        }
+        if (event.getAction() == MotionEvent.ACTION_UP){
             ACTION_FINISHED = false;
+            SWIPE_ACTION = true;
+            GESTURE_ACTION = false;
             startPoint = new float[4];
             endPoint = new float[4];
             distance = new float[2];
-//            return true;
         }
         return super.dispatchTouchEvent(event);
     }
 
-    //on swipe actions change hole date
+    //update tabs date based on date changes
     public void onDateChange(dayViewMode view){
         SELECTED_MONTH_INDEX = originalSelectedPersianDate.getiPersianMonth() -1;
         SELECTED_DAY_INDEX = originalSelectedPersianDate.getiPersianDate() + originalSelectedPersianDate.persianPreMonthRemainingDay();
@@ -644,13 +612,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             case DayList:
                 dayUCList.updateDayList();
                 SELECTED_DAY_CHANGED = true;
-                UPDATE_DAY_FULL = true;
+                UPDATE_DAY_FULL = (dayUCFull.getMiladiCalendar().compareTo(originalSelectedDate) != 0);
                 UPDATE_DAY_LIST = false;
                 break;
             case DayFull:
                 dayUCFull.updateDayFull();
                 SELECTED_DAY_CHANGED = true;
-                UPDATE_DAY_LIST = true;
+                UPDATE_DAY_LIST = (dayUCList.getMiladiCalendar().compareTo(originalSelectedDate) != 0);
                 UPDATE_DAY_FULL = false;
                 break;
             case Month:
@@ -659,14 +627,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         dayUCList.updateDayList();
                         SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_LIST = false;
-                        UPDATE_DAY_FULL = true;
+                        UPDATE_DAY_FULL = (dayUCFull.getMiladiCalendar().compareTo(originalSelectedDate) != 0);
                         UPDATE_MONTH = true;
                         break;
                     case 1:
                         dayUCFull.updateDayFull();
                         SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_FULL = false;
-                        UPDATE_DAY_LIST = true;
+                        UPDATE_DAY_LIST = (dayUCList.getMiladiCalendar().compareTo(originalSelectedDate) != 0);
                         UPDATE_MONTH = true;
                         break;
                     case 2:
@@ -689,7 +657,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         dayUCList.updateDayList();
                         SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_LIST = false;
-                        UPDATE_DAY_FULL = true;
+                        UPDATE_DAY_FULL = (dayUCFull.getMiladiCalendar().compareTo(originalSelectedDate) != 0);
                         UPDATE_MONTH = true;
                         UPDATE_YEAR = true;
                         break;
@@ -697,7 +665,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         dayUCFull.updateDayFull();
                         SELECTED_DAY_CHANGED = true;
                         UPDATE_DAY_FULL = false;
-                        UPDATE_DAY_LIST = true;
+                        UPDATE_DAY_LIST = (dayUCList.getMiladiCalendar().compareTo(originalSelectedDate) != 0);
                         UPDATE_MONTH = true;
                         UPDATE_YEAR = true;
                         break;
@@ -758,6 +726,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
+    //if back button pressed close drawer (if open) otherwise show message for exit app
     public void onBackPressed() {
         if (drawerOpen) {
             drawerLayout.closeDrawers();
@@ -776,26 +745,28 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
     @Override
+    // get event detail from event activity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 //        if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                String eventTitle, eventDetail;
+                String eventTitle, eventDetail, startHour, startMin, endHour, endMin;;
                 boolean isHoleDay;
                 Long eventDate;
-                int startHour, startMin, endHour, endMin;
                 eventMode mode = data.getStringExtra("EventMode").equals(eventMode.NewEvent.toString()) ? eventMode.NewEvent :
                         eventMode.EditEvent;
                 eventTitle = data.getStringExtra("Title");
                 eventDetail = data.getStringExtra("Detail");
-                eventDate = data.getLongExtra("Date", -1);
+//                eventDate = data.getLongExtra("Date", -1);
+//                Calendar eventCal = Calendar.getInstance();
+//                eventCal.setTimeInMillis(eventDate);
                 isHoleDay = data.getBooleanExtra("isHoleDay", false);
                 Events events = Events.newInstance(context,originalSelectedDate);
                 if (!isHoleDay) {
-                    startHour = data.getIntExtra("Start_Time_Hour", -1);
-                    startMin = data.getIntExtra("Start_Time_Minute", -1);
-                    endHour = data.getIntExtra("End_Time_Hour", -1);
-                    endMin = data.getIntExtra("End_Time_Minute", -1);
+                    startHour = data.getStringExtra("Start_Time_Hour");
+                    startMin = data.getStringExtra("Start_Time_Minute");
+                    endHour = data.getStringExtra("End_Time_Hour");
+                    endMin = data.getStringExtra("End_Time_Minute");
                     events.setEvent(eventTitle, eventDetail, startHour + ":" + startMin, endHour + ":" + endMin);
                 }else
                     events.setEvent(eventTitle, eventDetail);
@@ -804,7 +775,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     dayUCList.addEvent(events);
                 else
                     dayUCList.updateEvent(events);
-
                 //TODO set event
             }
 //        }
@@ -850,6 +820,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         EditEvent
     }
 
+    //select tabs views
     public class TabViewPagerAdapter extends FragmentPagerAdapter {
 
         public TabViewPagerAdapter(FragmentManager fm) {
@@ -860,21 +831,29 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    if (UPDATE_DAY_LIST)
+                    if (UPDATE_DAY_LIST) {
                         dayUCList.updateDayList();
+                        UPDATE_DAY_LIST = false;
+                    }
                     return dayUCList;
 //                    return daySwitch;
                 case 1:
-                    if (UPDATE_DAY_FULL)
+                    if (UPDATE_DAY_FULL) {
                         dayUCFull.updateDayFull();
+                        UPDATE_DAY_FULL = false;
+                    }
                     return dayUCFull;
                 case 2:
-                    if (UPDATE_MONTH)
+                    if (UPDATE_MONTH) {
                         monthView.initialMonth(originalSelectedDate);
+                        UPDATE_MONTH = false;
+                    }
                     return monthView;
                 case 3:
-                    if (UPDATE_YEAR)
+                    if (UPDATE_YEAR) {
                         yearView.initialYear();
+                        UPDATE_YEAR = false;
+                    }
                     return yearView;
             }
             return null;

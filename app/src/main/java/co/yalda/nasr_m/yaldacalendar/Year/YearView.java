@@ -19,6 +19,7 @@ import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Adapters.YearGridViewAdapter;
 import co.yalda.nasr_m.yaldacalendar.Adapters.YearListGridAdapter;
+import co.yalda.nasr_m.yaldacalendar.Calendars.ArabicCalendar;
 import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
@@ -28,11 +29,13 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_MONTH_INDEX;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_DAY_FULL;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_DAY_LIST;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_MONTH;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.arabicFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.timesFont;
 
 /**
  * Created by Nasr_M on 2/21/2015.
@@ -43,7 +46,7 @@ public class YearView extends Fragment implements GridView.OnItemClickListener, 
     private MonthView[] yearMonth;
     private ArrayList<MonthView> monthViewList;
     private YearGridViewAdapter yearGridAdapter;
-    private TextView yearHeader_tv;
+    private TextView yearHeader_tv, yearHeaderMiladi_tv, yearHeaderHejri_tv;
     private GridView yearGridView, yearListGrid;
     private Calendar yearCal = Calendar.getInstance();
     private PersianCalendar yearPersianCal;
@@ -52,6 +55,7 @@ public class YearView extends Fragment implements GridView.OnItemClickListener, 
     private LinearLayout completeYear, listYear;
     private YearListGridAdapter yearListGridAdapter;
     private ArrayList<String> yearList;
+    private int miladiYearStart, hejriYearStart;
 
     public static YearView newInstance(Calendar yearCal) {
         YearView yearView = new YearView();
@@ -100,6 +104,8 @@ public class YearView extends Fragment implements GridView.OnItemClickListener, 
             listYear = (LinearLayout) rootView.findViewById(R.id.year_list_view);
             listYear.setVisibility(View.INVISIBLE);
             yearHeader_tv = (TextView) rootView.findViewById(R.id.year_view_header);
+            yearHeaderMiladi_tv = (TextView) rootView.findViewById(R.id.year_view_miladdi);
+            yearHeaderHejri_tv = (TextView) rootView.findViewById(R.id.year_view_hejri);
             yearGridView = (GridView) rootView.findViewById(R.id.year_grid_view);
         }
 
@@ -112,6 +118,9 @@ public class YearView extends Fragment implements GridView.OnItemClickListener, 
         yearPersianCal = new PersianCalendar(yearCal);
         yearPersianCal.setPersian(Calendar.MONTH, 0);
         yearCal.setTime(yearPersianCal.getMiladiDate().getTime());
+        ArabicCalendar arabCal = new ArabicCalendar(yearCal);
+        hejriYearStart = arabCal.getArabicYear();
+        miladiYearStart = yearCal.get(Calendar.YEAR);
         yearMonth = new MonthView[12];
         Integer yearNum = yearPersianCal.getiPersianYear() - 4;
         yearList = new ArrayList<>();
@@ -132,6 +141,10 @@ public class YearView extends Fragment implements GridView.OnItemClickListener, 
 
         yearHeader_tv.setTypeface(homaFont);
         yearHeader_tv.setText(PersianUtil.toPersian(yearPersianCal.getiPersianYear()));
+        yearHeaderMiladi_tv.setTypeface(timesFont);
+        yearHeaderMiladi_tv.setText(miladiYearStart + "-" + (miladiYearStart + 1));
+        yearHeaderHejri_tv.setTypeface(arabicFont);
+        yearHeaderHejri_tv.setText(PersianUtil.toArabic(hejriYearStart + 1) + "-" + PersianUtil.toArabic(hejriYearStart));
         yearGridAdapter = new YearGridViewAdapter(monthViewList);
         yearGridView.setAdapter(yearGridAdapter);
         yearGridAdapter.notifyDataSetChanged();
@@ -179,6 +192,9 @@ public class YearView extends Fragment implements GridView.OnItemClickListener, 
         yearPersianCal.setMiladiDate(yearCal);
         yearPersianCal.setPersian(Calendar.MONTH, 0);
         yearCal.setTime(yearPersianCal.getMiladiDate().getTime());
+        ArabicCalendar arabCal = new ArabicCalendar(yearCal);
+        hejriYearStart = arabCal.getArabicYear();
+        miladiYearStart = yearCal.get(Calendar.YEAR);
         monthViewList.clear();
         yearList.clear();
         Integer yearNum = yearCal.get(Calendar.YEAR) - 4;
@@ -191,7 +207,9 @@ public class YearView extends Fragment implements GridView.OnItemClickListener, 
 
         setColumns();
 
-        yearHeader_tv.setText(String.valueOf(yearPersianCal.getiPersianYear()));
+        yearHeaderHejri_tv.setText(PersianUtil.toArabic(hejriYearStart + 1) + "-" + PersianUtil.toArabic(hejriYearStart));
+        yearHeaderMiladi_tv.setText((miladiYearStart) + "-" + (miladiYearStart + 1));
+        yearHeader_tv.setText(PersianUtil.toPersian(yearPersianCal.getiPersianYear()));
         yearGridAdapter.notifyDataSetChanged();
 
         setSelectedDate();

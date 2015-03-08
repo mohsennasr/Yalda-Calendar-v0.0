@@ -10,20 +10,17 @@ public class ArabicDateConverter {
         return ((n % m) + m) % m;
     }
 
-    static Integer[] kuwaiticalendar(boolean adjust, Calendar today) {
+    static Integer[] kuwaiticalendar(int adjustDate, Calendar today) {
 
-        int adj = 0;
-        if (adjust) {
-            adj = 0;
-        } else {
-            adj = 1;
-        }
+//        int adj = 0;
+//        if (adjustDate > 0) {
+//            adj = adjustDate;
 
-    /*if (adjust) {
-        int adjustmili = 1000 * 60 * 60 * 24 * adj;
+    if (adjustDate != 0) {
+        int adjustmili = 1000 * 60 * 60 * 24 * adjustDate;
         long todaymili = today.getTimeInMillis() + adjustmili;
         today.setTimeInMillis(todaymili);
-    }*/
+    }
 
         Integer tday = today.get(Calendar.DAY_OF_MONTH);
         Integer tmonth = today.get(Calendar.MONTH);
@@ -108,15 +105,17 @@ public class ArabicDateConverter {
         return myRes;
     }
 
-    public static Integer[] writeIslamicDate(Calendar Date) {
+    public static Integer[] writeIslamicDate(Calendar Date, int adjustDate) {
         String[] wdNames = {"Ahad", "Ithnin", "Thulatha", "Arbaa", "Khams",
                 "Jumuah", "Sabt"};
         String[] iMonthNames = {"محرم", "صفر", "ربیع الاول",
                 "ربیع الثانی", "جمادی الاول", "جمادی الثانی", "رجب",
                 "شعبان", "رمضان", "شوال", "ذی القعده", "ذی الحجه"};
         // This Value is used to give the correct day +- 1 day
-        boolean dayTest = true;
-        Integer[] iDate = kuwaiticalendar(dayTest, Date);
+//        boolean dayTest = true;
+        Calendar baseCal = Calendar.getInstance();
+        baseCal.setTime(Date.getTime());
+        Integer[] iDate = kuwaiticalendar(adjustDate, baseCal);
         Integer[] res = {iDate[7], iDate[6], iDate[5], iDate[4]};
 
         return res;

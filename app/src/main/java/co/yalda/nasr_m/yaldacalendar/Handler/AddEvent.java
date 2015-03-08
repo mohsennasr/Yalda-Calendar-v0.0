@@ -10,10 +10,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -21,9 +21,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import co.yalda.nasr_m.yaldacalendar.Calendars.PersianCalendar;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
-import co.yalda.nasr_m.yaldacalendar.PersianDatePicker.PersianDatePicker;
 import co.yalda.nasr_m.yaldacalendar.R;
 
 /**
@@ -32,10 +30,10 @@ import co.yalda.nasr_m.yaldacalendar.R;
 public class AddEvent extends Activity {
 
     private EditText eventTitle, eventDetail;
-    private PersianDatePicker datePicker;
+//    private PersianDatePicker datePicker;
     private TimePicker startTime, endTime;
     private Switch holeDay;
-    private LinearLayout datePickerHolder;
+//    private LinearLayout datePickerHolder;
     private TextView start, end, hole;
     private Button ok, cancel;
     private Intent result = new Intent();
@@ -47,13 +45,14 @@ public class AddEvent extends Activity {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL); //Set Direction Right-to-Left
         setContentView(R.layout.create_event);
 //        setContentView(R.layout.week_view_simple);
 
         eventTitle = (EditText) findViewById(R.id.event_title_et);
         eventDetail = (EditText) findViewById(R.id.event_detail_et);
-        datePickerHolder = (LinearLayout) findViewById(R.id.datePicker_holder);
+//        datePickerHolder = (LinearLayout) findViewById(R.id.datePicker_holder);
         startTime = (TimePicker) findViewById(R.id.start_timePicker);
         startTime.setIs24HourView(true);
         endTime = (TimePicker) findViewById(R.id.end_timePicker);
@@ -67,9 +66,9 @@ public class AddEvent extends Activity {
 
         context = this;
 
-        datePicker = new PersianDatePicker(getApplicationContext());
-        datePicker.setVisibility(View.VISIBLE);
-        datePickerHolder.addView(datePicker);
+//        datePicker = new PersianDatePicker(getApplicationContext());
+//        datePicker.setVisibility(View.VISIBLE);
+//        datePickerHolder.addView(datePicker);
         endTime.setCurrentHour(startTime.getCurrentHour() + 1);
 
         holeDay.setChecked(false);
@@ -92,30 +91,22 @@ public class AddEvent extends Activity {
             }
         });
 
-        startTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                endTime.setCurrentHour(startTime.getCurrentHour() + 1);
-                endTime.setCurrentMinute(startTime.getCurrentMinute());
-            }
-        });
-
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (eventTitle.getText().toString().isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Event Title Could not be Empty !!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "عنوان رویداد وار نشده است !!", Toast.LENGTH_LONG).show();
                     return;
                 } else if ((endTime.getCurrentHour() < startTime.getCurrentHour()) ||
                         (endTime.getCurrentHour() == startTime.getCurrentHour() &&
                                 endTime.getCurrentMinute() < startTime.getCurrentMinute())) {
-                    Toast.makeText(getApplicationContext(), "Event End Time Should be Greater Than Start Time !!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "زمان خاتمه رویداد کوچکتر از زمان شروع است !!", Toast.LENGTH_LONG).show();
                     return;
                 }
                 result.putExtra("EventMode", eventMode.toString());
                 result.putExtra("Title", eventTitle.getText().toString());
                 result.putExtra("Detail", eventDetail.getText().toString());
-                result.putExtra("Date", datePicker.getDisplayPersianDate().getMiladiDate().getTimeInMillis());
+//                result.putExtra("Date", datePicker.getDisplayPersianDate().getMiladiDate().getTimeInMillis());
                 result.putExtra("isHoleDay", isHoleDay);
                 if (!isHoleDay){
                     result.putExtra("Start_Time_Hour", startTime.getCurrentHour() < 10 ? "0" + startTime.getCurrentHour().toString()
@@ -157,8 +148,8 @@ public class AddEvent extends Activity {
                 holeDay.setChecked(true);
             }
             Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(extras.getLong("Date"));
-            datePicker.setDisplayPersianDate(new PersianCalendar(cal));
+//            cal.setTimeInMillis(extras.getLong("Date"));
+//            datePicker.setDisplayPersianDate(new PersianCalendar(cal));
         }
     }
 

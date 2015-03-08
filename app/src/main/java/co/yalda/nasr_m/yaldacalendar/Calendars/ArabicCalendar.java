@@ -25,7 +25,7 @@ public class ArabicCalendar{
     }
 
     private void calculate(){
-        Integer[] result = ArabicDateConverter.writeIslamicDate(baseMiladiCalendar);
+        Integer[] result = ArabicDateConverter.writeIslamicDate(baseMiladiCalendar, -1);
         arabicYear = result[0];
         arabicMonth = result[1];
         arabicDate = result[2];
@@ -35,7 +35,7 @@ public class ArabicCalendar{
     }
 
     public void setBaseMiladiCalendar(Calendar baseMiladiCalendar) {
-        this.baseMiladiCalendar = baseMiladiCalendar;
+        this.baseMiladiCalendar.setTime(baseMiladiCalendar.getTime());
         calculate();
     }
 

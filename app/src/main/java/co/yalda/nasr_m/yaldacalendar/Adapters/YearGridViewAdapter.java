@@ -50,7 +50,7 @@ public class YearGridViewAdapter extends BaseAdapter {
             height = height / 4;
         } else {
             width = viewSize[0] - 20;
-            height = viewSize[1] - 160;
+            height = viewSize[1] - 100;
             width = width / 4;
             height = height / 3;
         }

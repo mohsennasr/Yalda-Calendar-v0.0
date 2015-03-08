@@ -52,7 +52,7 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.timesFont;
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class DayUC extends Fragment {
+public class DayUC1 extends Fragment {
 
     public View rootView;                                                                                           // Root View of Fragment
     public TextView mainDate_TV, secondDate_TV, thirdDate_TV;                                                       // Date TextViews (Month & Year View Mode
@@ -62,8 +62,20 @@ public class DayUC extends Fragment {
     private Calendar miladiCalendar = Calendar.getInstance();                                                       // Day Base Calendar
     private ArabicCalendar arabicCalendar = new ArabicCalendar(Calendar.getInstance());                             // Arabic Calendar
     private MainActivity.dayViewMode dayViewMode;                                                                   // Day View Mode -> Year, Month, DayList, DayFull
-
+    private TextView dayName, dayDate, dayliNote1, dayliNote2, monthName, miladiFullDate, jalaliFulldate,           // Day Full View Mode TextViews
+            arabicFullDate, miladiDate, jalaliDate, arabicDate, holyDayNote;
+    private String DateIndex;
+    private String[] MonthName = {"January", "February", "March", "April", "May", "June", "July",                   // Miladi Month Names
+            "August", "September", "October", "November", "December"};
+    private NoteListViewAdapter adapter;                                                                            // List View Adapter for Note ListView in DayFull Mode
+    private ArrayList<String> notes = new ArrayList<String>();                                                           // Notes Array List for DayFull View Mode
+    private ArrayList<Events> eventsArrayList;                                                                      // Events Array List for DayList View Mode
+    private EventsListViewAdapter dayListadapter;                                                                   // Event List View Adapter for DayList View Mode
+    private ListView dayEventLV;                                                                                    // Events List View
+    private ListView noteList;                                                                                      // Notes List View
+    private DayUC1 dayUCListHeader;                                                                                  // DayUC Object for Showing in DayList View Mode (Header)
     private LayoutInflater mInfalater;                                                                              // Layout Inflater
+    private int CURRENT_SELECTED_EVENT = -1;                                                                        // Selected event in dayList mode
 
     /**
      * return new instance of class
@@ -72,8 +84,8 @@ public class DayUC extends Fragment {
      * @param dayViewMode   view mode
      * @return              instance od DayUC class
      */
-    public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode) {
-        DayUC dayUC = new DayUC();
+    public static DayUC1 newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode) {
+        DayUC1 dayUC = new DayUC1();
         dayUC.miladiCalendar.setTime(miladiDate.getTime());
         dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);              // Set First Day of Week Based on Primary Calendar
         dayUC.persianCalendar.setMiladiDate(dayUC.miladiCalendar);              // Initial Persian Calendar
@@ -551,7 +563,7 @@ public class DayUC extends Fragment {
     Initial DayList Mode
      */
     private void initialDayList() {
-        dayUCListHeader = DayUC.newInstance(miladiCalendar, false, DayHeader);
+        dayUCListHeader = DayUC1.newInstance(miladiCalendar, false, DayHeader);
 
         //TODO get event list from DB
 
