@@ -9,7 +9,7 @@
     <style name="AppHoloTheme" parent="@android:style/Theme.Holo.Light">
         <item name="android:windowActionBar">false</item>
         <item name="android:actionBarStyle">@style/CustomActionBar</item>
-        <item name="android:actionBarTabStyle">@style/CustomActionBarTab</item>
+        <!--<item name="android:actionBarTabStyle">@style/CustomActionBarTab</item>-->
         <!-- Customize your theme here. -->
     </style>
 
@@ -18,7 +18,7 @@
         <item name="android:textSize">22sp</item>
         <item name="android:height">44dp</item>
         <item name="android:textColor">#ffffff</item>
-        <item name="android:actionMenuTextAppearance">@style/CustomActionBarTabText</item>
+        <!--<item name="android:actionMenuTextAppearance">@style/CustomActionBarTabText</item>-->
     </style>
 
     <style name="CustomActionBarTab" parent="android:Widget.Holo.Light.Tab">

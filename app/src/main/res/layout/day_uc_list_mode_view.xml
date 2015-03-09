@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:id="@+id/day_event_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     android:layout_marginTop="10dp"
@@ -12,13 +13,20 @@
     <FrameLayout
         android:id="@+id/day_list_mode_frame"
         android:layout_width="match_parent"
-        android:layout_height="80dp" />
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/LightGray"/>
 
     <ListView
         android:id="@+id/day_list_mode_event_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fastScrollEnabled="true"/>
+        android:layout_height="wrap_content"
+        android:smoothScrollbar="true"
+        android:headerDividersEnabled="true"
+        android:overScrollHeader="@android:color/black"/>
 
     <!--<ScrollView-->
         <!--android:layout_width="match_parent"-->

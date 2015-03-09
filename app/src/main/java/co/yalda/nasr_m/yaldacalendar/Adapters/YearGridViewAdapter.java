@@ -3,7 +3,6 @@ package co.yalda.nasr_m.yaldacalendar.Adapters;
 import android.content.res.Configuration;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import co.yalda.nasr_m.yaldacalendar.Month.MonthView;
 
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.progressDialog;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewSize;
 
 /**
@@ -55,10 +53,10 @@ public class YearGridViewAdapter extends BaseAdapter {
             height = height / 3;
         }
 
-        gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(width, height));
-        if (position == 11 && progressDialog != null)
-            if (progressDialog.isShowing())
-                progressDialog.dismiss();
+//        gridList.get(position).rootView.setLayoutParams(new AbsListView.LayoutParams(width, height));
+//        if (position == 11 && progressDialog != null)
+//            if (progressDialog.isShowing())
+//                progressDialog.dismiss();
         return gridList.get(position).rootView;
     }
 

@@ -24,7 +24,6 @@ import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.arabicFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayEvent;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayFull;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
@@ -33,22 +32,24 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.homaFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.lastUCDaySelected;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.tahomaFont;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.timesFont;
 
 /**
  * Created by Nasr_M on 2/17/2015.
  */
-public class DayUC extends Fragment implements View.OnClickListener{
+public class DayUC extends Fragment{
 
     public View rootView;                                                                                           // Root View of Fragment
     public TextView mainDate_TV, secondDate_TV, thirdDate_TV;                                                       // Date TextViews (Month & Year View Mode
     private boolean isHoliday;                                                                                      // Is It Holiday
     public boolean isEnable = true;                                                                                 // Should be Clickable
-    private PersianCalendar persianCalendar = new PersianCalendar(Calendar.getInstance());                          // Persian Calendar
-    private Calendar miladiCalendar = Calendar.getInstance();                                                       // Day Base Calendar
-    private ArabicCalendar arabicCalendar = new ArabicCalendar(Calendar.getInstance());                             // Arabic Calendar
+    public PersianCalendar persianCalendar;                                                                        // Persian Calendar
+    private Calendar miladiCalendar;                                                                                // Day Base Calendar
+    private ArabicCalendar arabicCalendar;                             // Arabic Calendar
     private MainActivity.dayViewMode dayViewMode;                                                                   // Day View Mode -> Year, Month, DayList, DayFull
     private DayUC thisDay;
+    private ViewGroup container;
     private LayoutInflater mInfalater;                                                                              // Layout Inflater
 
     /**
@@ -58,11 +59,14 @@ public class DayUC extends Fragment implements View.OnClickListener{
      * @param dayViewMode   view mode
      * @return              instance od DayUC class
      */
-    public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode) {
+    public static DayUC newInstance(Calendar miladiDate, boolean isEnable, MainActivity.dayViewMode dayViewMode, ViewGroup container) {
         DayUC dayUC = new DayUC();
+        dayUC.miladiCalendar = Calendar.getInstance();
         dayUC.miladiCalendar.setTime(miladiDate.getTime());
         dayUC.miladiCalendar.setFirstDayOfWeek(Calendar.SATURDAY);              // Set First Day of Week Based on Primary Calendar
+        dayUC.persianCalendar  = new PersianCalendar(Calendar.getInstance());
         dayUC.persianCalendar.setMiladiDate(dayUC.miladiCalendar);              // Initial Persian Calendar
+        dayUC.arabicCalendar = new ArabicCalendar(Calendar.getInstance());
         dayUC.arabicCalendar.setBaseMiladiCalendar(dayUC.miladiCalendar);       // Initial Arabic Calendar
         dayUC.isEnable = isEnable;                                              // Set Day Clickable
         dayUC.dayViewMode = dayViewMode;                                        // Set Day View Mode
@@ -114,7 +118,6 @@ public class DayUC extends Fragment implements View.OnClickListener{
             mInfalater = (LayoutInflater) MainActivity.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             viewSelector();
         }
-
         return rootView;        // Return RootView of Fragment
     }
 
@@ -125,7 +128,7 @@ public class DayUC extends Fragment implements View.OnClickListener{
         switch (dayViewMode) {
             // Header Mode for Showing in DayList View Mode
             case DayEvent:
-                rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, null);
+                rootView = mInfalater.inflate(R.layout.day_uc_header_mode_view, container, false);
                 mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_header_mode_tv);
                 secondDate_TV = (TextView) rootView.findViewById(R.id.day_uc_header_mode_miladi_tv);
                 thirdDate_TV = (TextView) rootView.findViewById(R.id.day_uc_header_mode_hejri_tv);
@@ -136,41 +139,23 @@ public class DayUC extends Fragment implements View.OnClickListener{
                 break;
             // Single Date for Showing in YearView
             case Year:
-                rootView = mInfalater.inflate(R.layout.day_uc_year_view, null);
+                rootView = mInfalater.inflate(R.layout.day_uc_year_view, container, false);
                 mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_main_date);
                 initialYear();
-                setClickListener();
                 break;
             // Full Calendar View
             case DayFull:
-                rootView = mInfalater.inflate(R.layout.day_full_view, null);
+                rootView = mInfalater.inflate(R.layout.day_full_view, container, false);
                 break;
             // Triple Calendar for Showing in MonthView Mode
             case Month:
-                rootView = mInfalater.inflate(R.layout.day_uc_month_view, null);
+                rootView = mInfalater.inflate(R.layout.day_uc_month_view, container, false);
                 mainDate_TV = (TextView) rootView.findViewById(R.id.day_uc_main_date);
                 secondDate_TV = (TextView) rootView.findViewById(R.id.day_uc_second_date);
                 thirdDate_TV = (TextView) rootView.findViewById(R.id.day_uc_third_date);
                 initialMonth();
-                setClickListener();
                 break;
         }
-    }
-
-    private void setClickListener(){
-        rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (lastUCDaySelected != null){
-                    lastUCDaySelected.unSetSelectedDay();
-                }
-                lastUCDaySelected = DayUC.this;
-                originalSelectedDate.setTime(miladiCalendar.getTime());
-                originalSelectedPersianDate.setMiladiDate(miladiCalendar);
-                unSetSelectedDay();
-                setSelectedDay();
-            }
-        });
     }
 
     /**
@@ -187,7 +172,7 @@ public class DayUC extends Fragment implements View.OnClickListener{
                 mainDate_TV.setText(persianCalendar.getDateString(MainActivity.calendarType.Gregorian, true));
                 break;
             case Hejri:
-                mainDate_TV.setTypeface(arabicFont);
+                mainDate_TV.setTypeface(tahomaFont);
                 mainDate_TV.setText(persianCalendar.getDateString(MainActivity.calendarType.Hejri, true));
                 break;
         }
@@ -203,7 +188,7 @@ public class DayUC extends Fragment implements View.OnClickListener{
                     secondDate_TV.setText(persianCalendar.getDateString(MainActivity.calendarType.Gregorian, false));
                     break;
                 case Hejri:
-                    secondDate_TV.setTypeface(arabicFont);
+                    secondDate_TV.setTypeface(tahomaFont);
                     secondDate_TV.setText(persianCalendar.getDateString(MainActivity.calendarType.Hejri, false));
                     break;
             }
@@ -220,7 +205,7 @@ public class DayUC extends Fragment implements View.OnClickListener{
                     thirdDate_TV.setText(persianCalendar.getDateString(MainActivity.calendarType.Gregorian, false));
                     break;
                 case Hejri:
-                    thirdDate_TV.setTypeface(arabicFont);
+                    thirdDate_TV.setTypeface(tahomaFont);
                     thirdDate_TV.setText(persianCalendar.getDateString(MainActivity.calendarType.Hejri, false));
                     break;
             }
@@ -382,6 +367,7 @@ public class DayUC extends Fragment implements View.OnClickListener{
     public void setSelectedDay(){
         if (persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) == 0 && isEnable) {     // if it's today, set background
             rootView.setBackgroundResource(R.drawable.background_rectangle);
+            lastUCDaySelected = this;
         }else if (persianCalendar.persianCompare(originalSelectedPersianDate) == 0 && isEnable) {               // if it's selected day, set border
             rootView.setBackgroundResource(R.drawable.border_rectangle);
         }
@@ -431,10 +417,5 @@ public class DayUC extends Fragment implements View.OnClickListener{
                 menu.add(Menu.NONE, i, i, menuItems[i]);
             }
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-
     }
 }

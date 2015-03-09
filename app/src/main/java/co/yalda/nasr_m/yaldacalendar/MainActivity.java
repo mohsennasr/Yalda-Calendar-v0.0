@@ -21,7 +21,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.Window;
@@ -110,7 +109,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL); //Set Direction Right-to-Left
 
         context = this;
-        lastUCDaySelected = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayEvent);
+//        lastUCDaySelected = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayEvent);
         getWindowManager().getDefaultDisplay().getSize(point);
         init();
 
@@ -205,10 +204,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             viewSize[1] -= actionBarHeight;
         }
 
-        dayEventFragment = DayEventFragment.newInstance(originalSelectedDate);
-        dayUCFull = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayFull);
-        monthView = MonthView.newInstance(Calendar.getInstance(), dayViewMode.Month);
-        yearView = YearView.newInstance(Calendar.getInstance());
+        dayEventFragment = DayEventFragment.newInstance(originalSelectedDate, viewPager);
+
+//        dayUCFull = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayFull);
+        monthView = MonthView.newInstance(Calendar.getInstance(), dayViewMode.Month, viewPager);
+//        yearView = YearView.newInstance(Calendar.getInstance());
 
         getOverflowMenu();
 
@@ -334,19 +334,17 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 break;
             case 2:
                 if (UPDATE_MONTH && monthView != null) {
-                    monthView.initialMonth(originalSelectedDate);
+//                    monthView.initialMonth(originalSelectedDate);
                     UPDATE_MONTH = false;
                 }
-                if (monthView != null)
-                    monthView.setSelectedDate();
                 break;
             case 3:
                 if (UPDATE_YEAR && yearView != null) {
                     yearView.initialYear();
                     UPDATE_YEAR = false;
                 }
-                if (yearView != null)
-                    yearView.setSelectedDate();
+//                if (yearView != null)
+//                    yearView.setSelectedDate();
                 break;
         }
         viewPager.setCurrentItem(tab.getPosition());              //set view pager content base on selected tab
@@ -363,249 +361,249 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
 //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    @Override
-    //capture all touch events and detect motions
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        switch (viewPager.getCurrentItem()){
-            case 0:
-                return dayEventFragment.onTouch(dayEventFragment.getView(), event);
-        }
-//        super.dispatchTouchEvent(event);
-//        if (distance[0] != 0 && event.getAction() == MotionEvent.ACTION_UP)
-//            ACTION_FINISHED = true;
-//        if ((event.getPointerCount() >= 2)) {     // multiTouch gesture
-//            SWIPE_ACTION = false;
-//            GESTURE_ACTION = true;
-//            if (progressDialog != null) {
-//                progressDialog.dismiss();
-//                progressDialog = null;
-//            }
-//
-//            if (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
-//                startPoint[0] = event.getX(0);
-//                startPoint[1] = event.getY(0);
-//                startPoint[2] = event.getX(1);
-//                startPoint[3] = event.getY(1);
-//            } else if (event.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
-//                endPoint[0] = event.getX(0);
-//                endPoint[1] = event.getY(0);
-//                endPoint[2] = event.getX(1);
-//                endPoint[3] = event.getY(1);
-//
-//                //start distance
-//                distance[0] = (float) Math.sqrt(Math.pow((startPoint[0] - startPoint[2]), 2)
-//                        + Math.pow((startPoint[1] - startPoint[3]), 2));
-//
-//                //end distance
-//                distance[1] = (float) Math.sqrt(Math.pow((endPoint[0] - endPoint[2]), 2)
-//                        + Math.pow((endPoint[1] - startPoint[3]), 2));
-//
-//                if (distance[0] < distance[1]) { //zoom in
-//                    touchAction = ZoomIn;
-//                } else if (distance[0] > distance[1]) { //zoom out
-//                    touchAction = ZoomOut;
-//                }
-//                ACTION_FINISHED = true;
-//            }
+//    @Override
+//    //capture all touch events and detect motions
+//    public boolean dispatchTouchEvent(MotionEvent event) {
+//        switch (viewPager.getCurrentItem()){
+//            case 0:
+//                return dayEventFragment.onTouch(dayEventFragment.getView(), event);
 //        }
-//        if (SWIPE_ACTION)                   // swipe action
-//            switch (event.getAction()) {
-//                case MotionEvent.ACTION_DOWN:
-//                    getWindowManager().getDefaultDisplay().getSize(point);
-//                    if ((event.getX() > point.x - 40) || (event.getY() <= actionBar.getHeight()) || drawerOpen) {  //check for drawer touch
-//                        IS_IN_VIEWPAGER_AREA = false;
-//                        return super.dispatchTouchEvent(event);
-//                    } else
-//                        IS_IN_VIEWPAGER_AREA = true;
-//                    startPoint[0] = event.getX();
-//                    startPoint[1] = event.getY();
-//                    break;
-//                case MotionEvent.ACTION_UP:
-//                    if (!IS_IN_VIEWPAGER_AREA)
-//                        return super.dispatchTouchEvent(event);
-//                    endPoint[0] = event.getX();
-//                    endPoint[1] = event.getY();
-//                    float dx, dy;
-//                    dx = Math.abs(endPoint[0] - startPoint[0]);
-//                    dy = Math.abs(endPoint[1] - startPoint[1]);
-//                    if (dx > 10 || dy > 10) {
-//                        if ((dx >= dy) && (startPoint[0] >= endPoint[0])) {         // Right-to-Left Swipe
-//                            touchAction = Right2Left;
-//                        } else if ((dx > dy) && (startPoint[0] < endPoint[0])) {    // Left-to-Right Swipe
-//                            touchAction = Left2Right;
-//                        } else if ((dx < dy) && (startPoint[1] >= endPoint[1])) {   // Down-to-Up Swipe
-//                            touchAction = Down2Up;
-////                                if (progressDialog != null)
-////                                    progressDialog.dismiss();
-//                        } else if ((dx < dy) && (startPoint[1] < endPoint[1])) {    // Up-to-Down Swipe
-//                            touchAction = Up2Down;
-////                                if (progressDialog != null)
-////                                    progressDialog.dismiss();
-//                        }
-//                    } else {
-//                        return super.dispatchTouchEvent(event);
-//                    }
-//                    ACTION_FINISHED = true;
-//                    break;
-//                case MotionEvent.ACTION_MOVE:
-////                    if (viewPager.getCurrentItem() == 6
-////                            && Math.abs(event.getX() - startPoint[0]) > 10
-////                            && Math.abs(event.getY() - startPoint[1]) < Math.abs(event.getY() - startPoint[0])
-////                            && progressDialog == null
-////                            && IS_IN_VIEWPAGER_AREA
-////                            && SWIPE_ACTION
-////                            /*&& !yearCal.YEAR_LIST*/) {
+////        super.dispatchTouchEvent(event);
+////        if (distance[0] != 0 && event.getAction() == MotionEvent.ACTION_UP)
+////            ACTION_FINISHED = true;
+////        if ((event.getPointerCount() >= 2)) {     // multiTouch gesture
+////            SWIPE_ACTION = false;
+////            GESTURE_ACTION = true;
+////            if (progressDialog != null) {
+////                progressDialog.dismiss();
+////                progressDialog = null;
+////            }
 ////
+////            if (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
+////                startPoint[0] = event.getX(0);
+////                startPoint[1] = event.getY(0);
+////                startPoint[2] = event.getX(1);
+////                startPoint[3] = event.getY(1);
+////            } else if (event.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
+////                endPoint[0] = event.getX(0);
+////                endPoint[1] = event.getY(0);
+////                endPoint[2] = event.getX(1);
+////                endPoint[3] = event.getY(1);
+////
+////                //start distance
+////                distance[0] = (float) Math.sqrt(Math.pow((startPoint[0] - startPoint[2]), 2)
+////                        + Math.pow((startPoint[1] - startPoint[3]), 2));
+////
+////                //end distance
+////                distance[1] = (float) Math.sqrt(Math.pow((endPoint[0] - endPoint[2]), 2)
+////                        + Math.pow((endPoint[1] - startPoint[3]), 2));
+////
+////                if (distance[0] < distance[1]) { //zoom in
+////                    touchAction = ZoomIn;
+////                } else if (distance[0] > distance[1]) { //zoom out
+////                    touchAction = ZoomOut;
+////                }
+////                ACTION_FINISHED = true;
+////            }
+////        }
+////        if (SWIPE_ACTION)                   // swipe action
+////            switch (event.getAction()) {
+////                case MotionEvent.ACTION_DOWN:
+////                    getWindowManager().getDefaultDisplay().getSize(point);
+////                    if ((event.getX() > point.x - 40) || (event.getY() <= actionBar.getHeight()) || drawerOpen) {  //check for drawer touch
+////                        IS_IN_VIEWPAGER_AREA = false;
+////                        return super.dispatchTouchEvent(event);
+////                    } else
+////                        IS_IN_VIEWPAGER_AREA = true;
+////                    startPoint[0] = event.getX();
+////                    startPoint[1] = event.getY();
+////                    break;
+////                case MotionEvent.ACTION_UP:
+////                    if (!IS_IN_VIEWPAGER_AREA)
+////                        return super.dispatchTouchEvent(event);
+////                    endPoint[0] = event.getX();
+////                    endPoint[1] = event.getY();
+////                    float dx, dy;
+////                    dx = Math.abs(endPoint[0] - startPoint[0]);
+////                    dy = Math.abs(endPoint[1] - startPoint[1]);
+////                    if (dx > 10 || dy > 10) {
+////                        if ((dx >= dy) && (startPoint[0] >= endPoint[0])) {         // Right-to-Left Swipe
+////                            touchAction = Right2Left;
+////                        } else if ((dx > dy) && (startPoint[0] < endPoint[0])) {    // Left-to-Right Swipe
+////                            touchAction = Left2Right;
+////                        } else if ((dx < dy) && (startPoint[1] >= endPoint[1])) {   // Down-to-Up Swipe
+////                            touchAction = Down2Up;
+//////                                if (progressDialog != null)
+//////                                    progressDialog.dismiss();
+////                        } else if ((dx < dy) && (startPoint[1] < endPoint[1])) {    // Up-to-Down Swipe
+////                            touchAction = Up2Down;
+//////                                if (progressDialog != null)
+//////                                    progressDialog.dismiss();
+////                        }
+////                    } else {
+////                        return super.dispatchTouchEvent(event);
 ////                    }
-//                    break;
-//            }
-//        if (ACTION_FINISHED) {
-//            int month = 0, year = 0;
-//            switch (touchAction) {
-//                case Right2Left:                                            //Increase Date by 1
-//                    switch (viewPager.getCurrentItem()) {
-//                        case 0:         // DayList view Mode
-//                            month = originalSelectedPersianDate.getiPersianMonth();
-//                            year = originalSelectedPersianDate.getiPersianYear();
-//                            originalSelectedDate.add(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
-//                            if (originalSelectedPersianDate.getiPersianYear() != year){
-//                                onDateChange(dayViewMode.Year);
-//                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
-//                                onDateChange(dayViewMode.Month);
-//                            }else {
-//                                onDateChange(dayViewMode.DayEvent);
-//                            }
-//                            break;
-//                        case 1:         // DayFull View Mode
-//                            month = originalSelectedPersianDate.getiPersianMonth();
-//                            year = originalSelectedPersianDate.getiPersianYear();
-//                            originalSelectedDate.add(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
-//                            if (originalSelectedPersianDate.getiPersianYear() != year){
-//                                onDateChange(dayViewMode.Year);
-//                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
-//                                onDateChange(dayViewMode.Month);
-//                            }else {
-//                                onDateChange(dayViewMode.DayFull);
-//                            }
-//                            break;
-//                        case 2:         // Month View Mode
-//                            year = originalSelectedPersianDate.getiPersianYear();
-//                            originalSelectedDate.add(Calendar.MONTH, RIGHT_TO_LEFT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.MONTH, RIGHT_TO_LEFT_VALUE);
-//                            if (originalSelectedPersianDate.getiPersianYear() != year){
-//                                onDateChange(dayViewMode.Year);
-//                            }else {
-//                                onDateChange(dayViewMode.Month);
-//                            }
-//                            break;
-//                        case 3:         // Year View Mode
-//                            originalSelectedDate.add(Calendar.YEAR, RIGHT_TO_LEFT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.YEAR, RIGHT_TO_LEFT_VALUE);
-//                            onDateChange(dayViewMode.Year);
-//                            break;
-//                    }
-//                    break;
-//                case Left2Right:                                            //Decrease Date by 1
-//                    switch (viewPager.getCurrentItem()) {
-//                        case 0:         // DayList view Mode
-//                            month = originalSelectedPersianDate.getiPersianMonth();
-//                            year = originalSelectedPersianDate.getiPersianYear();
-//                            originalSelectedDate.add(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
-//                            if (originalSelectedPersianDate.getiPersianYear() != year){
-//                                onDateChange(dayViewMode.Year);
-//                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
-//                                onDateChange(dayViewMode.Month);
-//                            }else {
-//                                onDateChange(dayViewMode.DayEvent);
-//                            }
-//                            break;
-//                        case 1:         // DayFull View Mode
-//                            month = originalSelectedPersianDate.getiPersianMonth();
-//                            year = originalSelectedPersianDate.getiPersianYear();
-//                            originalSelectedDate.add(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
-//                            if (originalSelectedPersianDate.getiPersianYear() != year){
-//                                onDateChange(dayViewMode.Year);
-//                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
-//                                onDateChange(dayViewMode.Month);
-//                            }else {
-//                                onDateChange(dayViewMode.DayFull);
-//                            }
-//                            break;
-//                        case 2:         // Month View Mode
-//                            year = originalSelectedPersianDate.getiPersianYear();
-//                            originalSelectedDate.add(Calendar.MONTH, LEFT_TO_RIGHT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.MONTH, LEFT_TO_RIGHT_VALUE);
-//                            if (originalSelectedPersianDate.getiPersianYear() != year){
-//                                onDateChange(dayViewMode.Year);
-//                            }else {
-//                                onDateChange(dayViewMode.Month);
-//                            }
-//                            break;
-//                        case 3:         // Year View Mode
-//                            originalSelectedDate.add(Calendar.YEAR, LEFT_TO_RIGHT_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.YEAR, LEFT_TO_RIGHT_VALUE);
-//                            onDateChange(dayViewMode.Year);
-//                            break;
-//                    }
-//                    break;
-//                case Down2Up:                                               //Increase Parent Date by 1
-//                    switch (viewPager.getCurrentItem()) {
-//                        case 2:         // Month View Mode
-//                            originalSelectedDate.add(Calendar.YEAR, DOWN_TO_UP_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.YEAR, DOWN_TO_UP_VALUE);
-//                            onDateChange(dayViewMode.Year);
-//                            break;
-//                    }
-//                    break;
-//                case Up2Down:                                               //Decrease Parent Date by 1
-//                    switch (viewPager.getCurrentItem()) {
-//                        case 2:         // Month View Mode
-//                            originalSelectedDate.add(Calendar.YEAR, UP_TO_DOWN_VALUE);
-//                            originalSelectedPersianDate.addPersian(Calendar.YEAR, UP_TO_DOWN_VALUE);
-//                            onDateChange(dayViewMode.Year);
-//                            break;
-//                    }
-//                    break;
-//                case ZoomIn:
-//                    switch (viewPager.getCurrentItem()){
-////                        case 0:
-////                            daySwitch.switchView(1);
-//                        case 2:
-//                            monthView.monthSwitchView(1);
-//                            break;
-//                        case 3:
-//                            yearView.yearSwitchView(1);
-//                            break;
-//                    }
-//                    break;
-//                case ZoomOut:
-//                    switch (viewPager.getCurrentItem()){
-////                        case 0:
-////                            daySwitch.switchView(2);
-//                        case 2:
-//                            monthView.monthSwitchView(2);
-//                            break;
-//                        case 3:
-//                            yearView.yearSwitchView(2);
-//                            break;
-//                    }
-//                    break;
-//            }
-//        }
-//        if (event.getAction() == MotionEvent.ACTION_UP){
-//            ACTION_FINISHED = false;
-//            SWIPE_ACTION = true;
-//            GESTURE_ACTION = false;
-//            startPoint = new float[4];
-//            endPoint = new float[4];
-//            distance = new float[2];
-//        }
-        return super.dispatchTouchEvent(event);
-    }
+////                    ACTION_FINISHED = true;
+////                    break;
+////                case MotionEvent.ACTION_MOVE:
+//////                    if (viewPager.getCurrentItem() == 6
+//////                            && Math.abs(event.getX() - startPoint[0]) > 10
+//////                            && Math.abs(event.getY() - startPoint[1]) < Math.abs(event.getY() - startPoint[0])
+//////                            && progressDialog == null
+//////                            && IS_IN_VIEWPAGER_AREA
+//////                            && SWIPE_ACTION
+//////                            /*&& !yearCal.YEAR_LIST*/) {
+//////
+//////                    }
+////                    break;
+////            }
+////        if (ACTION_FINISHED) {
+////            int month = 0, year = 0;
+////            switch (touchAction) {
+////                case Right2Left:                                            //Increase Date by 1
+////                    switch (viewPager.getCurrentItem()) {
+////                        case 0:         // DayList view Mode
+////                            month = originalSelectedPersianDate.getiPersianMonth();
+////                            year = originalSelectedPersianDate.getiPersianYear();
+////                            originalSelectedDate.add(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
+////                            if (originalSelectedPersianDate.getiPersianYear() != year){
+////                                onDateChange(dayViewMode.Year);
+////                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+////                                onDateChange(dayViewMode.Month);
+////                            }else {
+////                                onDateChange(dayViewMode.DayEvent);
+////                            }
+////                            break;
+////                        case 1:         // DayFull View Mode
+////                            month = originalSelectedPersianDate.getiPersianMonth();
+////                            year = originalSelectedPersianDate.getiPersianYear();
+////                            originalSelectedDate.add(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.DATE, RIGHT_TO_LEFT_VALUE);
+////                            if (originalSelectedPersianDate.getiPersianYear() != year){
+////                                onDateChange(dayViewMode.Year);
+////                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+////                                onDateChange(dayViewMode.Month);
+////                            }else {
+////                                onDateChange(dayViewMode.DayFull);
+////                            }
+////                            break;
+////                        case 2:         // Month View Mode
+////                            year = originalSelectedPersianDate.getiPersianYear();
+////                            originalSelectedDate.add(Calendar.MONTH, RIGHT_TO_LEFT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.MONTH, RIGHT_TO_LEFT_VALUE);
+////                            if (originalSelectedPersianDate.getiPersianYear() != year){
+////                                onDateChange(dayViewMode.Year);
+////                            }else {
+////                                onDateChange(dayViewMode.Month);
+////                            }
+////                            break;
+////                        case 3:         // Year View Mode
+////                            originalSelectedDate.add(Calendar.YEAR, RIGHT_TO_LEFT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.YEAR, RIGHT_TO_LEFT_VALUE);
+////                            onDateChange(dayViewMode.Year);
+////                            break;
+////                    }
+////                    break;
+////                case Left2Right:                                            //Decrease Date by 1
+////                    switch (viewPager.getCurrentItem()) {
+////                        case 0:         // DayList view Mode
+////                            month = originalSelectedPersianDate.getiPersianMonth();
+////                            year = originalSelectedPersianDate.getiPersianYear();
+////                            originalSelectedDate.add(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
+////                            if (originalSelectedPersianDate.getiPersianYear() != year){
+////                                onDateChange(dayViewMode.Year);
+////                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+////                                onDateChange(dayViewMode.Month);
+////                            }else {
+////                                onDateChange(dayViewMode.DayEvent);
+////                            }
+////                            break;
+////                        case 1:         // DayFull View Mode
+////                            month = originalSelectedPersianDate.getiPersianMonth();
+////                            year = originalSelectedPersianDate.getiPersianYear();
+////                            originalSelectedDate.add(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.DATE, LEFT_TO_RIGHT_VALUE);
+////                            if (originalSelectedPersianDate.getiPersianYear() != year){
+////                                onDateChange(dayViewMode.Year);
+////                            }else if (originalSelectedPersianDate.getiPersianMonth() != month){
+////                                onDateChange(dayViewMode.Month);
+////                            }else {
+////                                onDateChange(dayViewMode.DayFull);
+////                            }
+////                            break;
+////                        case 2:         // Month View Mode
+////                            year = originalSelectedPersianDate.getiPersianYear();
+////                            originalSelectedDate.add(Calendar.MONTH, LEFT_TO_RIGHT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.MONTH, LEFT_TO_RIGHT_VALUE);
+////                            if (originalSelectedPersianDate.getiPersianYear() != year){
+////                                onDateChange(dayViewMode.Year);
+////                            }else {
+////                                onDateChange(dayViewMode.Month);
+////                            }
+////                            break;
+////                        case 3:         // Year View Mode
+////                            originalSelectedDate.add(Calendar.YEAR, LEFT_TO_RIGHT_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.YEAR, LEFT_TO_RIGHT_VALUE);
+////                            onDateChange(dayViewMode.Year);
+////                            break;
+////                    }
+////                    break;
+////                case Down2Up:                                               //Increase Parent Date by 1
+////                    switch (viewPager.getCurrentItem()) {
+////                        case 2:         // Month View Mode
+////                            originalSelectedDate.add(Calendar.YEAR, DOWN_TO_UP_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.YEAR, DOWN_TO_UP_VALUE);
+////                            onDateChange(dayViewMode.Year);
+////                            break;
+////                    }
+////                    break;
+////                case Up2Down:                                               //Decrease Parent Date by 1
+////                    switch (viewPager.getCurrentItem()) {
+////                        case 2:         // Month View Mode
+////                            originalSelectedDate.add(Calendar.YEAR, UP_TO_DOWN_VALUE);
+////                            originalSelectedPersianDate.addPersian(Calendar.YEAR, UP_TO_DOWN_VALUE);
+////                            onDateChange(dayViewMode.Year);
+////                            break;
+////                    }
+////                    break;
+////                case ZoomIn:
+////                    switch (viewPager.getCurrentItem()){
+//////                        case 0:
+//////                            daySwitch.switchView(1);
+////                        case 2:
+////                            monthView.monthSwitchView(1);
+////                            break;
+////                        case 3:
+////                            yearView.yearSwitchView(1);
+////                            break;
+////                    }
+////                    break;
+////                case ZoomOut:
+////                    switch (viewPager.getCurrentItem()){
+//////                        case 0:
+//////                            daySwitch.switchView(2);
+////                        case 2:
+////                            monthView.monthSwitchView(2);
+////                            break;
+////                        case 3:
+////                            yearView.yearSwitchView(2);
+////                            break;
+////                    }
+////                    break;
+////            }
+////        }
+////        if (event.getAction() == MotionEvent.ACTION_UP){
+////            ACTION_FINISHED = false;
+////            SWIPE_ACTION = true;
+////            GESTURE_ACTION = false;
+////            startPoint = new float[4];
+////            endPoint = new float[4];
+////            distance = new float[2];
+////        }
+//        return super.dispatchTouchEvent(event);
+//    }
 
     //update tabs date based on date changes
     public void onDateChange(dayViewMode view){
@@ -774,11 +772,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 }else
                     events.setEvent(eventTitle, eventDetail);
 
-//                if (mode == eventMode.NewEvent)
-//                    dayUCList.addEvent(events);
-//                else
-//                    dayUCList.updateEvent(events);
-                //TODO set event
+                if (mode == eventMode.NewEvent)
+                    dayEventFragment.addEvent(events);
+                else
+                    dayEventFragment.updateEvent(events);
+                //TODO add to DB
             }
 //        }
     }
@@ -833,29 +831,31 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             switch (position) {
                 case 0:
                     if (UPDATE_DAY_LIST) {
-//                        dayUCList.updateDayList();
+                        dayEventFragment.update();
                         UPDATE_DAY_LIST = false;
                     }
                     return dayEventFragment;
-//                    return daySwitch;
                 case 1:
                     if (UPDATE_DAY_FULL) {
 //                        dayUCFull.updateDayFull();
                         UPDATE_DAY_FULL = false;
                     }
-                    return dayUCFull;
+//                    return dayUCFull;
+                    return new Fragment();
                 case 2:
                     if (UPDATE_MONTH) {
-                        monthView.initialMonth(originalSelectedDate);
+//                        monthView.initialMonth(originalSelectedDate);
                         UPDATE_MONTH = false;
                     }
                     return monthView;
+//                    return new Fragment();
                 case 3:
                     if (UPDATE_YEAR) {
-                        yearView.initialYear();
+//                        yearView.initialYear();
                         UPDATE_YEAR = false;
                     }
-                    return yearView;
+//                    return yearView;
+                    return new Fragment();
             }
             return null;
         }

@@ -25,6 +25,22 @@ public class EventsListViewAdapter extends BaseAdapter {
         this.context = context;
     }
 
+    public void addItem(Events event){
+        eventListArray.add(event);
+        notifyDataSetChanged();
+    }
+
+    public void removeItem(int position){
+        eventListArray.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void updateItem(Events event, int position){
+        eventListArray.remove(position);
+        eventListArray.add(position, event);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return eventListArray.size();

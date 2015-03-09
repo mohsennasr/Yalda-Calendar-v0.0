@@ -1,16 +1,17 @@
 package co.yalda.nasr_m.yaldacalendar.Day;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,13 +35,10 @@ import static co.yalda.nasr_m.yaldacalendar.MainActivity.SELECTED_DAY_CHANGED;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_DAY_FULL;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_MONTH;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.UPDATE_YEAR;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.actionBarHeight;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.context;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.drawerOpen;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayEvent;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
-import static co.yalda.nasr_m.yaldacalendar.MainActivity.point;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.Left2Right;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.Right2Left;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.touchEvent.ZoomIn;
@@ -63,23 +60,23 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
     private float[] startPoint = new float[4];
     private float[] endPoint = new float[4];
     private float[] distance = new float[2];
+    private float dx, dy;
+    private Calendar calendar;
     private MainActivity.touchEvent touchAction;
     private boolean ACTION_FINISHED = false;
-    private boolean IS_IN_VIEWPAGER_AREA = false;
+    private ViewGroup container;
 
-    public static DayEventFragment newInstance(Calendar calendar) {
+    public static DayEventFragment newInstance(Calendar calendar, ViewGroup container) {
         DayEventFragment dayEventFragment = new DayEventFragment();
-        dayEventFragment.dayUC = DayUC.newInstance(calendar, false, dayViewMode.DayEvent);
-        LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        dayEventFragment.rootView = mInflater.inflate(R.layout.day_uc_list_mode_view, null);
+        dayEventFragment.calendar = Calendar.getInstance();
+        dayEventFragment.calendar.setTime(calendar.getTime());
+        dayEventFragment.container = container;
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        dayEventFragment.rootView = inflater.inflate(R.layout.day_uc_list_mode_view, container, false);
         dayEventFragment.eventList = (ListView) dayEventFragment.rootView.findViewById(R.id.day_list_mode_event_list);
+        dayEventFragment.dayUC = DayUC.newInstance(calendar, false, DayEvent, (ViewGroup) dayEventFragment.rootView);
         dayEventFragment.initial();
         return dayEventFragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -91,23 +88,54 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
     private void initial() {
         // TODO get data from DB
         eventsArrayList = new ArrayList<>();
-        Events events = Events.newInstance(context, Calendar.getInstance());
-        events.setEvent("asdf0", "asdfasdfasdfasdfa sdf ", "10:25", "16:56");
-        eventsArrayList.add(events);
+        for (int i=0; i< 20; i++) {
+            Events events = Events.newInstance(context, Calendar.getInstance());
+            events.setEvent("asdf0", "asdfasdfasdfasdfa sdf ", "10:25", "16:56");
+            eventsArrayList.add(events);
+        }
         eventsListViewAdapter = new EventsListViewAdapter(eventsArrayList, context);
 
+        eventList.setOnTouchListener(this);
+        rootView.setOnTouchListener(this);
         eventList.setAdapter(eventsListViewAdapter);
         eventsListViewAdapter.notifyDataSetChanged();
 
-        // show event detail on event list item click
-        eventList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        registerForContextMenu(eventList);
+    }
+
+    public void update(){
+        dayUC.updateDayHeader();
+        initial();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.day_list_mode_event_list) {
+            menu.setHeaderTitle("رویداد");
+            String[] menuItems = new String[]{"مشاهده","ویرایش", "حذف"};
+            for (int i = 0; i < menuItems.length; i++) {
+                menu.add(0, i, 0, menuItems[i]);
+            }
+        }
+    }
+
+    /**
+     * select action for selected event : Edit , Remove
+     *
+     * @param item selected item
+     * @return true
+     */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case 0:         // view event
                 String title, detail, start, end;
-                title = eventsArrayList.get(position).getTitle();
-                detail = eventsArrayList.get(position).getDescription();
-                start = eventsArrayList.get(position).getStartTime();
-                end = eventsArrayList.get(position).getEndTime();
+                title = eventsArrayList.get(info.position).getTitle();
+                detail = eventsArrayList.get(info.position).getDescription();
+                start = eventsArrayList.get(info.position).getStartTime();
+                end = eventsArrayList.get(info.position).getEndTime();
 
                 LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View eventView = mInflater.inflate(R.layout.event_show_dialog, null);
@@ -135,41 +163,8 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
 
                 //show dialog
                 inputNote.show();
-            }
-        });
-
-        // register for context menu on long click
-        registerForContextMenu(eventList);
-    }
-
-    public void update(){
-        dayUC.updateDayHeader();
-        initial();
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.getId() == R.id.day_list_mode_event_list) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            menu.setHeaderTitle("رویداد");
-            String[] menuItems = new String[]{"ویرایش", "حذف"};
-            for (int i = 0; i < menuItems.length; i++) {
-                menu.add(Menu.NONE, i, i, menuItems[i]);
-            }
-        }
-    }
-
-    /**
-     * select action for selected event : Edit , Remove
-     *
-     * @param item selected item
-     * @return true
-     */
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case 0:             //Edit Event
+                break;
+            case 1:             //Edit Event
                 Intent eventActivity = new Intent(context, AddEvent.class);
                 eventActivity.putExtra("EventMode", MainActivity.eventMode.EditEvent.toString());
                 eventActivity.putExtra("Title", eventsArrayList.get(info.position).getTitle());
@@ -183,11 +178,31 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
                 CURRENT_SELECTED_EVENT = info.position;
                 startActivityForResult(eventActivity, 0);
                 break;
-            case 1:             //remove event
-                eventsArrayList.remove(info.position);
-                eventsListViewAdapter = new EventsListViewAdapter(eventsArrayList, context);
-                eventList.setAdapter(eventsListViewAdapter);
-                eventsListViewAdapter.notifyDataSetChanged();
+            case 2:             //remove event
+                final TextView input = new TextView(context);
+                input.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+                input.setText("آیا از حذف رویداد اطمینان دارید؟");
+
+                //create dialog
+                AlertDialog.Builder remove = new AlertDialog.Builder(context);
+                remove.setTitle("خروج");
+                remove.setView(input);
+
+                //set dialog buttons
+                remove.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+//                        eventsArrayList.remove(info.position);
+//                        eventsListViewAdapter = new EventsListViewAdapter(eventsArrayList, context);
+//                        eventList.setAdapter(eventsListViewAdapter);
+//                        eventsListViewAdapter.notifyDataSetChanged();
+                        eventsListViewAdapter.removeItem(info.position);
+                    }
+                });
+                remove.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+                remove.show();
                 break;
         }
         return true;
@@ -196,7 +211,6 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        Toast.makeText(context, "touch event", Toast.LENGTH_SHORT).show();
         if ((event.getPointerCount() >= 2)) {     // multiTouch gesture
             SWIPE_ACTION = false;
             GESTURE_ACTION = true;
@@ -231,20 +245,12 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
         if (SWIPE_ACTION) {                  // swipe action
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    if ((event.getX() > point.x - 40) || (event.getY() <= actionBarHeight) || drawerOpen) {  //check for drawer touch
-                        IS_IN_VIEWPAGER_AREA = false;
-                        return false;
-                    } else
-                        IS_IN_VIEWPAGER_AREA = true;
                     startPoint[0] = event.getX();
                     startPoint[1] = event.getY();
                     break;
                 case MotionEvent.ACTION_UP:
-                    if (!IS_IN_VIEWPAGER_AREA)
-                        return false;
                     endPoint[0] = event.getX();
                     endPoint[1] = event.getY();
-                    float dx, dy;
                     dx = Math.abs(endPoint[0] - startPoint[0]);
                     dy = Math.abs(endPoint[1] - startPoint[1]);
                     if ((dx >= dy) && dx > 10) {
@@ -257,18 +263,6 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
                         return false;
                     }
                     ACTION_FINISHED = true;
-                    break;
-                case MotionEvent.ACTION_MOVE:
-//                    if (viewPager.getCurrentItem() == 6
-//                            && Math.abs(event.getX() - startPoint[0]) > 10
-//                            && Math.abs(event.getY() - startPoint[1]) < Math.abs(event.getY() - startPoint[0])
-//                            && progressDialog == null
-//                            && IS_IN_VIEWPAGER_AREA
-//                            && SWIPE_ACTION
-//                            /*&& !yearCal.YEAR_LIST*/) {
-//
-//                    }
-                    break;
             }
         }
         if (ACTION_FINISHED) {
@@ -325,6 +319,32 @@ public class DayEventFragment extends Fragment implements View.OnTouchListener {
             endPoint = new float[4];
             distance = new float[2];
         }
-        return true;
+        return false;
+    }
+
+    /**
+     //     * add new event to event list in dayList view mode
+     //     */
+    public void addEvent(Events events){
+//        eventsArrayList.add(events);
+//        eventsListViewAdapter = new EventsListViewAdapter(eventsArrayList, context);
+//        eventList.setAdapter(eventsListViewAdapter);
+//        eventsListViewAdapter.notifyDataSetChanged();
+        eventsListViewAdapter.addItem(events);
+    }
+
+    /**
+     * update event list
+     */
+    public void updateEvent(Events events){
+        if (CURRENT_SELECTED_EVENT >=0) {
+//            eventsArrayList.remove(CURRENT_SELECTED_EVENT);
+//            eventsArrayList.add(CURRENT_SELECTED_EVENT, events);
+//            eventsListViewAdapter = new EventsListViewAdapter(eventsArrayList, context);
+//            eventList.setAdapter(eventsListViewAdapter);
+//            eventsListViewAdapter.notifyDataSetChanged();
+//            CURRENT_SELECTED_EVENT = -1;
+            eventsListViewAdapter.updateItem(events, CURRENT_SELECTED_EVENT);
+        }
     }
 }
