@@ -3,9 +3,11 @@ package co.yalda.nasr_m.yaldacalendar.Calendars;
 import java.util.Calendar;
 import java.util.Date;
 
-import co.yalda.nasr_m.yaldacalendar.Converters.MiladiToSolarConverter;
+import co.yalda.nasr_m.yaldacalendar.Converters.JalaliCalendar;
 import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
+
+import static co.yalda.nasr_m.yaldacalendar.Converters.JalaliCalendar.YearMonthDate;
 
 /**
  * Created by Nasr_M on 2/17/2015.
@@ -13,14 +15,21 @@ import co.yalda.nasr_m.yaldacalendar.MainActivity;
 public class PersianCalendar extends Calendar{
 
     private Calendar miladiDate = getInstance();
+    private JalaliCalendar converter = new JalaliCalendar();
     private int iPersianYear, iPersianMonth, iPersianDate, iPersianWeekDay, iPersianFirstDayOfWeek;
+    private String persianYear, persianMonth, persianDay, persianFullDate;
     private String persianMonthName, persianDayName, sPersianFirstDayOfWeek;
     public static String[] persianMonthNames = new String[]{"فروردین", "اردیبهشت", "خرداد"
             , "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
-    private String[] persianWeekDayNames = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "چمعه"};
+    private String[] persianWeekDayNames = new String[]{"شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"};
     String[] miladiMonthName = {"January", "February", "March", "April", "May", "June", "July",                   // Miladi Month Names
                 "August", "September", "October", "November", "December"};
     private int[] monthDays = new int[]{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
+
+    private enum CalendarChanged{
+        Jalali,
+        Gregorian
+    }
 
     public PersianCalendar(Calendar cal) {
         this.miladiDate.setTime(cal.getTime());
@@ -36,13 +45,20 @@ public class PersianCalendar extends Calendar{
 
 
     private void calculateDate() {
-        String[] convertedDate = MiladiToSolarConverter.getCurrentShamsidate(miladiDate);
+//        if (change == CalendarChanged.Jalali) {
+//            miladiDate.setTime(converter.getGregorianDate(persianFullDate));
+//        }else {
+//        }
+
+        persianFullDate = converter.getJalaliDate(miladiDate.getTime());
+        persianFullDate = persianYear + "/" + persianMonth + "/" + persianDay;
+        String[] convertedDate = persianFullDate.split("/");
         iPersianYear = Integer.valueOf(convertedDate[0]);
         iPersianMonth = Integer.valueOf(convertedDate[1]);      // 1-12
         iPersianDate = Integer.valueOf(convertedDate[2]);
-        persianMonthName = convertedDate[3];
-        persianDayName = convertedDate[4];
+        persianMonthName = persianMonthNames[iPersianMonth-1];
         iPersianWeekDay = miladiDate.get(DAY_OF_WEEK);
+        persianDayName = persianWeekDayNames[iPersianWeekDay%7];
     }
 
     public int getMaxDayOfMonth() {
@@ -98,15 +114,18 @@ public class PersianCalendar extends Calendar{
     public void setPersian(int field, int amount) {
         switch (field) {
             case YEAR:
-                miladiDate.add(YEAR, amount - iPersianYear);
+                miladiDate.setTime(converter.getGregorianDate(amount + "/" + persianMonth + "/" + persianDay));
+//                miladiDate.add(YEAR, amount - iPersianYear);
                 calculateDate();
                 break;
             case MONTH:
-                miladiDate.add(MONTH, amount - iPersianMonth + 1);
+                miladiDate.setTime(converter.getGregorianDate(persianYear + "/" + amount + "/" + persianDay));
+//                miladiDate.add(MONTH, amount - iPersianMonth + 1);
                 calculateDate();
                 break;
             case DATE:
-                miladiDate.add(DATE, amount - iPersianDate);
+                miladiDate.setTime(converter.getGregorianDate(persianYear + "/" + persianMonth + "/" + amount));
+//                miladiDate.add(DATE, amount - iPersianDate);
                 calculateDate();
                 break;
         }
@@ -124,7 +143,7 @@ public class PersianCalendar extends Calendar{
         return iPersianMonth;
     }
 
-    public int getiPersianDate() {
+    public int getiPersianDay() {
         return iPersianDate;
     }
 
@@ -181,14 +200,8 @@ public class PersianCalendar extends Calendar{
     }
 
     public void setPersian(int year, int month, int day) {
-        addPersian(YEAR, year - iPersianYear);
-        addPersian(MONTH, month - iPersianMonth);
-        addPersian(DATE, day - iPersianDate);
-
-//        miladiDate.add(YEAR, year - iPersianYear);
-//        miladiDate.add(MONTH, month - iPersianMonth + 1);
-//        miladiDate.add(DATE, day - iPersianDate);
-//        calculateDate();
+        miladiDate.setTime(converter.getGregorianDate(year + "/" + month + "/" + day));
+        calculateDate();
     }
 
     public void addPersian(int field, int amount){
@@ -202,33 +215,18 @@ public class PersianCalendar extends Calendar{
             case MONTH:
                 int dayCount = 0, currentYear = iPersianYear;
                 if (amount > 0) {
-                    for (int i = iPersianMonth; i < amount + iPersianMonth; i++) {
-                        if (((i % 12) <= 6) && (i % 12) != 0 ) {
-                            dayCount += 31;
-                        } else if (((i % 12) > 6) || isLeap(currentYear)) {
-                            dayCount += 30;
-                        } else {
-                            dayCount += 29;
-                        }
-                        if ((i / 12) >= 1) {
-                            currentYear++;
-                        }
-                    }
+                    YearMonthDate yearMonthDate = new YearMonthDate(iPersianYear, iPersianMonth-1, iPersianDate);
+                    YearMonthDate converted = JalaliCalendar.jalaliToGregorian(yearMonthDate);
+
+                    miladiDate.set(converted.getYear(), converted.getMonth(), converted.getDate());
+                    calculateDate();
                 }else{
-                    for (int i = iPersianMonth; i > iPersianMonth + amount; i--) {
-                        if ((Math.abs(i) / 12) >= 1) {
-                            currentYear--;
-                        }
-                        if ((Math.abs(i) % 12) <= 7 && (Math.abs(i) % 12) > 1) {
-                            dayCount += 31;
-                        } else if (((Math.abs(i) % 12) > 7) || ((Math.abs(i) % 12) == 0 ) || isLeap(currentYear)) {
-                            dayCount += 30;
-                        } else {
-                            dayCount += 29;
-                        }
-                    }
+
+                    YearMonthDate yearMonthDate = new YearMonthDate(iPersianYear, (iPersianMonth-1)%12, iPersianDate);
+                    YearMonthDate converted = JalaliCalendar.jalaliToGregorian(yearMonthDate);
+                    miladiDate.set(converted.getYear(), converted.getMonth(), converted.getDate());
+                    calculateDate();
                 }
-                miladiDate.add(DATE, amount > 0 ? dayCount : - dayCount);
                 calculateDate();
                 break;
             case DATE:

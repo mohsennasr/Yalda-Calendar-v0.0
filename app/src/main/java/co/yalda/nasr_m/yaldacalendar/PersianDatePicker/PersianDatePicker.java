@@ -133,7 +133,7 @@ public class PersianDatePicker extends LinearLayout {
 		 */
         dayNumberPicker.setMinValue(1);
         dayNumberPicker.setMaxValue(31);
-        int selectedDay = a.getInteger(R.styleable.PersianDatePicker_selectedDay, pCalendar.getiPersianDate());
+        int selectedDay = a.getInteger(R.styleable.PersianDatePicker_selectedDay, pCalendar.getiPersianDay());
         if (selectedDay > 31 || selectedDay < 1) {
             throw new IllegalArgumentException(String.format("Selected day (%d) must be between 1 and 31", selectedDay));
         }
@@ -172,7 +172,7 @@ public class PersianDatePicker extends LinearLayout {
     public void setDisplayPersianDate(PersianCalendar displayPersianDate) {
         int year = displayPersianDate.getiPersianYear();
         int month = displayPersianDate.getiPersianMonth()+1;
-        int day = displayPersianDate.getiPersianDate();
+        int day = displayPersianDate.getiPersianDay();
         if (month > 6 && month < 12 && day == 31) {
             day = 30;
         } else {

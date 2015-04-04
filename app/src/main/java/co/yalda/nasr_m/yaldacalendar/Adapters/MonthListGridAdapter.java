@@ -74,4 +74,9 @@ public class MonthListGridAdapter extends BaseAdapter{
 
         return convertView;
     }
+
+    public void setSelected(int position){
+        currentPosition = position;
+        notifyDataSetChanged();
+    }
 }

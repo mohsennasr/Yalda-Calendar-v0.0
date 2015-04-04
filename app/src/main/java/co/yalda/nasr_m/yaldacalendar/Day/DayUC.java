@@ -24,6 +24,7 @@ import co.yalda.nasr_m.yaldacalendar.Converters.PersianUtil;
 import co.yalda.nasr_m.yaldacalendar.MainActivity;
 import co.yalda.nasr_m.yaldacalendar.R;
 
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.currentPersianCalendar;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayEvent;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.DayFull;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode.Month;
@@ -48,9 +49,9 @@ public class DayUC extends Fragment{
     private Calendar miladiCalendar;                                                                                // Day Base Calendar
     private ArabicCalendar arabicCalendar;                             // Arabic Calendar
     private MainActivity.dayViewMode dayViewMode;                                                                   // Day View Mode -> Year, Month, DayList, DayFull
-    private DayUC thisDay;
     private ViewGroup container;
     private LayoutInflater mInfalater;                                                                              // Layout Inflater
+    public boolean isSelected = false;
 
     /**
      * return new instance of class
@@ -239,7 +240,7 @@ public class DayUC extends Fragment{
         switch (MainActivity.mainCalendarType) {
             case Solar:
                 mainDate_TV.setTypeface(homaFont);
-                mainDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
+                mainDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDay()));
                 break;
             case Gregorian:
                 mainDate_TV.setTypeface(timesFont);
@@ -278,13 +279,16 @@ public class DayUC extends Fragment{
                 thirdDate_TV.setTextColor(Color.RED);
         }
 
-        setSelectedDay();
+        if (persianCalendar.getiPersianDay() == originalSelectedPersianDate.getiPersianDay()
+                || persianCalendar.persianCompare(currentPersianCalendar) == 0) {
+            setSelectedDay();
+        }
 
         mainDate_TV.setTypeface(homaFont);
         switch (MainActivity.mainCalendarType) {
             case Solar:
                 mainDate_TV.setTypeface(homaFont);
-                mainDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
+                mainDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDay()));
                 break;
             case Gregorian:
                 mainDate_TV.setTypeface(timesFont);
@@ -300,7 +304,7 @@ public class DayUC extends Fragment{
             switch (MainActivity.secondCalendarType) {
                 case Solar:
                     secondDate_TV.setTypeface(homaFont);
-                    secondDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
+                    secondDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDay()));
                     break;
                 case Gregorian:
                     secondDate_TV.setTypeface(timesFont);
@@ -317,7 +321,7 @@ public class DayUC extends Fragment{
             switch (MainActivity.thirdCalendarType) {
                 case Solar:
                     thirdDate_TV.setTypeface(homaFont);
-                    thirdDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
+                    thirdDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDay()));
                     break;
                 case Gregorian:
                     thirdDate_TV.setTypeface(timesFont);
@@ -341,7 +345,6 @@ public class DayUC extends Fragment{
         persianCalendar.setMiladiDate(miladiCalendar);
         arabicCalendar.setBaseMiladiCalendar(miladiCalendar);
         this.isEnable = isEnable;
-        unSetSelectedDay();
         checkHoliday();
         initialMonth();
     }
@@ -365,12 +368,15 @@ public class DayUC extends Fragment{
      * set border for seleted day in month/year view
      */
     public void setSelectedDay(){
-        if (persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) == 0 && isEnable) {     // if it's today, set background
+        if (lastUCDaySelected != null)
+            lastUCDaySelected.unSetSelectedDay();
+        if (persianCalendar.persianCompare(currentPersianCalendar) == 0 && isEnable) {     // if it's today, set background
             rootView.setBackgroundResource(R.drawable.background_rectangle);
-            lastUCDaySelected = this;
-        }else if (persianCalendar.persianCompare(originalSelectedPersianDate) == 0 && isEnable) {               // if it's selected day, set border
+        }else if (persianCalendar.getiPersianDay() == originalSelectedPersianDate.getiPersianDay() && isEnable) {               // if it's selected day, set border
             rootView.setBackgroundResource(R.drawable.border_rectangle);
         }
+        isSelected = true;
+        lastUCDaySelected = this;
     }
 
     /**
@@ -378,8 +384,10 @@ public class DayUC extends Fragment{
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void unSetSelectedDay(){
-        if (persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) != 0)
+        if (persianCalendar.persianCompare(new PersianCalendar(Calendar.getInstance())) != 0) {
             rootView.setBackground(null);
+            isSelected = false;
+        }
     }
 
     /**

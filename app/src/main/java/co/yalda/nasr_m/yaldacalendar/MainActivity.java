@@ -58,6 +58,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static calendarType thirdCalendarType = calendarType.Hejri;
     public static Calendar originalSelectedDate = Calendar.getInstance();
     public static PersianCalendar originalSelectedPersianDate = new PersianCalendar(Calendar.getInstance());
+    public static Calendar currentCalendar = Calendar.getInstance();
+    public static PersianCalendar currentPersianCalendar = new PersianCalendar(Calendar.getInstance());
     public static String[] dayWeekHoliday = new String[]{"5", "6"} ;
     public static List<OCCVAC> holiday;
     public static Context context;
@@ -207,7 +209,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         dayEventFragment = DayEventFragment.newInstance(originalSelectedDate, viewPager);
 
 //        dayUCFull = DayUC.newInstance(Calendar.getInstance(), false, dayViewMode.DayFull);
-        monthView = MonthView.newInstance(Calendar.getInstance(), dayViewMode.Month, viewPager);
+        monthView = MonthView.newInstance(currentPersianCalendar.getiPersianMonth(), dayViewMode.Month, viewPager);
 //        yearView = YearView.newInstance(Calendar.getInstance());
 
         getOverflowMenu();
@@ -608,7 +610,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     //update tabs date based on date changes
     public void onDateChange(dayViewMode view){
 //        SELECTED_MONTH_INDEX = originalSelectedPersianDate.getiPersianMonth() -1;
-//        SELECTED_DAY_INDEX = originalSelectedPersianDate.getiPersianDate() + originalSelectedPersianDate.persianPreMonthRemainingDay();
+//        SELECTED_DAY_INDEX = originalSelectedPersianDate.getiPersianDay() + originalSelectedPersianDate.persianPreMonthRemainingDay();
 //        switch (view) {
 //            case DayList:
 //                dayUCList.updateDayList();
@@ -855,7 +857,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         UPDATE_YEAR = false;
                     }
 //                    return yearView;
-                    return new Fragment();
+                    return new Test();
             }
             return null;
         }

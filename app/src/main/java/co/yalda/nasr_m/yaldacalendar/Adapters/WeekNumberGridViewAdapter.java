@@ -61,4 +61,8 @@ public class WeekNumberGridViewAdapter extends BaseAdapter {
 
         return convertView;
     }
+
+    public void update(ArrayList<String> gridList){
+        this.gridList = gridList;
+    }
 }

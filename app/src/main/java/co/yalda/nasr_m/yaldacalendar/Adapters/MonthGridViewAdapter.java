@@ -8,10 +8,13 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import co.yalda.nasr_m.yaldacalendar.Day.DayUC;
 
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.dayViewMode;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.lastUCDaySelected;
+import static co.yalda.nasr_m.yaldacalendar.MainActivity.originalSelectedPersianDate;
 import static co.yalda.nasr_m.yaldacalendar.MainActivity.viewSize;
 
 /**
@@ -66,5 +69,14 @@ public class MonthGridViewAdapter extends BaseAdapter {
     @Override
     public boolean isEnabled(int position) {
         return gridList.get(position).isEnable;
+    }
+
+    public void update(Calendar calendar, int position, boolean isEnable){
+        gridList.get(position).updateMonth(calendar, isEnable);
+        if (gridList.get(position).persianCalendar.getiPersianDay() == originalSelectedPersianDate.getiPersianDay()
+                && gridList.get(position).isEnable){
+            gridList.get(position).setSelectedDay();
+            lastUCDaySelected = gridList.get(position);
+        }
     }
 }

@@ -249,7 +249,7 @@
 //        switch (MainActivity.mainCalendarType) {
 //            case Solar:
 //                mainDate_TV.setTypeface(homaFont);
-//                mainDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
+//                mainDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDay()));
 //                break;
 //            case Gregorian:
 //                mainDate_TV.setTypeface(timesFont);
@@ -265,7 +265,7 @@
 //            switch (MainActivity.secondCalendarType) {
 //                case Solar:
 //                    secondDate_TV.setTypeface(homaFont);
-//                    secondDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
+//                    secondDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDay()));
 //                    break;
 //                case Gregorian:
 //                    secondDate_TV.setTypeface(timesFont);
@@ -282,7 +282,7 @@
 //            switch (MainActivity.thirdCalendarType) {
 //                case Solar:
 //                    thirdDate_TV.setTypeface(homaFont);
-//                    thirdDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDate()));
+//                    thirdDate_TV.setText(PersianUtil.toPersian(persianCalendar.getiPersianDay()));
 //                    break;
 //                case Gregorian:
 //                    thirdDate_TV.setTypeface(timesFont);
@@ -495,7 +495,7 @@
 ////        String[] PDate = new String[5];
 ////        PDate[0] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianYear()));
 ////        PDate[1] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianMonth()));
-////        PDate[2] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianDate()));
+////        PDate[2] = PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianDay()));
 ////        PDate[3] = persianCalendar.getPersianMonthName();
 ////        PDate[4] = persianCalendar.getPersianDayName();
 ////
@@ -528,14 +528,14 @@
 //        holyDayNote.setTextColor(firstTextColor);
 //        dayName.setText(persianCalendar.getPersianDayName());
 //        dayName.setTextColor(firstTextColor);
-//        dayDate.setText(PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianDate())));
+//        dayDate.setText(PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianDay())));
 //        dayDate.setTextColor(firstTextColor);
 //        monthName.setText(persianCalendar.getPersianMonthName());
 //        monthName.setTextColor(firstTextColor);
 //        jalaliFulldate.setText(persianCalendar.getPersianMonthName() + " "
 //                + PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianYear())));
 //        jalaliFulldate.setTextColor(secondTextColor);
-//        jalaliDate.setText(PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianDate())));
+//        jalaliDate.setText(PersianUtil.convertDigits(String.valueOf(persianCalendar.getiPersianDay())));
 //        jalaliDate.setTextColor(secondTextColor);
 //        miladiFullDate.setText(originalSelectedDate.get(Calendar.YEAR) + " "
 //                + MonthName[originalSelectedDate.get(Calendar.MONTH)]);
